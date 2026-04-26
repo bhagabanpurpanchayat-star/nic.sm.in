@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Member Entry Form</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .glass-container {
+      width: 100%;
+      max-width: 1600px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s ease-in-out;
+    }
+    .refresh-btn:hover { background: rgba(0,123,255,0.2); }
+    .progress-wrapper {
+      flex-grow: 1;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .progress-bar {
+      flex-grow: 1;
+      height: 14px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        #ff9800 0%,
+        #ffeb3b 30%,
+        #ffffff 50%,
+        #ffeb3b 70%,
+        #ff9800 100%
+      );
+      background-size: 200% 100%;
+      animation: spark 0.5s linear infinite;
+    }
+    @keyframes spark {
+      from { background-position: 200% 0; }
+      to   { background-position: 0 0; }
+    }
+    .progress-text {
+      min-width: 50px;
+      font-size: 14px;
+      color: #333;
+      font-weight: 600;
+    }
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1200px;
+    }
+    th, td {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 14px 10px;
+      text-align: center;
+      vertical-align: middle;
+      color: #333;
+      font-size: 14px;
+    }
+    thead th {
+      background: #2c3e50;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.7); }
+    input, select, textarea {
+      width: 95%;
+      box-sizing: border-box;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 8px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+    }
+    textarea { resize: none; height: 36px; }
+    input[type="file"] { width: auto; }
+    .actions { min-width: 150px; white-space: nowrap; }
+    .actions button,
+    .add-row {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 0 2px;
+      transition: all 0.2s ease;
+    }
+    .actions button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .save-btn { color: #007BFF; }
+    .edit-btn { color: #FF9800; }
+    .delete-btn { color: #E91E63; }
+    .add-row { margin-top: 15px; color: #28a745; }
+  </style>
+</head>
+<body>
+
+<div class="glass-container">
+  <h2>Member,Staff & Supporting Staff Entry Module</h2>
+
+  <div class="toolbar">
+    <div class="progress-wrapper">
+      <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+      <div class="progress-text">0%</div>
+    </div>
+    <button type="button" class="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+  </div>
+
+  <form id="memberForm">
+    <div class="table-container">
+      <table id="memberTable">
+        <thead>
+          <tr>
+            <th>SL No</th>
+            <th>SANSAD</th>
+            <th>Member Name</th>
+            <th>Guardian</th>
+            <th>Gender</th>
+            <th>PRI Rank</th>
+            <th>Local Address</th>
+            <th>Contact No</th>
+            <th>Photo</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button type="button" class="add-row" onclick="addRow()">+ Add Row</button>
+  </form>
+</div>
+
+<script>
+  const endpoint = "https://script.google.com/macros/s/AKfycbxoe-GnEQtyWpe6P6V85DgyG4XNjb9YhnQ7G_n23WBPgDJycRdUer9xXBvcB_lwAzuxgg/exec";
+
+  let progressInterval;
+
+  function startProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    let percent = 0;
+    wrapper.style.display = "flex";
+    fill.style.width = "0%";
+    text.textContent = "0%";
+
+    progressInterval = setInterval(() => {
+      percent += 2;
+      if (percent > 100) percent = 100;
+      fill.style.width = percent + "%";
+      text.textContent = percent + "%";
+      if (percent === 100) clearInterval(progressInterval);
+    }, 80); // smooth increment
+  }
+
+  function endProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    clearInterval(progressInterval);
+    fill.style.width = "100%";
+    text.textContent = "100%";
+    setTimeout(() => { wrapper.style.display = "none"; }, 600);
+  }
+
+  async function refreshData() {
+    startProgress();
+    await loadData();
+    endProgress();
+  }
+
+  async function loadData() {
+    const tbody = document.querySelector("#memberTable tbody");
+    tbody.innerHTML = "";
+    const res = await fetch(endpoint);
+    const records = await res.json();
+
+    if (!records.length) { addRow(); return; }
+
+    records.forEach((data, i) => {
+      const tr = document.createElement("tr");
+      tr.setAttribute("data-rowindex", data.rowIndex);
+      const hasName = data["Member Name"] && data["Member Name"].trim() !== "";
+
+      tr.innerHTML = `
+        <td><input type="text" name="slno[]" value="${i+1}" readonly></td>
+        <td><input type="text" name="sansad[]" value="${data["SANSAD"]||""}"></td>
+        <td><input type="text" name="membername[]" value="${data["Member Name"]||""}"></td>
+        <td><input type="text" name="guardian[]" value="${data["Gurdian"]||""}"></td>
+        <td>
+          <select name="gender[]">
+            <option ${!data["GENDER"]?"selected":""}></option>
+            <option ${data["GENDER"]=="Male"?"selected":""}>Male</option>
+            <option ${data["GENDER"]=="Female"?"selected":""}>Female</option>
+            <option ${data["GENDER"]=="Other"?"selected":""}>Other</option>
+          </select>
+        </td>
+        <td><input type="text" name="prirank[]" value="${data["PRI RANK"]||""}"></td>
+        <td><textarea name="localaddress[]">${data["Local Address"]||""}</textarea></td>
+        <td><input type="text" name="contact[]" value="${data["Contact No"]||""}"></td>
+        <td>
+          <input type="file" name="photo[]" accept="image/*">
+          ${data["Photo"] ? `<br><a href="${data["Photo"]}" target="_blank">View</a>` : ""}
+        </td>
+        <td class="actions">
+          <button type="button" class="save-btn" ${hasName ? "disabled" : ""} onclick="handleSaveClick(this, ${hasName})">💾 Save</button>
+          <button type="button" class="edit-btn" onclick="updateRow(this)">✏️ Update</button>
+          <button type="button" class="delete-btn" onclick="deleteRow(this)">🗑️ Delete</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addRow() {
+    const tbody = document.querySelector("#memberTable tbody");
+    const rowCount = tbody.rows.length + 1;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" name="slno[]" value="${rowCount}" readonly></td>
+      <td><input type="text" name="sansad[]"></td>
+      <td><input type="text" name="membername[]"></td>
+      <td><input type="text" name="guardian[]"></td>
+      <td>
+        <select name="gender[]">
+          <option value="">Select</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </td>
+      <td><input type="text" name="prirank[]"></td>
+      <td><textarea name="localaddress[]"></textarea></td>
+      <td><input type="text" name="contact[]"></td>
+      <td><input type="file" name="photo[]" accept="image/*"></td>
+      <td class="actions">
+        <button type="button" class="save-btn" onclick="handleSaveClick(this, false)">💾 Save</button>
+        <button type="button" class="edit-btn" onclick="updateRow(this)">✏️ Update</button>
+        <button type="button" class="delete-btn" onclick="deleteRow(this)">🗑️ Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  }
+
+  function handleSaveClick(btn, isExisting) {
+    if (isExisting) {
+      alert("You can Edit/Delete this record.");
+    } else {
+      saveRow(btn);
+    }
+  }
+
+  async function saveRow(btn) {
+    btn.disabled = true; btn.textContent = "💾 Saving...";
+    const row = btn.closest("tr");
+    const inputs = row.querySelectorAll("input, select, textarea");
+    const formData = new FormData();
+    formData.append("action", "save");
+    inputs.forEach(el => {
+      if (el.type === "file" && el.files[0]) formData.append("photo", el.files[0]);
+      else formData.append(el.name.replace("[]",""), el.value);
+    });
+    const res = await fetch(endpoint, { method: "POST", body: formData });
+    btn.textContent = "💾 Save"; btn.disabled = false;
+    console.log(await res.text());
+  }
+
+  async function updateRow(btn) {
+    btn.disabled = true; btn.textContent = "✏️ Updating...";
+    const row = btn.closest("tr");
+    const rowIndex = row.getAttribute("data-rowindex");
+    const inputs = row.querySelectorAll("input, select, textarea");
+    const formData = new FormData();
+    formData.append("action", "update");
+    formData.append("rowIndex", rowIndex);
+    inputs.forEach(el => {
+      if (el.type === "file" && el.files[0]) formData.append("photo", el.files[0]);
+      else formData.append(el.name.replace("[]",""), el.value);
+    });
+    const res = await fetch(endpoint, { method: "POST", body: formData });
+    btn.textContent = "✏️ Update"; btn.disabled = false;
+    console.log(await res.text());
+  }
+
+  async function deleteRow(btn) {
+    if (!confirm("Delete this row?")) return;
+    btn.disabled = true; btn.textContent = "🗑️ Deleting...";
+    const row = btn.closest("tr");
+    const rowIndex = row.getAttribute("data-rowindex");
+    const formData = new FormData();
+    formData.append("action", "delete");
+    formData.append("rowIndex", rowIndex);
+    const res = await fetch(endpoint, { method: "POST", body: formData });
+    btn.textContent = "🗑️ Delete"; btn.disabled = false;
+    console.log(await res.text());
+  }
+
+  // Auto load on page open
+  window.addEventListener("load", () => refreshData());
+</script>
+</body>
+</html>

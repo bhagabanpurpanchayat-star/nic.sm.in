@@ -1,0 +1,1001 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NIT Template Preview</title>
+  <style>
+    :root {
+      --a4-width: 210mm;
+      --a4-height: 297mm;
+      --primary-color: #1a73e8;
+      --secondary-color: #155ab6;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #333;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin: 0 0 20px 0;
+      color: var(--primary-color);
+      font-size: 32px;
+      text-align: center;
+      padding-bottom: 15px;
+      border-bottom: 3px solid var(--primary-color);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .header-subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    .controls-panel {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+      width: 100%;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #444;
+      font-size: 14px;
+    }
+
+    select {
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      font-size: 16px;
+      background: white;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 48px;
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      background: #a0c4ff;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #00695c, #00897b);
+      box-shadow: 0 2px 8px rgba(0, 105, 92, 0.3);
+    }
+    
+    .btn-print:hover:not(:disabled) {
+      background: linear-gradient(135deg, #00897b, #009688);
+      box-shadow: 0 4px 12px rgba(0, 105, 92, 0.4);
+    }
+
+    .btn-export {
+      background: linear-gradient(135deg, #8e24aa, #ab47bc);
+      box-shadow: 0 2px 8px rgba(142, 36, 170, 0.3);
+    }
+    
+    .btn-export:hover:not(:disabled) {
+      background: linear-gradient(135deg, #ab47bc, #ba68c8);
+      box-shadow: 0 4px 12px rgba(142, 36, 170, 0.4);
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      display: none;
+      font-size: 14px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid transparent;
+    }
+    
+    .status.loading {
+      background: #e3f2fd;
+      color: #1565c0;
+      border-color: #bbdefb;
+      display: block;
+    }
+    
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+      border-color: #ffcdd2;
+      display: block;
+    }
+    
+    .status.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-color: #c8e6c9;
+      display: block;
+    }
+
+    /* A4 Preview Container */
+    .a4-preview-container {
+      width: 100%;
+      max-width: 1000px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+      overflow: hidden;
+      margin: 0 auto 30px;
+    }
+
+    .preview-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 18px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .preview-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .preview-info {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .info-item {
+      background: rgba(255,255,255,0.15);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* A4 Paper Simulation */
+    .a4-paper {
+      width: var(--a4-width);
+      height: var(--a4-height);
+      background: white;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      margin: 20px auto;
+      padding: 15mm 20mm;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #e0e0e0;
+    }
+
+    /* Print-specific styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      
+      .a4-paper, .a4-paper * {
+        visibility: visible;
+      }
+      
+      .a4-paper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: var(--a4-width);
+        height: var(--a4-height);
+        margin: 0;
+        padding: 15mm 20mm;
+        box-shadow: none;
+        border: none;
+      }
+      
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+      .a4-paper {
+        width: 100%;
+        height: auto;
+        min-height: var(--a4-height);
+        transform: scale(0.85);
+        transform-origin: top center;
+        padding: 10mm 15mm;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .control-group {
+        min-width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        margin: 10px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .controls-panel {
+        padding: 15px;
+      }
+      
+      .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+      
+      .a4-paper {
+        transform: scale(0.75);
+        margin: 10px auto;
+      }
+    }
+
+    /* Loading animation */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Preview content area */
+    #preview-content {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: #fafafa;
+    }
+    
+    .template-content {
+      width: 100%;
+      min-height: 100%;
+      background: white;
+      padding: 0;
+    }
+    
+    /* Preview controls */
+    .preview-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      flex-wrap: wrap;
+    }
+    
+    .preview-controls button {
+      padding: 8px 16px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .preview-controls button:hover {
+      background: #5a6268;
+    }
+    
+    /* Document info panel */
+    .doc-info-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      font-size: 13px;
+      color: #666;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    /* Fix for template tables in PDF */
+    .preview-content-fix table {
+      width: 100% !important;
+      max-width: 100% !important;
+      table-layout: fixed !important;
+    }
+    
+    .preview-content-fix td, 
+    .preview-content-fix th {
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+    }
+  </style>
+</head>
+<body>
+  <h1>NIT Document Preview System</h1>
+  <div class="header-subtitle">Annexure-1 / Notice Inviting Tender</div>
+
+  <div class="controls-panel">
+    <div class="controls">
+      <div class="control-group">
+        <label for="nitSelect">📋 Select NIT Number</label>
+        <select id="nitSelect">
+          <option value="">-- Loading NITs from database --</option>
+        </select>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn" id="previewBtn">
+          <span>🔍</span>
+          Preview Document
+        </button>
+        
+        <button class="btn btn-print" id="printBtn" disabled>
+          <span>🖨️</span>
+          Print A4
+        </button>
+        
+        <button class="btn btn-export" id="exportBtn" disabled>
+          <span>📥</span>
+          Export DOC
+        </button>
+        
+        <button class="btn" id="pdfBtn" disabled style="background: linear-gradient(135deg, #d32f2f, #f44336);">
+          <span>📄</span>
+          Save PDF
+        </button>
+      </div>
+    </div>
+    
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="a4-preview-container no-print">
+    <div class="preview-header">
+      <h3>📄 A4 Document Preview</h3>
+      <div class="preview-info">
+        <span class="info-item" id="pageInfo">📄 Page: 1/1</span>
+        <span class="info-item" id="scaleInfo">🔍 Scale: 100%</span>
+        <span class="info-item" id="docInfo">📋 Ready</span>
+        <span class="info-item" id="rowsInfo">📊 Rows: 0</span>
+      </div>
+    </div>
+    
+    <div class="doc-info-panel">
+      <div id="nitInfo">NIT: Not selected</div>
+      <div id="dateInfo">Date: --/--/----</div>
+    </div>
+    
+    <div class="a4-paper">
+      <div id="preview-content">
+        <!-- Template will be loaded here -->
+        <div style="text-align: center; padding: 100px 20px; color: #999; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <div style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;">📄</div>
+          <h3 style="color: #666; margin-bottom: 10px;">No Document Selected</h3>
+          <p>Select a NIT number and click "Preview Document" to view the A4 template</p>
+          <p style="font-size: 12px; margin-top: 20px; color: #888;">Format: A4 (210mm × 297mm)</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="preview-controls">
+      <button onclick="zoomOut()" title="Zoom Out">➖ Zoom Out</button>
+      <button onclick="resetZoom()" title="Reset Zoom">🔄 Reset (100%)</button>
+      <button onclick="zoomIn()" title="Zoom In">➕ Zoom In</button>
+      <button onclick="fitToPage()" title="Fit to Page">📏 Fit to Page</button>
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = "https://script.google.com/macros/s/AKfycbxjLM4BeEGxDBNCAwY44vFBC833gGkJzWpG-Cdb2IQQnGIwe0y91S5lQ9G-OmQl8xKn7A/exec";
+
+    // DOM Elements
+    const elements = {
+      nitSelect: document.getElementById("nitSelect"),
+      previewBtn: document.getElementById("previewBtn"),
+      printBtn: document.getElementById("printBtn"),
+      exportBtn: document.getElementById("exportBtn"),
+      pdfBtn: document.getElementById("pdfBtn"),
+      previewContent: document.getElementById("preview-content"),
+      status: document.getElementById("status"),
+      pageInfo: document.getElementById("pageInfo"),
+      scaleInfo: document.getElementById("scaleInfo"),
+      docInfo: document.getElementById("docInfo"),
+      rowsInfo: document.getElementById("rowsInfo"),
+      nitInfo: document.getElementById("nitInfo"),
+      dateInfo: document.getElementById("dateInfo")
+    };
+
+    // Current state
+    let currentState = {
+      nit: null,
+      html: null,
+      meta: null,
+      zoomLevel: 1
+    };
+
+    // Show status message
+    function showStatus(message, type = "info", autoHide = true) {
+      elements.status.textContent = message;
+      elements.status.className = `status ${type}`;
+      
+      if (autoHide && type !== 'loading') {
+        setTimeout(() => {
+          elements.status.style.display = 'none';
+        }, 5000);
+      }
+    }
+
+    // Clear status
+    function clearStatus() {
+      elements.status.style.display = 'none';
+    }
+
+    // Update document info
+    function updateDocumentInfo(nit, date, rows) {
+      elements.nitInfo.textContent = `NIT: ${nit || 'Not selected'}`;
+      elements.dateInfo.textContent = `Date: ${date || '--/--/----'}`;
+      if (rows !== undefined) {
+        elements.rowsInfo.textContent = `📊 Rows: ${rows}`;
+      }
+    }
+
+    // Load NITs from Google Apps Script
+    async function loadNITs() {
+      showStatus("🔍 Loading NITs from database...", "loading", false);
+      
+      try {
+        const response = await fetch(baseUrl + "?function=getNITs");
+        
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        const nits = await response.json();
+        console.log("NITs loaded:", nits);
+        
+        if (!Array.isArray(nits)) {
+          throw new Error("Invalid response format");
+        }
+        
+        if (nits.length === 0) {
+          elements.nitSelect.innerHTML = '<option value="">-- No NITs found --</option>';
+          showStatus("⚠️ No NITs found in database", "error");
+          return;
+        }
+        
+        elements.nitSelect.innerHTML = '<option value="">-- Select a NIT --</option>';
+        nits.forEach(nit => {
+          const option = document.createElement("option");
+          option.value = nit;
+          option.textContent = `NIT: ${nit}`;
+          elements.nitSelect.appendChild(option);
+        });
+        
+        clearStatus();
+        showStatus(`✅ Loaded ${nits.length} NITs`, "success");
+        
+      } catch (error) {
+        console.error("Error loading NITs:", error);
+        elements.nitSelect.innerHTML = '<option value="">-- Error loading NITs --</option>';
+        showStatus(`❌ Error: ${error.message}`, "error");
+      }
+    }
+
+    // Load and preview selected NIT
+    async function previewNIT(nit) {
+      if (!nit) {
+        showStatus("⚠️ Please select a NIT number", "error");
+        return;
+      }
+
+      currentState.nit = nit;
+      showStatus(`⏳ Loading NIT ${nit}...`, "loading", false);
+      
+      // Show loading state
+      elements.previewContent.innerHTML = `
+        <div style="text-align: center; padding: 100px 20px; color: #666;">
+          <div style="font-size: 48px; margin-bottom: 20px; animation: pulse 1.5s infinite;">⏳</div>
+          <h3 style="margin-bottom: 10px;">Loading Document...</h3>
+          <p>Fetching NIT ${nit} data</p>
+          <div style="margin-top: 20px; width: 200px; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden;">
+            <div style="width: 60%; height: 100%; background: #1a73e8; animation: loading 2s infinite;"></div>
+          </div>
+          <style>
+            @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+            @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+          </style>
+        </div>
+      `;
+      
+      elements.previewBtn.disabled = true;
+      elements.previewBtn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+
+      try {
+        const response = await fetch(baseUrl + "?function=getNITData&nit=" + encodeURIComponent(nit));
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("NIT Data received:", data);
+
+        if (!data || !data.html) {
+          if (data && data.error) {
+            throw new Error(data.error);
+          }
+          throw new Error("No document data received");
+        }
+
+        // Store the HTML
+        currentState.html = data.html;
+        
+        // Apply fixes for PDF generation
+        const fixedHTML = applyPDFFixes(data.html);
+        
+        // Extract date from HTML
+        const dateMatch = data.html.match(/(\d{2}\/\d{2}\/\d{4})/);
+        const extractedDate = dateMatch ? dateMatch[1] : new Date().toLocaleDateString('en-IN');
+        
+        // Calculate row count
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = data.html;
+        const rowCount = tempDiv.querySelectorAll('#annexureTable tbody tr').length;
+        
+        // Display in preview area with fix class
+        elements.previewContent.innerHTML = `
+          <div class="template-content preview-content-fix">
+            ${fixedHTML}
+          </div>
+        `;
+        
+        // Update row count in the template if exists
+        const rcElement = elements.previewContent.querySelector('#rc');
+        if (rcElement && rowCount > 0) {
+          rcElement.textContent = rowCount;
+        }
+        
+        // Update UI
+        updateDocumentInfo(nit, extractedDate, rowCount);
+        elements.docInfo.textContent = `📋 NIT: ${nit}`;
+        
+        // Enable buttons
+        elements.printBtn.disabled = false;
+        elements.exportBtn.disabled = false;
+        elements.pdfBtn.disabled = false;
+        
+        // Reset zoom
+        resetZoom();
+        
+        clearStatus();
+        showStatus(`✅ Document loaded successfully: ${nit} (${rowCount} rows)`, "success");
+        
+      } catch (error) {
+        console.error("Error loading NIT:", error);
+        elements.previewContent.innerHTML = `
+          <div style="text-align: center; padding: 100px 20px; color: #d32f2f;">
+            <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
+            <h3 style="margin-bottom: 10px;">Error Loading Document</h3>
+            <p style="margin-bottom: 20px;">${error.message}</p>
+            <button onclick="loadNITs()" style="padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+              🔄 Retry Loading NITs
+            </button>
+          </div>
+        `;
+        showStatus(`❌ Error: ${error.message}`, "error");
+      } finally {
+        elements.previewBtn.disabled = false;
+        elements.previewBtn.innerHTML = '<span>🔍</span> Preview Document';
+      }
+    }
+
+    // Apply fixes for PDF generation
+    function applyPDFFixes(html) {
+      // Fix table widths for PDF
+      return html
+        .replace(/<table/g, '<table style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important;"')
+        .replace(/<td/g, '<td style="word-wrap: break-word !important; overflow-wrap: break-word !important;"')
+        .replace(/<th/g, '<th style="word-wrap: break-word !important; overflow-wrap: break-word !important;"')
+        .replace(/style="width:/g, 'style="max-width:')
+        .replace(/width:\s*\d+%/g, 'max-width: 100%');
+    }
+
+    // Zoom functions
+    function zoomIn() {
+      const paper = document.querySelector('.a4-paper');
+      currentState.zoomLevel = Math.min(currentState.zoomLevel + 0.1, 1.5);
+      paper.style.transform = `scale(${currentState.zoomLevel})`;
+      elements.scaleInfo.textContent = `🔍 Scale: ${Math.round(currentState.zoomLevel * 100)}%`;
+    }
+
+    function zoomOut() {
+      const paper = document.querySelector('.a4-paper');
+      currentState.zoomLevel = Math.max(currentState.zoomLevel - 0.1, 0.5);
+      paper.style.transform = `scale(${currentState.zoomLevel})`;
+      elements.scaleInfo.textContent = `🔍 Scale: ${Math.round(currentState.zoomLevel * 100)}%`;
+    }
+
+    function resetZoom() {
+      const paper = document.querySelector('.a4-paper');
+      currentState.zoomLevel = 1;
+      paper.style.transform = 'scale(1)';
+      elements.scaleInfo.textContent = '🔍 Scale: 100%';
+    }
+
+    function fitToPage() {
+      const paper = document.querySelector('.a4-paper');
+      const container = document.querySelector('.a4-preview-container');
+      const containerWidth = container.clientWidth;
+      const paperWidth = 210; // mm
+      const scale = (containerWidth - 40) / (paperWidth * 3.78); // Convert mm to pixels
+      
+      currentState.zoomLevel = Math.min(scale, 1.2);
+      paper.style.transform = `scale(${currentState.zoomLevel})`;
+      elements.scaleInfo.textContent = `🔍 Scale: ${Math.round(currentState.zoomLevel * 100)}%`;
+    }
+
+    // Print function - FIXED for PDF cutting issue
+    function printDocument() {
+      if (!currentState.html) {
+        showStatus("⚠️ No document to print", "error");
+        return;
+      }
+
+      showStatus("🖨️ Preparing for print/PDF...", "loading", false);
+      
+      // Create a hidden iframe for printing
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = '0';
+      printFrame.style.visibility = 'hidden';
+      document.body.appendChild(printFrame);
+      
+      // Prepare print content with FIXED CSS for PDF
+      const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>NIT Document - ${currentState.nit}</title>
+          <meta charset="UTF-8">
+          <style>
+            /* CRITICAL FIX: PDF/Print specific CSS */
+            @page {
+              size: A4;
+              margin: 10mm 15mm 10mm 15mm !important;
+            }
+            
+            body {
+              font-family: "Times New Roman", Times, serif !important;
+              font-size: 11px !important;
+              line-height: 1.05 !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              color: #000 !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              overflow: visible !important;
+            }
+            
+            /* Fix table cutting issue */
+            table {
+              width: 100% !important;
+              max-width: 100% !important;
+              table-layout: fixed !important;
+              border-collapse: collapse !important;
+              page-break-inside: avoid !important;
+            }
+            
+            td, th {
+              word-wrap: break-word !important;
+              overflow-wrap: break-word !important;
+              padding: 2px 3px !important;
+            }
+            
+            /* Ensure no content is cut */
+            * {
+              box-sizing: border-box !important;
+              max-width: 100% !important;
+            }
+            
+            /* Specific fixes for your template */
+            .tender-table {
+              width: 100% !important;
+              max-width: 100% !important;
+            }
+            
+            .tender-table td, 
+            .tender-table th {
+              font-size: 9px !important;
+              padding: 1px 2px !important;
+              border: 0.5px solid #000 !important;
+            }
+            
+            /* Prevent page breaks inside important elements */
+            h1, h2, h3, h4, h5, h6 {
+              page-break-after: avoid !important;
+            }
+            
+            p {
+              page-break-inside: avoid !important;
+            }
+            
+            /* Print footer */
+            .print-footer {
+              position: fixed;
+              bottom: 5mm;
+              right: 15mm;
+              font-size: 8px;
+              color: #666;
+            }
+            
+            @media print {
+              body {
+                margin: 0 !important;
+                padding: 0 !important;
+              }
+              
+              .no-print {
+                display: none !important;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          ${currentState.html}
+          <div class="print-footer">
+            Printed: ${new Date().toLocaleDateString('en-IN')} | NIT: ${currentState.nit}
+          </div>
+        </body>
+        </html>
+      `;
+      
+      // Write to iframe
+      printFrame.contentDocument.open();
+      printFrame.contentDocument.write(printContent);
+      printFrame.contentDocument.close();
+      
+      // Wait for content to load
+      printFrame.onload = function() {
+        setTimeout(() => {
+          printFrame.contentWindow.focus();
+          printFrame.contentWindow.print();
+          
+          // Clean up
+          setTimeout(() => {
+            document.body.removeChild(printFrame);
+            clearStatus();
+            showStatus("✅ Print/PDF dialog opened", "success");
+          }, 1000);
+        }, 500);
+      };
+    }
+
+    // Save as PDF directly (using jsPDF library approach)
+    function saveAsPDF() {
+      if (!currentState.html) {
+        showStatus("⚠️ No document to save as PDF", "error");
+        return;
+      }
+
+      showStatus("📄 Generating PDF...", "loading", false);
+      
+      // Use print function but with PDF save option
+      printDocument();
+      
+      // Note: For direct PDF download without print dialog, you would need jsPDF library
+      // This requires additional setup and might have limitations with complex HTML
+    }
+
+    // Export to Word document
+    function exportToWord() {
+      if (!currentState.html) {
+        showStatus("⚠️ No document to export", "error");
+        return;
+      }
+
+      showStatus("📥 Generating Word document...", "loading", false);
+      
+      try {
+        const content = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>NIT Document - ${currentState.nit}</title>
+            <style>
+              body {
+                font-family: "Times New Roman", Times, serif;
+                font-size: 11pt;
+                line-height: 1.05;
+                margin: 2cm;
+                color: #000;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+              }
+            </style>
+          </head>
+          <body>
+            ${currentState.html}
+            <br><br>
+            <hr>
+            <p style="font-size: 9pt; color: #666; text-align: right;">
+              Exported: ${new Date().toLocaleDateString('en-IN')}<br>
+              NIT: ${currentState.nit}
+            </p>
+          </body>
+          </html>
+        `;
+        
+        const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        link.href = url;
+        link.download = `NIT_${currentState.nit}_${new Date().toISOString().split('T')[0]}.doc`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        clearStatus();
+        showStatus("✅ Word document exported successfully", "success");
+        
+      } catch (error) {
+        console.error("Error exporting to Word:", error);
+        showStatus("❌ Error exporting document", "error");
+      }
+    }
+
+    // Event Listeners
+    elements.previewBtn.addEventListener('click', () => {
+      previewNIT(elements.nitSelect.value);
+    });
+
+    elements.printBtn.addEventListener('click', printDocument);
+    elements.exportBtn.addEventListener('click', exportToWord);
+    elements.pdfBtn.addEventListener('click', saveAsPDF);
+
+    elements.nitSelect.addEventListener('change', function() {
+      const hasSelection = !!this.value;
+      elements.previewBtn.disabled = !hasSelection;
+      
+      if (hasSelection && currentState.nit !== this.value) {
+        elements.printBtn.disabled = true;
+        elements.exportBtn.disabled = true;
+        elements.pdfBtn.disabled = true;
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'p') {
+        e.preventDefault();
+        printDocument();
+      }
+      
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        exportToWord();
+      }
+      
+      if (e.key === 'Enter' && document.activeElement === elements.nitSelect) {
+        previewNIT(elements.nitSelect.value);
+      }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNITs();
+      
+      // Show keyboard shortcuts
+      setTimeout(() => {
+        showStatus("💡 Tip: Use Ctrl+P to print/save as PDF, Ctrl+S to export as Word", "success");
+      }, 2000);
+    });
+
+    // Auto-refresh NIT list every 60 seconds
+    setInterval(() => {
+      if (!document.hidden) {
+        loadNITs();
+      }
+    }, 60000);
+  </script>
+</body>
+</html>

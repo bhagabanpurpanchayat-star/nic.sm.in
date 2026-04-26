@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bill Payment Module | Optimized View</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #0f2126;
+      color: #eef4ff;
+      margin: 0;
+      padding: 20px;
+      font-size: 13px;
+    }
+
+    .app-container {
+      max-width: 100%;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+      color: #ffffff;
+      border-left: 6px solid #2c9b6e;
+      padding-left: 20px;
+      letter-spacing: -0.2px;
+    }
+
+    /* toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      background: #1e3a40;
+      padding: 12px 24px;
+      border-radius: 60px;
+      backdrop-filter: blur(2px);
+    }
+
+    .search-wrapper {
+      flex: 3;
+      min-width: 260px;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      padding: 10px 18px;
+      border-radius: 40px;
+      border: none;
+      background: #f8fdfe;
+      color: #0b2b33;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .search-wrapper input:focus {
+      box-shadow: 0 0 0 3px #2c9b6e;
+    }
+
+    .toolbar button {
+      background: #2c9b6e;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .toolbar button:hover {
+      background: #1f7a55;
+      transform: scale(0.97);
+    }
+
+    /* message toast */
+    #message {
+      margin-bottom: 16px;
+      padding: 12px 18px;
+      border-radius: 60px;
+      display: none;
+      font-weight: 600;
+      text-align: center;
+      font-size: 13px;
+    }
+    #message.success { background: #1f6e43; color: white; }
+    #message.error { background: #b91c1c; color: white; }
+    #message.loading { background: #2c6e9e; color: white; }
+
+    /* table container */
+    .table-container {
+      border-radius: 20px;
+      overflow-x: auto;
+      overflow-y: auto;
+      border: 1px solid #2f555e;
+      background: #1c3b42;
+      max-height: calc(100vh - 190px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      table-layout: auto;
+    }
+
+    th, td {
+      border: 1px solid #3a6a74;
+      padding: 8px 10px;
+      text-align: center;
+      vertical-align: middle;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    /* Column width optimization */
+    th:nth-child(1), td:nth-child(1) { min-width: 90px; max-width: 110px; } /* Timestamp */
+    th:nth-child(2), td:nth-child(2) { min-width: 80px; max-width: 100px; } /* UNIQUE NIT */
+    th:nth-child(3), td:nth-child(3) { min-width: 60px; max-width: 80px; }  /* NIT */
+    th:nth-child(4), td:nth-child(4) { min-width: 45px; max-width: 55px; }   /* SL */
+    th:nth-child(5), td:nth-child(5) { min-width: 80px; max-width: 95px; }   /* NIT DATE */
+    th:nth-child(6), td:nth-child(6) { min-width: 150px; max-width: 200px; }  /* VENDOR */
+    th:nth-child(7), td:nth-child(7) { min-width: 180px; max-width: 250px; }  /* Name of work */
+    th:nth-child(8), td:nth-child(8) { min-width: 100px; max-width: 140px; }  /* Source of Fund */
+    th:nth-child(9), td:nth-child(9) { min-width: 90px; max-width: 120px; }   /* WORK ORDER NO */
+    th:nth-child(10), td:nth-child(10) { min-width: 90px; max-width: 110px; } /* WORK ORDER DATE */
+    th:nth-child(11), td:nth-child(11) { min-width: 90px; max-width: 120px; } /* ESTIMATE VALUE */
+    
+    /* Editable columns - optimized widths */
+    th:nth-child(12), td:nth-child(12) { min-width: 85px; max-width: 100px; } /* GROSS BILL */
+    th:nth-child(13), td:nth-child(13) { min-width: 95px; max-width: 110px; } /* Completion Date */
+    th:nth-child(14), td:nth-child(14) { min-width: 55px; max-width: 70px; }  /* TDS */
+    th:nth-child(15), td:nth-child(15) { min-width: 55px; max-width: 70px; }  /* CGST */
+    th:nth-child(16), td:nth-child(16) { min-width: 55px; max-width: 70px; }  /* SGST */
+    th:nth-child(17), td:nth-child(17) { min-width: 80px; max-width: 95px; }  /* LABOUR CESS */
+    th:nth-child(18), td:nth-child(18) { min-width: 65px; max-width: 80px; }  /* ROYALTY */
+    th:nth-child(19), td:nth-child(19) { min-width: 70px; max-width: 85px; }  /* SECURITY */
+    th:nth-child(20), td:nth-child(20) { min-width: 85px; max-width: 100px; } /* NET PAYMENT */
+    th:nth-child(21), td:nth-child(21) { min-width: 100px; max-width: 120px; } /* PAYMENT MODE */
+    th:nth-child(22), td:nth-child(22) { min-width: 120px; max-width: 160px; } /* REFERENCE */
+    th:nth-child(23), td:nth-child(23) { min-width: 110px; max-width: 130px; } /* Actions */
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #0a2a30;
+      color: #ffffff;
+      font-weight: 700;
+      z-index: 10;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(4px);
+      padding: 10px 6px;
+    }
+
+    /* Highlight row when REFERENCE has a value */
+    tr.highlight-row {
+      background-color: #1a4d2a !important;
+      border-left: 3px solid #39ff14;
+      border-right: 3px solid #39ff14;
+    }
+    
+    tr.highlight-row td {
+      background-color: #1a4d2a !important;
+    }
+    
+    tr.highlight-row:hover td {
+      background-color: #236b3a !important;
+    }
+    
+    tr:hover td {
+      background-color: #3a3a3a;
+    }
+
+    /* Inline editable controls - compact */
+    td input, td select {
+      width: 100%;
+      min-width: 50px;
+      box-sizing: border-box;
+      font-size: 11px;
+      padding: 5px 6px;
+      background: #fff;
+      color: #0a1e22;
+      border: 1px solid #628e99;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: 0.1s;
+    }
+    
+    td input:focus, td select:focus {
+      outline: none;
+      border-color: #2c9b6e;
+      box-shadow: 0 0 0 2px rgba(44,155,110,0.4);
+    }
+    
+    /* Date picker specific */
+    input[type="date"] {
+      min-width: 90px;
+    }
+    
+    /* Number inputs alignment */
+    input[type="text"] {
+      text-align: right;
+    }
+    
+    td input[placeholder="0.00"] {
+      text-align: right;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .inline-save-btn, .modal-view-btn {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.15s;
+      border: none;
+    }
+    
+    .inline-save-btn {
+      background: #2c9b6e;
+      color: white;
+    }
+    
+    .modal-view-btn {
+      background: #2c6e9e;
+      color: white;
+    }
+    
+    .inline-save-btn:hover, .modal-view-btn:hover {
+      opacity: 0.85;
+      transform: scale(0.96);
+    }
+    
+    .no-data-message {
+      text-align: center;
+      padding: 48px;
+      font-size: 15px;
+      color: #cde7ed;
+      background: #1f4149;
+    }
+    
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #fff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 0.7s linear infinite;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.2s;
+    }
+    
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .modal-container {
+      background: #ffffff;
+      color: #1a2f35;
+      border-radius: 36px;
+      width: 95%;
+      max-width: 1000px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 30px 50px rgba(0,0,0,0.5);
+      animation: fadeSlideUp 0.25s ease-out;
+    }
+    
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(25px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    
+    .modal-header {
+      padding: 18px 24px;
+      background: #1f5e6e;
+      color: white;
+      border-radius: 36px 36px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      line-height: 1;
+      opacity: 0.8;
+    }
+    
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+      background: #fafeff;
+    }
+    
+    .modal-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px 20px;
+      margin-bottom: 20px;
+      background: #f2f9fc;
+      padding: 14px 18px;
+      border-radius: 24px;
+    }
+    
+    .info-row {
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #d9e9ef;
+    }
+    
+    .info-label {
+      font-weight: 800;
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #1f8a7a;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #07323d;
+      word-break: break-word;
+    }
+    
+    .editable-section {
+      margin-top: 12px;
+      border-top: 2px solid #cbe2ea;
+      padding-top: 18px;
+    }
+    
+    .editable-title {
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 16px;
+      color: #1f5e6e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .editable-fields-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px 20px;
+    }
+    
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .field-group label {
+      font-weight: 700;
+      font-size: 11px;
+      color: #1f5e6e;
+    }
+    
+    .field-group input, .field-group select {
+      padding: 8px 12px;
+      border: 1px solid #c2d9e2;
+      border-radius: 24px;
+      font-size: 12px;
+      background: white;
+    }
+    
+    .field-group input:focus, .field-group select:focus {
+      border-color: #2c9b6e;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(44,155,110,0.25);
+    }
+    
+    .modal-footer {
+      padding: 14px 24px;
+      background: #eef5f8;
+      border-radius: 0 0 36px 36px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    
+    .modal-footer button {
+      padding: 8px 24px;
+      border-radius: 40px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-save-modal {
+      background: #2c9b6e;
+      color: white;
+    }
+    
+    .btn-cancel-modal {
+      background: #6c8b94;
+      color: white;
+    }
+    
+    /* Compact text wrapping for long content */
+    td {
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+      line-height: 1.3;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      body {
+        padding: 10px;
+      }
+      th, td {
+        padding: 6px 8px;
+      }
+      .toolbar {
+        padding: 10px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <h2>📄 Bill Payment Entry Module</h2>
+  <div id="message"></div>
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" placeholder="🔍 Search by UNIQUE NIT, NIT, Vendor Name..." oninput="filterTable()">
+    </div>
+    <button id="refreshBtn" onclick="refreshData()">⟳ Refresh Data</button>
+  </div>
+
+  <div class="table-container">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Timestamp</th><th>UNIQUE NIT</th><th>NIT</th><th>SL</th><th>NIT DATE</th>
+          <th>VENDOR</th><th>Name of work</th><th>Source of Fund</th><th>WORK ORDER NO</th>
+          <th>WORK ORDER DATE</th><th>ESTIMATE VALUE</th>
+          <th>GROSS BILL</th><th>Completion Date</th><th>TDS</th><th>CGST</th><th>SGST</th>
+          <th>LABOUR CESS</th><th>ROYALTY</th><th>SECURITY</th><th>NET PAYMENT</th>
+          <th>PAYMENT MODE</th><th>REFERENCE</th><th>Actions</th>
+         </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="editModal" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3>📋 View Full Details & Edit Bill</h3>
+      <button class="close-modal" id="closeModalBtn">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div style="text-align:center; padding:20px;">Loading details...</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel-modal" id="modalCancelBtn">Cancel</button>
+      <button class="btn-save-modal" id="modalSaveBtn">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ======================== CONFIGURATION ========================
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwG_VmMzSpUAgAi60tpzgRmdH1xGsIbZt4elyoWBofvdG7EKbGj7bHjyQCbzYrAthEizw/exec";
+  let allRawData = [];
+  let tableData = [];
+  let currentFilteredData = [];
+  
+  let currentModalOriginalIndex = null;
+  let currentModalRow = null;
+
+  function showMessage(text, type) {
+    const msgDiv = document.getElementById("message");
+    msgDiv.textContent = text;
+    msgDiv.className = type;
+    msgDiv.style.display = "block";
+    setTimeout(() => { msgDiv.style.display = "none"; }, 2800);
+  }
+
+  function formatDateToDDMMYYYY(dateValue) {
+    if (!dateValue) return "";
+    try {
+      if (typeof dateValue === 'string' && dateValue.includes('T')) {
+        const d = new Date(dateValue);
+        if (!isNaN(d.getTime())) return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+      }
+      if (dateValue instanceof Date) {
+        return `${String(dateValue.getDate()).padStart(2,'0')}/${String(dateValue.getMonth()+1).padStart(2,'0')}/${dateValue.getFullYear()}`;
+      }
+      if (typeof dateValue === 'string' && dateValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+        let parts = dateValue.split('T')[0].split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      return dateValue;
+    } catch(e) { return dateValue; }
+  }
+
+  function formatToInputDate(value) {
+    if (!value) return "";
+    try {
+      if (typeof value === 'string' && value.includes('T')) {
+        const d = new Date(value);
+        if (!isNaN(d.getTime())) return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      }
+      if (value instanceof Date) return `${value.getFullYear()}-${String(value.getMonth()+1).padStart(2,'0')}-${String(value.getDate()).padStart(2,'0')}`;
+      if (typeof value === 'string' && value.match(/^\d{2}\/\d{2}\/\d{4}/)) {
+        let parts = value.split('/');
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}/)) return value.split('T')[0];
+      return "";
+    } catch(e) { return ""; }
+  }
+
+  function hasReferenceValue(row) {
+    const reference = row[21];
+    return reference && reference.toString().trim() !== "";
+  }
+
+  async function loadData() {
+    try {
+      showMessage("Fetching bill data...", "loading");
+      const res = await fetch(scriptURL + "?action=getBillPaymentData");
+      const data = await res.json();
+      
+      if (!Array.isArray(data)) throw new Error("Invalid sheet response");
+      
+      allRawData = data;
+      const dataRows = data.slice(1);
+      
+      tableData = dataRows.filter(row => {
+        const wo = row[8];
+        return wo && wo.toString().trim() !== "";
+      });
+      
+      if (tableData.length === 0) showMessage("No work order records found", "loading");
+      applySearchAndRender();
+      showMessage(`✅ Loaded ${tableData.length} bills`, "success");
+    } catch (err) {
+      console.error(err);
+      showMessage("Error loading data: " + err.message, "error");
+    }
+  }
+
+  function applySearchAndRender() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = tableData.filter(row => {
+      return (row[1] && row[1].toString().toLowerCase().includes(search)) ||
+             (row[2] && row[2].toString().toLowerCase().includes(search)) ||
+             (row[5] && row[5].toString().toLowerCase().includes(search));
+    });
+    currentFilteredData = filtered;
+    renderTableWithInlineEdits(filtered);
+  }
+
+  function filterTable() { applySearchAndRender(); }
+
+  function renderTableWithInlineEdits(dataArray) {
+    const tbody = document.querySelector("#dataTable tbody");
+    tbody.innerHTML = "";
+    if (!dataArray.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 23;
+      td.className = "no-data-message";
+      td.textContent = "📭 No matching bills found. Adjust search or refresh.";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    dataArray.forEach((row, idx) => {
+      const originalTableIndex = tableData.findIndex(r => 
+        String(r[1]) === String(row[1]) && String(r[5]) === String(row[5])
+      );
+      
+      const tr = document.createElement("tr");
+      tr.setAttribute("data-original-idx", originalTableIndex);
+      tr.setAttribute("data-unique-nit", row[1] || "");
+      tr.setAttribute("data-vendor", row[5] || "");
+      
+      if (hasReferenceValue(row)) {
+        tr.classList.add('highlight-row');
+      }
+      
+      // Columns 0-10: Read-only display
+      for (let j = 0; j <= 10; j++) {
+        const td = document.createElement("td");
+        if (j === 0 || j === 4 || j === 9) {
+          td.textContent = formatDateToDDMMYYYY(row[j]) ?? "";
+        } else {
+          td.textContent = row[j] ?? "";
+        }
+        tr.appendChild(td);
+      }
+
+      // Columns 11-19: Editable
+      for (let j = 11; j <= 19; j++) {
+        const td = document.createElement("td");
+        let currentVal = row[j] || "";
+        if (j === 12) {
+          const dateForInput = formatToInputDate(currentVal);
+          td.innerHTML = `<input type="date" class="inline-edit" data-col="${j}" data-original-idx="${originalTableIndex}" value="${dateForInput}" style="min-width:85px;">`;
+        } else {
+          td.innerHTML = `<input type="text" class="inline-edit" data-col="${j}" data-original-idx="${originalTableIndex}" value="${escapeHtml(currentVal)}" placeholder="0.00">`;
+        }
+        tr.appendChild(td);
+      }
+
+      // PAYMENT MODE
+      const tdPayment = document.createElement("td");
+      const paymentMode = row[20] || "";
+      tdPayment.innerHTML = `<select class="inline-edit" data-col="20" data-original-idx="${originalTableIndex}" style="min-width:90px;">
+        <option value="" ${paymentMode === '' ? 'selected' : ''}>Select</option>
+        <option value="Online" ${paymentMode === 'Online' ? 'selected' : ''}>Online</option>
+        <option value="Cheque" ${paymentMode === 'Cheque' ? 'selected' : ''}>Cheque</option>
+        <option value="Cash" ${paymentMode === 'Cash' ? 'selected' : ''}>Cash</option>
+        <option value="RTGS" ${paymentMode === 'RTGS' ? 'selected' : ''}>RTGS</option>
+        <option value="NEFT" ${paymentMode === 'NEFT' ? 'selected' : ''}>NEFT</option>
+      </select>`;
+      tr.appendChild(tdPayment);
+
+      // REFERENCE
+      const tdRef = document.createElement("td");
+      const reference = row[21] || "";
+      tdRef.innerHTML = `<input type="text" class="inline-edit" data-col="21" data-original-idx="${originalTableIndex}" value="${escapeHtml(reference)}" placeholder="UTR/Cheque" style="min-width:100px;" oninput="updateRowHighlight(this, ${originalTableIndex})">`;
+      tr.appendChild(tdRef);
+
+      // Actions
+      const tdAction = document.createElement("td");
+      tdAction.className = "action-group";
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "💾 Save";
+      saveBtn.className = "inline-save-btn";
+      saveBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        saveInlineRow(originalTableIndex);
+      });
+      const modalBtn = document.createElement("button");
+      modalBtn.textContent = "🔍 View";
+      modalBtn.className = "modal-view-btn";
+      modalBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openModalForRow(originalTableIndex, tableData[originalTableIndex]);
+      });
+      tdAction.appendChild(saveBtn);
+      tdAction.appendChild(modalBtn);
+      tr.appendChild(tdAction);
+      tbody.appendChild(tr);
+    });
+  }
+
+  function updateRowHighlight(inputElement, originalIdx) {
+    const tr = inputElement.closest('tr');
+    if (tr) {
+      const referenceValue = inputElement.value;
+      if (referenceValue && referenceValue.trim() !== "") {
+        tr.classList.add('highlight-row');
+      } else {
+        tr.classList.remove('highlight-row');
+      }
+    }
+  }
+
+  async function saveInlineRow(originalIdx) {
+    const rowData = tableData[originalIdx];
+    if (!rowData) { showMessage("Row data missing", "error"); return; }
+    const uniqueNit = String(rowData[1] || "");
+    const vendor = String(rowData[5] || "");
+    if (!uniqueNit || !vendor) { showMessage("Missing identifiers", "error"); return; }
+    
+    const tr = document.querySelector(`tr[data-original-idx="${originalIdx}"]`);
+    if (!tr) { showMessage("Row not found", "error"); return; }
+    const inlineInputs = tr.querySelectorAll(".inline-edit");
+    const updatedValues = {};
+    inlineInputs.forEach(input => {
+      const col = input.getAttribute("data-col");
+      if (col) updatedValues[col] = input.value;
+    });
+    
+    const formData = new FormData();
+    formData.append("action", "updateBillPayment");
+    formData.append("uniqueNit", uniqueNit);
+    formData.append("vendor", vendor);
+    
+    for (let j = 11; j <= 19; j++) {
+      let val = updatedValues[j] !== undefined ? updatedValues[j] : (rowData[j] || "");
+      formData.append(`col${j}`, val);
+    }
+    formData.append("col20", updatedValues["20"] !== undefined ? updatedValues["20"] : (rowData[20] || ""));
+    formData.append("col21", updatedValues["21"] !== undefined ? updatedValues["21"] : (rowData[21] || ""));
+    
+    const saveBtns = tr.querySelectorAll(".inline-save-btn");
+    let targetBtn = null;
+    saveBtns.forEach(btn => { if(btn.textContent.includes("Save")) targetBtn = btn; });
+    if (targetBtn) { targetBtn.textContent = "⏳"; targetBtn.disabled = true; }
+    
+    try {
+      const response = await fetch(scriptURL, { method: "POST", body: formData });
+      const result = await response.json();
+      if (result.success) {
+        for (let j = 11; j <= 19; j++) {
+          if (updatedValues[j] !== undefined) rowData[j] = updatedValues[j];
+        }
+        if (updatedValues["20"] !== undefined) rowData[20] = updatedValues["20"];
+        if (updatedValues["21"] !== undefined) rowData[21] = updatedValues["21"];
+        
+        if (rowData[21] && rowData[21].toString().trim() !== "") {
+          tr.classList.add('highlight-row');
+        } else {
+          tr.classList.remove('highlight-row');
+        }
+        
+        showMessage(`✅ Updated: ${uniqueNit}`, "success");
+      } else {
+        showMessage("Update failed: " + (result.error || "unknown"), "error");
+        if (targetBtn) { targetBtn.textContent = "💾 Save"; targetBtn.disabled = false; }
+      }
+    } catch (err) {
+      showMessage("Network error: " + err.message, "error");
+      if (targetBtn) { targetBtn.textContent = "💾 Save"; targetBtn.disabled = false; }
+    }
+  }
+
+  function openModalForRow(originalIdx, row) {
+    currentModalOriginalIndex = originalIdx;
+    currentModalRow = row;
+    
+    const uniqueNit = row[1] || ""; 
+    const nit = row[2] || ""; 
+    const vendor = row[5] || "";
+    const workOrderNo = row[8] || ""; 
+    const workName = row[6] || ""; 
+    const sourceFund = row[7] || "";
+    const estimateValue = row[10] || ""; 
+    const timestamp = formatDateToDDMMYYYY(row[0]);
+    const nitDate = formatDateToDDMMYYYY(row[4]); 
+    const workOrderDate = formatDateToDDMMYYYY(row[9]);
+    
+    const grossBill = row[11] || ""; 
+    const completionDateRaw = row[12] || "";
+    const tds = row[13] || ""; 
+    const cgst = row[14] || ""; 
+    const sgst = row[15] || "";
+    const labourCess = row[16] || ""; 
+    const royalty = row[17] || ""; 
+    const security = row[18] || "";
+    const netPayment = row[19] || ""; 
+    const paymentMode = row[20] || ""; 
+    const reference = row[21] || "";
+    const completionDateVal = formatToInputDate(completionDateRaw);
+    
+    const modalBody = document.getElementById("modalBody");
+    modalBody.innerHTML = `
+      <div class="modal-details-grid">
+        <div class="info-row"><span class="info-label">📅 Timestamp</span><span class="info-value">${escapeHtml(timestamp)}</span></div>
+        <div class="info-row"><span class="info-label">🔖 UNIQUE NIT</span><span class="info-value">${escapeHtml(uniqueNit)}</span></div>
+        <div class="info-row"><span class="info-label">📌 NIT</span><span class="info-value">${escapeHtml(nit)}</span></div>
+        <div class="info-row"><span class="info-label">🏢 VENDOR</span><span class="info-value">${escapeHtml(vendor)}</span></div>
+        <div class="info-row"><span class="info-label">📄 WORK ORDER NO</span><span class="info-value">${escapeHtml(workOrderNo)}</span></div>
+        <div class="info-row"><span class="info-label">📅 NIT DATE</span><span class="info-value">${escapeHtml(nitDate)}</span></div>
+        <div class="info-row"><span class="info-label">📅 WORK ORDER DATE</span><span class="info-value">${escapeHtml(workOrderDate)}</span></div>
+        <div class="info-row"><span class="info-label">🛠️ Name of Work</span><span class="info-value">${escapeHtml(workName)}</span></div>
+        <div class="info-row"><span class="info-label">💰 Source of Fund</span><span class="info-value">${escapeHtml(sourceFund)}</span></div>
+        <div class="info-row"><span class="info-label">📊 ESTIMATE VALUE</span><span class="info-value">${escapeHtml(estimateValue)}</span></div>
+      </div>
+      <div class="editable-section">
+        <div class="editable-title">✏️ Editable Fields</div>
+        <div class="editable-fields-grid">
+          <div class="field-group"><label>💰 GROSS BILL</label><input type="text" id="modal_grossBill" value="${escapeHtml(grossBill)}"></div>
+          <div class="field-group"><label>📅 Completion Date</label><input type="date" id="modal_completionDate" value="${completionDateVal}"></div>
+          <div class="field-group"><label>💸 TDS</label><input type="text" id="modal_tds" value="${escapeHtml(tds)}"></div>
+          <div class="field-group"><label>🧾 CGST</label><input type="text" id="modal_cgst" value="${escapeHtml(cgst)}"></div>
+          <div class="field-group"><label>🧾 SGST</label><input type="text" id="modal_sgst" value="${escapeHtml(sgst)}"></div>
+          <div class="field-group"><label>⚒️ LABOUR CESS</label><input type="text" id="modal_labourCess" value="${escapeHtml(labourCess)}"></div>
+          <div class="field-group"><label>👑 ROYALTY</label><input type="text" id="modal_royalty" value="${escapeHtml(royalty)}"></div>
+          <div class="field-group"><label>🔒 SECURITY</label><input type="text" id="modal_security" value="${escapeHtml(security)}"></div>
+          <div class="field-group"><label>💵 NET PAYMENT</label><input type="text" id="modal_netPayment" value="${escapeHtml(netPayment)}"></div>
+          <div class="field-group"><label>💳 PAYMENT MODE</label><select id="modal_paymentMode">
+            <option value="" ${paymentMode===''?'selected':''}>Select Mode</option>
+            <option value="Online" ${paymentMode==='Online'?'selected':''}>Online</option>
+            <option value="Cheque" ${paymentMode==='Cheque'?'selected':''}>Cheque</option>
+            <option value="Cash" ${paymentMode==='Cash'?'selected':''}>Cash</option>
+            <option value="RTGS" ${paymentMode==='RTGS'?'selected':''}>RTGS</option>
+            <option value="NEFT" ${paymentMode==='NEFT'?'selected':''}>NEFT</option>
+          </select></div>
+          <div class="field-group"><label>📎 REFERENCE</label><input type="text" id="modal_reference" value="${escapeHtml(reference)}"></div>
+        </div>
+      </div>`;
+    
+    document.getElementById("editModal").classList.add("active");
+  }
+  
+  async function saveModalChanges() {
+    if (!currentModalRow) { showMessage("No active row", "error"); closeModal(); return; }
+    const row = currentModalRow;
+    const uniqueNit = String(row[1] || ""); 
+    const vendor = String(row[5] || "");
+    
+    const grossBill = document.getElementById("modal_grossBill")?.value || "";
+    const completionDate = document.getElementById("modal_completionDate")?.value || "";
+    const tds = document.getElementById("modal_tds")?.value || "";
+    const cgst = document.getElementById("modal_cgst")?.value || "";
+    const sgst = document.getElementById("modal_sgst")?.value || "";
+    const labourCess = document.getElementById("modal_labourCess")?.value || "";
+    const royalty = document.getElementById("modal_royalty")?.value || "";
+    const security = document.getElementById("modal_security")?.value || "";
+    const netPayment = document.getElementById("modal_netPayment")?.value || "";
+    const paymentMode = document.getElementById("modal_paymentMode")?.value || "";
+    const reference = document.getElementById("modal_reference")?.value || "";
+    
+    const formData = new FormData();
+    formData.append("action", "updateBillPayment");
+    formData.append("uniqueNit", uniqueNit); 
+    formData.append("vendor", vendor);
+    formData.append("col11", grossBill); 
+    formData.append("col12", completionDate);
+    formData.append("col13", tds); 
+    formData.append("col14", cgst); 
+    formData.append("col15", sgst);
+    formData.append("col16", labourCess); 
+    formData.append("col17", royalty);
+    formData.append("col18", security); 
+    formData.append("col19", netPayment);
+    formData.append("col20", paymentMode); 
+    formData.append("col21", reference);
+    
+    const saveBtn = document.getElementById("modalSaveBtn");
+    const originalText = saveBtn.innerText;
+    saveBtn.innerText = "⏳ Saving..."; 
+    saveBtn.disabled = true;
+    try {
+      const response = await fetch(scriptURL, { method: "POST", body: formData });
+      const result = await response.json();
+      if (result.success) {
+        row[11] = grossBill; 
+        row[12] = completionDate; 
+        row[13] = tds; 
+        row[14] = cgst; 
+        row[15] = sgst;
+        row[16] = labourCess; 
+        row[17] = royalty; 
+        row[18] = security; 
+        row[19] = netPayment;
+        row[20] = paymentMode; 
+        row[21] = reference;
+        applySearchAndRender();
+        showMessage(`✅ Modal save successful`, "success");
+        closeModal();
+      } else { 
+        showMessage("Update failed: " + (result.error || "error"), "error"); 
+      }
+    } catch (err) { 
+      showMessage("Network error: " + err.message, "error"); 
+    } finally { 
+      saveBtn.innerText = originalText; 
+      saveBtn.disabled = false; 
+    }
+  }
+  
+  function closeModal() { 
+    document.getElementById("editModal").classList.remove("active"); 
+    currentModalOriginalIndex = null; 
+    currentModalRow = null; 
+  }
+  
+  function escapeHtml(str) { 
+    if(!str) return ""; 
+    return String(str).replace(/[&<>]/g, function(m){ 
+      if(m==='&') return '&amp;'; 
+      if(m==='<') return '&lt;'; 
+      if(m==='>') return '&gt;'; 
+      return m;
+    }); 
+  }
+  
+  async function refreshData() { 
+    const btn = document.getElementById("refreshBtn"); 
+    const oldHtml = btn.innerHTML; 
+    btn.innerHTML = `<span class="spinner"></span> Refreshing...`; 
+    btn.disabled = true; 
+    await loadData(); 
+    btn.innerHTML = oldHtml; 
+    btn.disabled = false; 
+  }
+  
+  function bindModalEvents() { 
+    const modal = document.getElementById("editModal"); 
+    document.getElementById("closeModalBtn").onclick = () => closeModal(); 
+    document.getElementById("modalCancelBtn").onclick = () => closeModal(); 
+    document.getElementById("modalSaveBtn").onclick = () => saveModalChanges(); 
+    modal.addEventListener("click", (e) => { 
+      if (e.target === modal) closeModal(); 
+    }); 
+  }
+  
+  window.addEventListener("DOMContentLoaded", () => { 
+    bindModalEvents(); 
+    loadData(); 
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>EMD Refund - Merge Template</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --secondary-dark: #27ae60;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --dark: #2c3e50;
+      --darker: #1a2530;
+      --light: #ecf0f1;
+      --gray: #95a5a6;
+      --border: #34495e;
+      --card-bg: #243447;
+      --table-header: #2c3e50;
+      --table-row: #2a3c4f;
+      --table-alt: #253544;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    h1 i {
+      color: var(--primary);
+    }
+    
+    h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: white;
+    }
+    
+    h3 {
+      font-size: 18px;
+      margin: 20px 0 12px;
+      color: white;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #bdc3c7;
+    }
+    
+    select, input[type="date"], input[type="text"] {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      width: 100%;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    /* Vendor dropdown specific styles */
+    #vendorSelect {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid var(--primary);
+      color: white;
+      font-weight: 500;
+      font-size: 15px;
+    }
+    
+    #vendorSelect option {
+      background: var(--card-bg);
+      color: white;
+      padding: 10px;
+    }
+    
+    #vendorSelect:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    #vendorSelect:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: var(--secondary);
+    }
+    
+    /* Make the selected value always visible */
+    #vendorSelect:valid {
+      background: rgba(52, 152, 219, 0.2);
+      border-color: var(--primary);
+    }
+    
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    select:hover, input:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    
+    .row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .col {
+      flex: 1;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    button.secondary {
+      background: var(--secondary);
+    }
+    
+    button.secondary:hover {
+      background: var(--secondary-dark);
+    }
+    
+    button.ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--light);
+    }
+    
+    button.ghost:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    button.danger {
+      background: var(--danger);
+    }
+    
+    button.danger:hover {
+      background: #c0392b;
+    }
+    
+    .note {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 8px;
+      line-height: 1.5;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      border-left: 3px solid var(--warning);
+    }
+    
+    table.data {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 14px;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    table.data th, table.data td {
+      border: 1px solid var(--border);
+      padding: 12px 10px;
+      text-align: center;
+    }
+    
+    table.data th {
+      background: var(--table-header);
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    
+    table.data tbody tr {
+      background: var(--table-row);
+    }
+    
+    table.data tbody tr:nth-child(even) {
+      background: var(--table-alt);
+    }
+    
+    table.data tbody tr:hover {
+      background: rgba(52, 152, 219, 0.1);
+    }
+    
+    .preview-area {
+      margin-top: 24px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    
+    .letter {
+      background: white;
+      color: #333;
+      padding: 40px;
+      border-radius: 8px;
+      margin: 0 auto;
+      max-width: 800px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      line-height: 1.6;
+    }
+    
+    .left-block {
+      float: left;
+      width: 65%;
+    }
+    
+    .right-block {
+      float: right;
+      text-align: right;
+    }
+    
+    .clear {
+      clear: both;
+    }
+    
+    .letter p {
+      line-height: 1.6;
+      margin: 12px 0;
+    }
+    
+    .bill-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    
+    .bill-table th, .bill-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+      font-size: 14px;
+    }
+    
+    .bill-table th {
+      background: #f5f5f5;
+      font-weight: 600;
+    }
+    
+    .bill-table tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    
+    .signature {
+      margin-top: 60px;
+      text-align: right;
+      padding-right: 20px;
+    }
+    
+    .print-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 24px;
+      margin-left: auto;
+    }
+    
+    .stat-box {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px 16px;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 120px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray);
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: var(--border);
+    }
+    
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 768px) {
+      .row {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .stats {
+        margin-left: 0;
+        justify-content: space-between;
+      }
+      
+      .print-buttons {
+        flex-direction: column;
+      }
+    }
+    
+    /* SIMPLIFIED PRINT STYLES - Fixed based on working reference */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      .container {
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      .card {
+        background: #fff !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      /* Hide everything except the preview area */
+      .card > *:not(.preview-area) {
+        display: none !important;
+      }
+      
+      .preview-area {
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      .letter {
+        box-shadow: none !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        padding: 20px !important;
+        width: 100% !important;
+        max-width: none !important;
+      }
+      
+      /* Hide print buttons in print view */
+      .print-buttons,
+      .card-header {
+        display: none !important;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <header>
+        <h1><i class="fas fa-file-invoice-dollar"></i> Earnest Money Prayer Generator</h1>
+        <div class="stats">
+          <div class="stat-box">
+            <div class="stat-value" id="totalSelected">0</div>
+            <div class="stat-label">Selected Items</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">₹<span id="sumAmount">0</span></div>
+            <div class="stat-label">Total Amount</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="form-group">
+        <label for="vendorSelect">Select Vendor</label>
+        <div class="row">
+          <div class="col">
+            <select id="vendorSelect" required>
+              <option value="">-- Select a vendor --</option>
+            </select>
+          </div>
+          <div style="width: 160px">
+            <button id="refreshBtn" class="secondary">
+              <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="letterDate">Letter Date</label>
+            <input type="date" id="letterDate"/>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            <label for="firmName">Signatory / Firm Name</label>
+            <input type="text" id="firmName" value="ANIKA AND AYESHA ENTERPRISE"/>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            <label for="place">Place (for header)</label>
+            <input type="text" id="place" value="Arbara, Chanchal, Malda"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <i class="fas fa-info-circle"></i> After selecting a vendor, unpaid rows for that vendor will appear below. 
+        Select the rows you wish to merge into the letter, then click <strong>Generate Letter</strong>.
+      </div>
+
+      <table class="data" id="sheetTable" aria-live="polite">
+        <thead>
+          <tr>
+            <th style="width: 50px">
+              <div class="checkbox-container">
+                <input type="checkbox" id="selectAll" title="Select all"/>
+              </div>
+            </th>
+            <th>NIT</th>
+            <th>SL</th>
+            <th>NIT DATE</th>
+            <th>EARNEST MONEY (Rs)</th>
+            <th>Payment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="6" class="empty-state">
+              <i class="fas fa-table"></i>
+              <div>Select a vendor to view data</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="controls">
+        <button id="generateBtn">
+          <i class="fas fa-file-pdf"></i> Generate Letter
+        </button>
+        <button id="clearBtn" class="ghost">
+          <i class="fas fa-times"></i> Clear Selection
+        </button>
+      </div>
+
+      <!-- MOVED PREVIEW AREA INSIDE THE MAIN CARD -->
+      <div class="preview-area" id="previewArea" style="display:none">
+        <div class="card-header">
+          <h2><i class="fas fa-eye"></i> Letter Preview</h2>
+          <div class="print-buttons">
+            <button id="printBtn">
+              <i class="fas fa-print"></i> Print / Save PDF
+            </button>
+            <button id="editBtn" class="ghost">
+              <i class="fas fa-edit"></i> Back to Edit
+            </button>
+          </div>
+        </div>
+        <div id="letterContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw_zOggb9P4-veVW8PyofioUlTRb2d5tifegtUgq1iHtEwYe1bJHbGrgZbB8JHTFulJsw/exec";
+    let tableData = [], displayedRows = [], selectedIndices = new Set();
+    const $ = id => document.getElementById(id);
+    const todayISO = () => new Date().toISOString().split('T')[0];
+
+    function numberToWords(num) {
+      num = Math.floor(Number(num) || 0);
+      if (num === 0) return "Zero Rupees Only";
+      const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+      const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+      function twoDigit(n) { return n < 20 ? ones[n] : tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : ""); }
+      function threeDigit(n) { return (n >= 100 ? ones[Math.floor(n / 100)] + " Hundred " + (n % 100 ? twoDigit(n % 100) : "") : twoDigit(n)); }
+      let c = Math.floor(num / 1e7), l = Math.floor(num % 1e7 / 1e5), t = Math.floor(num % 1e5 / 1e3), h = num % 1e3;
+      return (c ? threeDigit(c) + " Crore " : "") + (l ? threeDigit(l) + " Lakh " : "") + (t ? threeDigit(t) + " Thousand " : "") + (h ? threeDigit(h) : "") + " Rupees Only";
+    }
+
+    // Mock data for testing when the API is not accessible
+    const mockData = [
+      ["1", "Header1", "NIT001", "SL001", "2023-01-15", "VENDOR A", "50000", "Unpaid"],
+      ["2", "Header2", "NIT002", "SL002", "2023-02-20", "VENDOR B", "75000", "Unpaid"],
+      ["3", "Header3", "NIT003", "SL003", "2023-03-10", "VENDOR A", "30000", "Unpaid"],
+      ["4", "Header4", "NIT004", "SL004", "2023-04-05", "VENDOR C", "100000", "Unpaid"],
+      ["5", "Header5", "NIT005", "SL005", "2023-05-12", "VENDOR B", "45000", "Unpaid"],
+      ["6", "Header6", "NIT006", "SL006", "2023-06-18", "VENDOR A", "60000", "Unpaid"]
+    ];
+
+    async function refreshData() {
+      $('refreshBtn').disabled = true;
+      $('refreshBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+      try {
+        // Try to fetch from the API first
+        const res = await fetch(scriptURL + "?action=getEarnestMoneyData");
+        if (res.ok) {
+          const json = await res.json();
+          tableData = Array.isArray(json) ? json : [];
+          console.log("Data loaded from API:", tableData);
+        } else {
+          throw new Error("API not accessible");
+        }
+      } catch (e) {
+        // If API fails, use mock data
+        console.warn("Using mock data due to API error:", e.message);
+        tableData = mockData;
+      }
+      
+      populateVendorList();
+      $('refreshBtn').disabled = false;
+      $('refreshBtn').innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+    }
+
+    function populateVendorList() {
+      // Extract vendor names from column index 5
+      const vendors = [...new Set(tableData.map(r => r[5]).filter(Boolean))].sort();
+      console.log("Vendors found:", vendors);
+      
+      const sel = $('vendorSelect');
+      sel.innerHTML = '<option value="">-- Select Vendor --</option>';
+      vendors.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v;
+        o.textContent = v;
+        sel.appendChild(o);
+      });
+      
+      $('letterDate').value = todayISO();
+      clearTable();
+    }
+
+    function clearTable() {
+      $('sheetTable').querySelector('tbody').innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-table"></i><div>Select a vendor to view data</div></td></tr>';
+      displayedRows = [];
+      selectedIndices.clear();
+      updateTotalsUI();
+    }
+
+    function onVendorChange() {
+      const v = $('vendorSelect').value;
+      if (!v) {
+        clearTable();
+        return;
+      }
+      $('firmName').value = v; // Auto-fill Firm Name
+      renderVendorRows(v);
+    }
+
+    function renderVendorRows(vendor) {
+      const tbody = $('sheetTable').querySelector('tbody');
+      tbody.innerHTML = "";
+      displayedRows = [];
+      selectedIndices.clear();
+
+      // Filter rows for the selected vendor with "Unpaid" status
+      const vendorRows = tableData.filter((r, i) => {
+        return r[5] === vendor && (!r[7] || r[7].toLowerCase() === "unpaid");
+      });
+      
+      if (vendorRows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-exclamation-circle"></i><div>No unpaid records found for this vendor</div></td></tr>';
+        updateTotalsUI();
+        return;
+      }
+
+      vendorRows.forEach((r, i) => {
+        const originalIndex = tableData.findIndex(row => row === r);
+        displayedRows.push(originalIndex);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><div class="checkbox-container"><input type="checkbox" data-idx="${originalIndex}"></div></td>
+          <td>${r[2] || ""}</td>
+          <td>${r[3] || ""}</td>
+          <td>${formatDate(r[4])}</td>
+          <td style="text-align:right">${formatNumber(r[6])}</td>
+          <td>${r[7] || "Unpaid"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      attachCheckboxes();
+      updateTotalsUI();
+    }
+
+    function attachCheckboxes() {
+      document.querySelectorAll('#sheetTable tbody input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', e => {
+          const idx = Number(e.target.dataset.idx);
+          if (e.target.checked) selectedIndices.add(idx);
+          else selectedIndices.delete(idx);
+          updateTotalsUI();
+        });
+      });
+
+      $('selectAll').checked = false;
+      $('selectAll').onchange = function() {
+        const chk = this.checked;
+        document.querySelectorAll('#sheetTable tbody input[type="checkbox"]').forEach(c => {
+          c.checked = chk;
+          const idx = Number(c.dataset.idx);
+          if (chk) selectedIndices.add(idx);
+          else selectedIndices.delete(idx);
+        });
+        updateTotalsUI();
+      }
+    }
+
+    function updateTotalsUI() {
+      let tot = 0;
+      selectedIndices.forEach(i => tot += Number(tableData[i][6]) || 0);
+      $('sumAmount').textContent = formatNumber(tot);
+      $('totalSelected').textContent = selectedIndices.size;
+    }
+
+    function formatNumber(n) {
+      return n ? Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }) : "";
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "";
+      const d = new Date(iso);
+      if (isNaN(d)) return iso.replace(/[-.]/g, "/");
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    function buildLetter() {
+      if (!selectedIndices.size) {
+        alert("Please select at least one row to generate the letter.");
+        return;
+      }
+
+      const vendor = $('vendorSelect').value;
+      const date = $('letterDate').value || todayISO();
+      const place = $('place').value;
+      const firm = $('firmName').value;
+
+      const grouped = {};
+      selectedIndices.forEach(i => {
+        const r = tableData[i];
+        const nit = r[2];
+        const dateVal = r[4];
+        const sl = r[3];
+        const amt = Number(r[6]) || 0;
+
+        if (!grouped[nit]) grouped[nit] = { date: dateVal, sls: [], total: 0 };
+        grouped[nit].sls.push(sl);
+        grouped[nit].total += amt;
+      });
+
+      let total = 0;
+      const rowsHtml = Object.keys(grouped).map(nit => {
+        const g = grouped[nit];
+        total += g.total;
+        return `<tr>
+          <td>${nit}</td>
+          <td>${formatDate(g.date)}</td>
+          <td>${g.sls.join(', ')}</td>
+          <td style="text-align:right">${formatNumber(g.total)}</td>
+        </tr>`;
+      }).join("");
+
+      const words = numberToWords(total);
+
+      const html = `
+      <div class="letter">
+        <div style="overflow:hidden; margin-top: 120px;">
+          <div class="left-block">
+            <p>To,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;The Prodhan<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;Bhagabanpur Gram Panchayat<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;${place}</p>
+          </div>
+          <div class="right-block">
+            <p>Date - ${formatDate(date)}</p>
+          </div>
+        </div>
+        <div class="clear"></div>
+        
+        <p style="margin-top: 40px; text-align: center;"><strong>Sub - "Prayer for Earnest Money (EMD)"</strong></p>
+        
+        <p>Sir/Madam,</p>
+        
+        <p>In the above mentioned subject, I made a participation in the below mentioned works and deposited the required amount of earnest money as mentioned in the published NIT from your kind end. As my bid has been <strong>Accepted/Rejected</strong> I request you to pay my deposited amount & oblige. I hope you will be kind enough to refund my deposited amount from your kind end.</p>
+        
+        <h3>Bill Description</h3>
+        
+        <p><strong>Total Bill Amount (Rs.):</strong> ₹${formatNumber(total)}</p>
+        <p><strong>In Words:</strong> ${words}</p>
+        
+        <table class="bill-table">
+          <thead>
+            <tr>
+              <th>NIT NO</th>
+              <th>Date</th>
+              <th>SL No</th>
+              <th style="text-align:center">Amount (Rs)</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+        
+        <div class="signature">
+          <p>Yours Faithfully,</p>
+          <p><strong>${firm}</strong></p>
+        </div>
+      </div>`;
+
+      $('letterContainer').innerHTML = html;
+      $('previewArea').style.display = 'block';
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    // Event Listeners
+    $('refreshBtn').addEventListener('click', refreshData);
+    $('vendorSelect').addEventListener('change', onVendorChange);
+    $('generateBtn').addEventListener('click', buildLetter);
+    $('clearBtn').addEventListener('click', () => {
+      selectedIndices.clear();
+      updateTotalsUI();
+      document.querySelectorAll('#sheetTable tbody input').forEach(c => c.checked = false);
+      $('selectAll').checked = false;
+    });
+
+    document.addEventListener('click', e => {
+      if (e.target.id === 'printBtn') window.print();
+      if (e.target.id === 'editBtn') $('previewArea').style.display = 'none';
+    });
+
+    // Initialize
+    $('letterDate').value = todayISO();
+    refreshData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ভগবানপুর গ্রাম পঞ্চায়েত | সরকারি তথ্য পোর্টাল</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      background: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2070&auto=format') center/cover no-repeat fixed;
+      position: relative;
+      color: #1e2f3e;
+      line-height: 1.5;
+    }
+    
+    /* Dark overlay for better readability */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.8rem 1.5rem;
+    }
+
+    /* Welcome Hero Section - Glass Effect */
+    .welcome-hero {
+      background: rgba(11, 43, 64, 0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      padding: 2rem 2rem;
+      margin-bottom: 2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .welcome-hero::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(230,177,126,0.15);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .welcome-hero h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .welcome-hero h1 i {
+      color: #E6B17E;
+      font-size: 2rem;
+    }
+    .welcome-note {
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 85%;
+      opacity: 0.95;
+    }
+    .office-desc {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #FFE6C7;
+    }
+    @media (max-width: 768px) {
+      .welcome-hero { padding: 1.5rem; }
+      .welcome-hero h1 { font-size: 1.3rem; }
+      .welcome-note { max-width: 100%; font-size: 0.85rem; }
+    }
+
+    /* Action Cards Grid - Glass Transparent with Unique Colors */
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .action-card {
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .action-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.25);
+      border-color: rgba(255,255,255,0.5);
+    }
+    
+    /* Individual Card Colors */
+    .card-1 { background: rgba(30, 90, 107, 0.65); }
+    .card-2 { background: rgba(139, 69, 19, 0.65); }
+    .card-3 { background: rgba(46, 125, 50, 0.65); }
+    .card-4 { background: rgba(123, 31, 162, 0.65); }
+    .card-5 { background: rgba(211, 84, 0, 0.65); }
+    .card-6 { background: rgba(25, 118, 210, 0.65); }
+    
+    .action-icon {
+      width: 70px;
+      height: 70px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .action-icon i {
+      font-size: 2rem;
+      color: #FFE6C7;
+    }
+    .action-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .action-card p {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 1.2rem;
+      line-height: 1.4;
+    }
+    .action-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 8px 20px;
+      border-radius: 40px;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(4px);
+    }
+    .action-btn:hover {
+      background: rgba(255,255,255,0.35);
+      transform: scale(1.02);
+    }
+    
+    @media (max-width: 700px) {
+      .action-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: rgba(255,255,255,0.95);
+      border-radius: 28px;
+      max-width: 900px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 1.8rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #E6B17E;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .modal-header h2 {
+      color: #0B2B40;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .modal-header h2 i {
+      color: #E6B17E;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #8ba0bc;
+      transition: color 0.2s;
+    }
+    .modal-close:hover {
+      color: #c62828;
+    }
+    .modal-body {
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    
+    /* Table inside modal */
+    .modal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .modal-table th {
+      background: #f8fafc;
+      color: #1e5a6b;
+      padding: 10px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .modal-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    
+    .badge-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .badge {
+      background: #f1f5f9;
+      padding: 5px 14px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      color: #2c5f6e;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .info-row {
+      background: #f9fbfd;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border-left: 3px solid #E6B17E;
+    }
+    
+    .chart-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    .chart-box {
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+    canvas {
+      max-height: 180px;
+      width: 100%;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.8);
+      border-top: 1px solid rgba(255,255,255,0.2);
+      margin-top: 1.5rem;
+      backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.3);
+      border-radius: 40px;
+    }
+    
+    .copy-icon {
+      cursor: pointer;
+      color: #8ba0bc;
+      margin-left: 8px;
+    }
+    .copy-icon:hover {
+      color: #E6B17E;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  
+  <!-- Welcome Hero with Glass Effect -->
+  <div class="welcome-hero">
+    <h1><i class="fas fa-hand-peace"></i> স্বাগতম | Welcome</h1>
+    <div class="welcome-note">
+      <p>ভগবানপুর গ্রাম পঞ্চায়েত, চাঁচল-১ ব্লক, মালদহ জেলার একটি অগ্রণী পঞ্চায়েত। গ্রামীণ উন্নয়ন, স্বচ্ছ শাসন ও জনমুখী সেবার মাধ্যমে আমরা প্রতিটি নাগরিকের দোরগোড়ায় সরকারি পরিষেবা পৌঁছে দিতে প্রতিশ্রুতিবদ্ধ।</p>
+    </div>
+    <div class="office-desc">
+      <i class="fas fa-landmark" style="margin-right: 8px;"></i> 
+      ভগবানপুর গ্রাম পঞ্চায়েত কার্যালয় স্থানীয় স্বায়ত্তশাসনের কেন্দ্রবিন্দু। এখানে গ্রামীণ জনগণের উন্নয়নমূলক কাজ, প্রশাসনিক পরিষেবা, এবং বিভিন্ন প্রকল্প বাস্তবায়ন করা হয়। আমাদের লক্ষ্য হল "সবাই মিলে উন্নয়ন" - স্বচ্ছতা, জবাবদিহিতা ও অংশগ্রহণের মাধ্যমে গ্রামের সামগ্রিক অগ্রগতি নিশ্চিত করা।
+    </div>
+  </div>
+
+  <!-- Action Cards Grid - Glass Transparent with Unique Colors -->
+  <div class="action-grid">
+    
+    <!-- Card 1: Contact & Location -->
+    <div class="action-card card-1" onclick="openModal('contact')">
+      <div class="action-icon"><i class="fas fa-map-pin"></i></div>
+      <h3>যোগাযোগ ও অবস্থান</h3>
+      <p>গ্রাম পঞ্চায়েত কার্যালয়ের ঠিকানা, ইমেইল, ফোন নম্বর ও গুগল ম্যাপ লোকেশন দেখুন</p>
+      <button class="action-btn"><i class="fas fa-arrow-right"></i> দেখুন</button>
+    </div>
+    
+    <!-- Card 2: Elected Members -->
+    <div class="action-card card-2" onclick="openModal('members')">
+      <div class="action-icon"><i class="fas fa-users"></i></div>
+      <h3>নির্বাচিত পঞ্চায়েত সদস্য (২০ আসন)</h3>
+      <p>গ্রাম পঞ্চায়েতের সমস্ত নির্বাচিত সদস্যের তালিকা, এলাকা ও সাঁসদ নম্বর সহ</p>
+      <button class="action-btn"><i class="fas fa-arrow-right"></i> দেখুন</button>
+    </div>
+    
+    <!-- Card 3: Polling Stations & Villages -->
+    <div class="action-card card-3" onclick="openModal('polling')">
+      <div class="action-icon"><i class="fas fa-vote-yea"></i></div>
+      <h3>ভোটকেন্দ্র (১০৯-১২৯) ও গ্রাম তালিকা</h3>
+      <p>সমস্ত ভোটকেন্দ্রের তালিকা ও পঞ্চায়েতের অন্তর্গত গ্রামসমূহ</p>
+      <button class="action-btn"><i class="fas fa-arrow-right"></i> দেখুন</button>
+    </div>
+    
+    <!-- Card 4: Staff List -->
+    <div class="action-card card-4" onclick="openModal('staff')">
+      <div class="action-icon"><i class="fas fa-id-card"></i></div>
+      <h3>পঞ্চায়েত কর্মীবৃন্দ</h3>
+      <p>প্রশাসনিক কর্মী, GPK, VRP, CF সহ সমস্ত কর্মচারীর তালিকা</p>
+      <button class="action-btn"><i class="fas fa-arrow-right"></i> দেখুন</button>
+    </div>
+    
+    <!-- Card 5: Statistics & Charts -->
+    <div class="action-card card-5" onclick="openModal('stats')">
+      <div class="action-icon"><i class="fas fa-chart-pie"></i></div>
+      <h3>জনসংখ্যা ও উন্নয়ন তথ্য</h3>
+      <p>জনসংখ্যার পরিসংখ্যান, সাক্ষরতার হার, MGNREGA বাজেট ও রঙিন গ্রাফ</p>
+      <button class="action-btn"><i class="fas fa-arrow-right"></i> দেখুন</button>
+    </div>
+    
+    <!-- Card 6: Infrastructure -->
+    <div class="action-card card-6" onclick="openModal('infra')">
+      <div class="action-icon"><i class="fas fa-hard-hat"></i></div>
+      <h3>উন্নয়ন পরিকাঠামো</h3>
+      <p>পানীয় জল, বিদ্যুৎ, শিক্ষা, স্বাস্থ্য, সড়ক সংযোগ ও MGNREGA প্রকল্প</p>
+      <button class="action-btn"><i class="fas fa-arrow-right"></i> দেখুন</button>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>© ২০২৫ ভগবানপুর গ্রাম পঞ্চায়েত, চাঁচল-১, মালদহ | ই-গভর্নেন্স পোর্টাল | তথ্য: নির্বাচন কমিশন ও পঞ্চায়েত দপ্তর</p>
+  </div>
+</div>
+
+<!-- Modal Container -->
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle"><i class="fas fa-info-circle"></i> তথ্য</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Load Chart.js dynamically only when needed (previons loading issues)
+  let chartJsLoaded = false;
+  
+  function loadChartJs() {
+    return new Promise((resolve, reject) => {
+      if (typeof Chart !== 'undefined') {
+        chartJsLoaded = true;
+        resolve();
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+      script.onload = () => {
+        chartJsLoaded = true;
+        resolve();
+      };
+      script.onerror = () => {
+        console.warn('Chart.js failed to load, charts will not display');
+        resolve(); // Resolve anyway to not break the modal
+      };
+      document.head.appendChild(script);
+    });
+  }
+  
+  function openModal(type) {
+    const modal = document.getElementById('infoModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    
+    modal.classList.add('active');
+    
+    if (type === 'contact') {
+      modalTitle.innerHTML = '<i class="fas fa-map-pin"></i> যোগাযোগ ও অবস্থান';
+      modalBody.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <div class="info-row"><strong>📧 ইমেইল</strong><br>bhagabanpur.gp@gmail.com <i class="fas fa-copy copy-icon" onclick="copyEmail()"></i></div>
+            <div class="info-row"><strong>📍 ঠিকানা</strong><br>ভগবানপুর গ্রাম পঞ্চায়েত কার্যালয়, চাঁচল-১ ব্লক, মালদহ, পশ্চিমবঙ্গ - 732123</div>
+            <div class="info-row"><strong>🗺️ ভৌগোলিক অবস্থান</strong><br>চাঁচল মহকুমা, তাল অঞ্চল (নিম্নভূমি)</div>
+            <div class="info-row"><strong>📞 ফোন</strong><br>+91-XXXX-XXXXXX</div>
+          </div>
+          <div>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115291.35131263392!2d88.07192475467665!3d25.38515207320463!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39fcc9b6f34b3a6d%3A0x9e6f4d3e2f5c8a1!2sChanchal%2C%20West%20Bengal!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" width="100%" height="250" style="border:0; border-radius:12px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+      `;
+    }
+    else if (type === 'members') {
+      modalTitle.innerHTML = '<i class="fas fa-users"></i> নির্বাচিত পঞ্চায়েত সদস্য (২০ আসন)';
+      modalBody.innerHTML = `
+        <div style="overflow-x: auto;">
+          <table class="modal-table">
+            <thead><tr><th>ক্রমিক</th><th>গ্রাম সাঁসদ</th><th>এলাকা</th><th>সদস্যের নাম</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>ভগবানপুর/I</td><td>ঘাগরপাড়, নিমগাছি</td><td>ফেনশী খাতুন, রেজাউল করিম</td></tr>
+              <tr><td>2</td><td>ভগবানপুর/II</td><td>জাসুয়া</td><td>নার্গিশ খাতুন</td></tr>
+              <tr><td>3</td><td>ভগবানপুর/III</td><td>ভগবানপুর</td><td>কেশোমতী বর্মন</td></tr>
+              <tr><td>4</td><td>ভগবানপুর/IV</td><td>নয়নপুর</td><td>আলো মহালদার</td></tr>
+              <tr><td>5</td><td>ভগবানপুর/V</td><td>রামদেবপুর</td><td>তাজমিরা ইয়াসমিন</td></tr>
+              <tr><td>6</td><td>ভগবানপুর/VI</td><td>জোতচণ্ডী</td><td>অন্তরা খাতুন বিবি</td></tr>
+              <tr><td>7</td><td>ভগবানপুর/VII</td><td>দ.কালীগঞ্জ, উত্তর কালীগঞ্জ</td><td>আবু বক্কর সিদ্দিকী, নাসিমা বানু</td></tr>
+              <tr><td>8</td><td>ভগবানপুর/VIII</td><td>দারাকান্দি</td><td>মোঃ সরিফ আলী</td></tr>
+              <tr><td>9</td><td>ভগবানপুর/IX</td><td>ভেবা</td><td>হুসনারা খাতুন</td></tr>
+              <tr><td>10</td><td>ভগবানপুর/X</td><td>ভেবা</td><td>মোঃ আলামিন</td></tr>
+              <tr><td>11</td><td>ভগবানপুর/XI</td><td>সেরবাবর</td><td>ফেরদৌসি বেগম</td></tr>
+              <tr><td>12</td><td>ভগবানপুর/XII</td><td>সেরবাবর</td><td>ইঞ্জিলা বিবি</td></tr>
+              <tr><td>13</td><td>ভগবানপুর/XIII</td><td>চরালু</td><td>গুলাব আলী</td></tr>
+              <tr><td>14</td><td>ভগবানপুর/XIV</td><td>হরিপুর</td><td>বেনেজি খাতুন</td></tr>
+              <tr><td>15</td><td>ভগবানপুর/XV</td><td>হরিপুর</td><td>মোঃ আতাউর রহমান</td></tr>
+              <tr><td>16</td><td>ভগবানপুর/XVI</td><td>পানবাড়া</td><td>কৌসারা বেগম</td></tr>
+              <tr><td>17</td><td>ভগবানপুর/XVII</td><td>খাদিয়ারপুর</td><td>আফাজুদ্দিন আহমেদ</td></tr>
+              <tr><td>18</td><td>ভগবানপুর/XVIII</td><td>অরবরা</td><td>জেদ রহমান</td></tr>
+              <tr><td>19</td><td>ভগবানপুর/XIX</td><td>অরবরা</td><td>মৌসুমি খাতুন</td></tr>
+              <tr><td>20</td><td>ভগবানপুর/XX</td><td>খাসালপুর</td><td>সৈয়দ নিয়ামুল হক</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    else if (type === 'polling') {
+      modalTitle.innerHTML = '<i class="fas fa-vote-yea"></i> ভোটকেন্দ্র ও গ্রাম তালিকা';
+      modalBody.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <h3 style="color:#1E5A6B;">🗳️ ভোটকেন্দ্র (১০৯-১২৯)</h3>
+            <div class="badge-container">
+              <span class="badge">109 নিমগাছি SSK</span><span class="badge">110 নিমগাছি SSK</span>
+              <span class="badge">111 জাসুয়া জহির খান</span><span class="badge">112 ভগবানপুর প্রা. বিদ্যা</span>
+              <span class="badge">113 নয়নপুর প্রা. বিদ্যা</span><span class="badge">114 রামদেবপুর প্রা. বিদ্যা</span>
+              <span class="badge">115 ভেবা ক্লাব</span><span class="badge">116 দক্ষিণ কালীগঞ্জ</span>
+              <span class="badge">117 চণ্ডীপুর</span><span class="badge">118-119 ভেবা</span>
+              <span class="badge">120 সেরবাবর MSK</span><span class="badge">121 সেরবাবর প্রা. বিদ্যা</span>
+              <span class="badge">122 চরালু</span><span class="badge">123-124 পূর্ব নিচিতপুর</span>
+              <span class="badge">125 বাগুঞ্জ</span><span class="badge">126 ভগবানপুর SGSY</span>
+              <span class="badge">127 অরবরা হাই স্কুল</span><span class="badge">128 অরবরা প্রা. বিদ্যা</span>
+              <span class="badge">129 অরবরা শিশু শিক্ষা কেন্দ্র</span>
+            </div>
+          </div>
+          <div>
+            <h3 style="color:#1E5A6B;">🏡 মৌজা ও গ্রাম (৩২টি)</h3>
+            <div class="badge-container">
+              <span class="badge">নিমগাছি</span><span class="badge">ঘাগরপাড়</span><span class="badge">জাসুয়া</span>
+              <span class="badge">ভগবানপুর</span><span class="badge">নয়নপুর</span><span class="badge">রামদেবপুর</span>
+              <span class="badge">জোতচণ্ডী</span><span class="badge">ভেবা</span><span class="badge">উত্তর কালীগঞ্জ</span>
+              <span class="badge">দক্ষিণ কালীগঞ্জ</span><span class="badge">বাগুঞ্জ</span><span class="badge">পানবাড়া</span>
+              <span class="badge">হরিপুর</span><span class="badge">খাদিয়ারপুর</span><span class="badge">অরবরা</span>
+              <span class="badge">খোশালপুর</span><span class="badge">চণ্ডীপুর</span><span class="badge">দারাকান্দি</span>
+              <span class="badge">রায়ঘাটা</span><span class="badge">সেরবাবর</span><span class="badge">চরালু</span>
+              <span class="badge">গৌরীপুর</span><span class="badge">রাণাপুর</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    else if (type === 'staff') {
+      modalTitle.innerHTML = '<i class="fas fa-id-card"></i> পঞ্চায়েত কর্মীবৃন্দ';
+      modalBody.innerHTML = `
+        <div class="info-row"><strong>📋 প্রশাসনিক কর্মী</strong><br>নির্বাহী সহকারী মোঃ নুরুল ইসলাম, সচিব নরেশ চন্দ্র সরকার, টিএ সুদীপ কুমার, সহায়ক দীপঙ্কর প্রামাণিক, সুরজিৎ মণ্ডল</div>
+        <div class="info-row"><strong>👥 GPK / HMO / GRS</strong><br>মুসরেফা খাতুন, ভূষণ সরকার, উত্তম বসাক, ডঃ মালয় সরকার, মোঃ সানাউল্লাহ, আকরামুল মন্ডল, সৈয়দ রেহান আলী</div>
+        <div class="info-row"><strong>🛡️ VRP & CF</strong><br>VRP: মুন্নুন রায় দাস, মোঃ সাকিল আলম, মোহাম্মদুল হাসান, মুক্তি দাস, মঙ্গলা কর্মকার, সাহানাজ খাতুন, রাজু জুলফিকার, সহজামল হক।<br>CF: মোঃ মৃণাল আজাদ, নুরজামাল, মিরাজ হোসেন, সৈয়দ নুমান আলী, মোঃ আফজাল হোসেন, নাজিমুদ্দিন, এহেসানুল হক, রফিকুল ইসলাম, মোঃ ফিরোজ</div>
+        <div class="info-row"><strong>📊 NREGS Supervisor / BFT</strong><br>মোজাম্মেল হক, সৈয়দ রেজাউল রহমান</div>
+      `;
+    }
+    else if (type === 'stats') {
+      modalTitle.innerHTML = '<i class="fas fa-chart-pie"></i> জনসংখ্যা ও উন্নয়ন তথ্য';
+      modalBody.innerHTML = `
+        <div class="chart-container" id="chartContainer">
+          <div class="chart-box"><canvas id="statReligionChart" width="200" height="150"></canvas><p style="font-size:0.7rem;">ধর্মীয় অনুপাত (ব্লক)</p></div>
+          <div class="chart-box"><canvas id="statLiteracyChart" width="200" height="150"></canvas><p style="font-size:0.7rem;">সাক্ষরতার হার (%)</p></div>
+          <div class="chart-box"><canvas id="statMgnregaChart" width="200" height="150"></canvas><p style="font-size:0.7rem;">MGNREGA তহবিল (লাখ টাকা)</p></div>
+        </div>
+        <div class="info-row"><strong>📊 পরিসংখ্যান</strong><br>মোট জনসংখ্যা (ব্লক) ২,০৪,৭৪০; মুসলিম ৭১.২২%, হিন্দু ২৮.৬১%; সাক্ষরতার হার ৬৫.০৯% (চাঁচল সাবডিভিশনের গড় ৫৭.৬৮%)। MGNREGA উদ্বোধনী ব্যালেন্স ₹১১.৫৩ লাখ।</div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <div style="background: #eef2f6; padding: 10px; border-radius: 12px; text-align: center; flex:1;"><i class="fas fa-building"></i><br>পঞ্চায়েত ভবন</div>
+          <div style="background: #eef2f6; padding: 10px; border-radius: 12px; text-align: center; flex:1;"><i class="fas fa-school"></i><br>গ্রামীণ স্কুল</div>
+          <div style="background: #eef2f6; padding: 10px; border-radius: 12px; text-align: center; flex:1;"><i class="fas fa-hand-holding-heart"></i><br>উন্নয়ন প্রকল্প</div>
+        </div>
+      `;
+      
+      // Load Chart.js and create charts safely
+      loadChartJs().then(() => {
+        setTimeout(() => {
+          try {
+            if (typeof Chart !== 'undefined') {
+              // Religion Chart
+              const religionCtx = document.getElementById('statReligionChart');
+              if (religionCtx) {
+                new Chart(religionCtx, {
+                  type: 'doughnut', 
+                  data: { labels: ['মুসলিম 71.22%', 'হিন্দু 28.61%'], datasets: [{ data: [71.22, 28.61], backgroundColor: ['#2c7a5e', '#E6B17E'], borderWidth: 0 }] },
+                  options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 9 } } } } }
+                });
+              }
+              
+              // Literacy Chart
+              const literacyCtx = document.getElementById('statLiteracyChart');
+              if (literacyCtx) {
+                new Chart(literacyCtx, {
+                  type: 'bar', 
+                  data: { labels: ['ভগবানপুর GP', 'চাঁচল সাবডিভিশন'], datasets: [{ label: 'সাক্ষরতার হার %', data: [65.09, 57.68], backgroundColor: ['#1E5A6B', '#E6B17E'] }] },
+                  options: { responsive: true, maintainAspectRatio: true, scales: { y: { max: 80, beginAtZero: true } }, plugins: { legend: { position: 'top' } } }
+                });
+              }
+              
+              // MGNREGA Chart
+              const mgnregaCtx = document.getElementById('statMgnregaChart');
+              if (mgnregaCtx) {
+                new Chart(mgnregaCtx, {
+                  type: 'bar', 
+                  data: { labels: ['উদ্বোধনী ব্যালেন্স'], datasets: [{ label: 'লাখ টাকা', data: [11.53], backgroundColor: '#1E5A6B' }] },
+                  options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
+                });
+              }
+            } else {
+              console.log('Chart.js not available, showing fallback');
+              const chartContainer = document.getElementById('chartContainer');
+              if (chartContainer) {
+                chartContainer.innerHTML = '<div style="text-align:center; padding:20px;">📊 চার্ট লোড করা যায়নি</div>';
+              }
+            }
+          } catch(e) {
+            console.warn('Chart creation error:', e);
+          }
+        }, 100);
+      });
+    }
+    else if (type === 'infra') {
+      modalTitle.innerHTML = '<i class="fas fa-hard-hat"></i> উন্নয়ন পরিকাঠামো';
+      modalBody.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+          <div class="info-row"><strong>💧 পানীয় জল</strong><br>নলকূপ, ট্যাপ ও হ্যান্ডপাম্প</div>
+          <div class="info-row"><strong>⚡ বিদ্যুৎ</strong><br>গৃহস্থালি ও কৃষি সংযোগ</div>
+          <div class="info-row"><strong>🏫 শিক্ষা</strong><br>প্রাথমিক বিদ্যালয়, অরবরা উচ্চ বিদ্যালয়</div>
+          <div class="info-row"><strong>🏥 স্বাস্থ্য</strong><br>সাব-সেন্টার, PHC ৫-১০ কিমি দূরে</div>
+          <div class="info-row"><strong>🛣️ সড়ক সংযোগ</strong><br>পাকা রাস্তা, বাস পরিষেবা</div>
+          <div class="info-row"><strong>💰 MGNREGA</strong><br>সক্রিয় প্রকল্প ও কর্মসংস্থান</div>
+        </div>
+      `;
+    }
+  }
+  
+  function closeModal() {
+    document.getElementById('infoModal').classList.remove('active');
+  }
+  
+  function copyEmail() {
+    navigator.clipboard.writeText("bhagabanpur.gp@gmail.com").then(() => {
+      alert("ইমেল ঠিকানা কপি হয়েছে: bhagabanpur.gp@gmail.com");
+    }).catch(() => {
+      alert("ইমেল ঠিকানা: bhagabanpur.gp@gmail.com");
+    });
+  }
+  
+  window.copyEmail = copyEmail;
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+  
+  // Close modal on outside click
+  document.getElementById('infoModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  
+  // Ensure body doesn't have any scroll issues
+  document.body.style.overflow = 'auto';
+</script>
+</body>
+</html>

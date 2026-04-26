@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EARNEST MONEY REGISTER</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 20px;
+      background: #e8eef2;
+    }
+    
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 100%;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 15px;
+    }
+    
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 6px 14px;
+      background: white;
+      color: #1a1a1a;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    button:hover {
+      background: #f5f5f5;
+      border-color: #999;
+    }
+    
+    .export-group {
+      display: flex;
+      gap: 10px;
+      margin-left: auto;
+    }
+    
+    .export-excel {
+      background: #1e6f3f;
+      color: white;
+      border-color: #1e6f3f;
+    }
+    
+    .export-excel:hover {
+      background: #155a34;
+    }
+    
+    .print-btn {
+      background: #1a1a1a;
+      color: white;
+      border-color: #1a1a1a;
+    }
+    
+    .print-btn:hover {
+      background: #333;
+    }
+    
+    .info {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #2c3e50;
+      border-left: 3px solid #2ecc71;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .columns-badge {
+      font-family: monospace;
+      font-size: 11px;
+      background: #e9ecef;
+      padding: 3px 8px;
+      border-radius: 3px;
+      color: #495057;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      background: white;
+    }
+    
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+    }
+    
+    th {
+      background: #000000;
+      color: #ffffff;
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #333;
+      font-size: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    td {
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      color: #000000;
+      font-weight: 400;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    
+    tr:hover {
+      background-color: #fafbfc;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 12px;
+    }
+    
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      font-size: 13px;
+      font-weight: 500;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Print styles - Landscape with full data */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .container {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        background: white;
+        max-width: 100%;
+      }
+      
+      .header {
+        display: none;
+      }
+      
+      .info {
+        display: none;
+      }
+      
+      button {
+        display: none;
+      }
+      
+      .table-container {
+        overflow: visible;
+        border: none;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+      
+      th {
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        border: 1px solid #000;
+        padding: 8px;
+      }
+      
+      td {
+        border: 1px solid #000;
+        color: #000;
+        padding: 6px;
+        white-space: normal;
+        word-wrap: break-word;
+      }
+      
+      @page {
+        size: landscape;
+        margin: 0.3in;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 12px;
+      }
+      th, td {
+        padding: 8px 6px;
+        font-size: 11px;
+      }
+      button {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>EARNEST MONEY REGISTER</h2>
+    <div class="button-group">
+      <button onclick="refreshData()">Refresh</button>
+      <button class="print-btn" onclick="printPage()">Print</button>
+    </div>
+    <div class="export-group">
+      <button class="export-excel" onclick="exportToExcel()">Export Excel</button>
+    </div>
+  </div>
+  <div class="info" id="info">
+    <span>Loading data...</span>
+    <span class="columns-badge" id="columns-badge">Columns: -</span>
+  </div>
+  <div id="data">
+    <div class="loading">Loading data from server...</div>
+  </div>
+</div>
+
+<script>
+var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
+var DESIRED_COLUMNS = [3,4,5,6,7,8,9,10,11,12,13];
+var currentData = null;
+
+function isInIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+}
+
+function showMessage(msg, type) {
+  var existingToast = document.querySelector('.toast-message');
+  if (existingToast) existingToast.remove();
+  
+  var toast = document.createElement('div');
+  toast.className = 'toast-message';
+  toast.innerHTML = msg;
+  document.body.appendChild(toast);
+  
+  setTimeout(function() {
+    toast.remove();
+  }, 3000);
+}
+
+function exportToExcel() {
+  if (!currentData || currentData.length === 0) {
+    showMessage('No data to export', 'error');
+    return;
+  }
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  var html = '<html><head><meta charset="UTF-8"><title>Earnest Money Register</title>';
+  html += '<style>th{background:#000;color:#fff;padding:10px}td,th{border:1px solid #ddd;padding:8px}table{border-collapse:collapse}</style>';
+  html += '</head><body><h2>EARNEST MONEY REGISTER</h2>';
+  html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+  html += '<p>Total Records: ' + (currentData.length - 1) + '</p>';
+  html += '<table border="1" cellpadding="8" cellspacing="0">';
+  
+  for (var i = 0; i < currentData.length; i++) {
+    html += '<tr>';
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (currentData[i][colIndex] !== undefined && currentData[i][colIndex] !== null) ? currentData[i][colIndex] : '';
+      if (i === 0) {
+        html += '<th>' + escapeHtml(String(cellValue)) + '</th>';
+      } else {
+        html += '<td>' + escapeHtml(String(cellValue)) + '</td>';
+      }
+    }
+    html += '</tr>';
+  }
+  
+  html += '</table></body></html>';
+  
+  var blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+  var link = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = 'Earnest_Money_Register_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.xls';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  showMessage('Excel export complete!', 'success');
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  var map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+function loadData() {
+  document.getElementById('data').innerHTML = '<div class="loading">Loading data from server...</div>';
+  document.getElementById('columns-badge').textContent = 'Columns: ' + DESIRED_COLUMNS.join(', ');
+  
+  fetch(WEB_APP_URL)
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (!data || data.length === 0) {
+        document.getElementById('data').innerHTML = '<div class="empty-state">No data found</div>';
+        document.getElementById('info').innerHTML = '<span>No data found</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+        return;
+      }
+      
+      currentData = data;
+      displayTable(data);
+      
+      document.getElementById('info').innerHTML = '<span>Loaded ' + (data.length - 1) + ' records | ' + data[0].length + ' total columns</span><span class="columns-badge">Showing columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+      showMessage('Loaded ' + (data.length - 1) + ' records successfully', 'success');
+    })
+    .catch(function(error) {
+      document.getElementById('data').innerHTML = '<div class="empty-state" style="color:#dc3545;">Error: ' + error.message + '</div>';
+      document.getElementById('info').innerHTML = '<span>Failed to load data</span><span class="columns-badge">Columns: ' + DESIRED_COLUMNS.join(', ') + '</span>';
+      showMessage('Failed to load data: ' + error.message, 'error');
+    });
+}
+
+function displayTable(data) {
+  if (!data || data.length === 0) return;
+  
+  var colIndices = DESIRED_COLUMNS.map(function(col) { return col - 1; });
+  
+  var html = '<div class="table-container"><table>';
+  
+  for (var i = 0; i < data.length; i++) {
+    html += '<tr>';
+    
+    for (var j = 0; j < colIndices.length; j++) {
+      var colIndex = colIndices[j];
+      var cellValue = (data[i][colIndex] !== undefined && data[i][colIndex] !== null) ? data[i][colIndex] : '';
+      var escapedText = escapeHtml(String(cellValue));
+      
+      if (i === 0) {
+        html += '<th>' + escapedText + '</th>';
+      } else {
+        html += '<td>' + escapedText + '</td>';
+      }
+    }
+    
+    html += '</tr>';
+  }
+  
+  html += '</table></div>';
+  document.getElementById('data').innerHTML = html;
+}
+
+function refreshData() {
+  loadData();
+}
+
+function printPage() {
+  window.print();
+}
+
+window.onload = loadData;
+</script>
+</body>
+</html>

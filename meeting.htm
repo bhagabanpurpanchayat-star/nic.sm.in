@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মিটিং ম্যানেজমেন্ট · এডিট মোড (আপডেট বাটন)</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #a5bed9;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 15px 15px 30px 15px;
+            font-family: 'Noto Sans Bengali', 'Segoe UI', 'Times New Roman', serif;
+        }
+        .app-wrapper {
+            max-width: 1500px;
+            width: 100%;
+            background: #e2ecf7;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 20, 40, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .system-title {
+            background: #08355c;
+            color: white;
+            padding: 0.8rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 3px solid #ffc107;
+            text-align: center;
+        }
+        .system-title span {
+            font-size: 0.9rem;
+            background: #306998;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            margin-left: 15px;
+        }
+
+        /* Storage Indicator */
+        .storage-bar-container {
+            background: #e9f2fc;
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid #9cb9d7;
+        }
+        .storage-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .storage-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #08355c;
+        }
+        .progress-bar {
+            flex: 1;
+            height: 20px;
+            background: #c8d9f0;
+            border-radius: 30px;
+            overflow: hidden;
+            border: 1px solid #5f8fc0;
+            min-width: 200px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1b5385, #2a7a4d);
+            width: 0%;
+            border-radius: 30px;
+            transition: width 0.3s;
+        }
+        .storage-text {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #123f67;
+            white-space: nowrap;
+        }
+        .storage-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .storage-btn {
+            background: #1b5385;
+            color: white;
+            border: none;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            cursor: pointer;
+            border: 1px solid #598ac2;
+        }
+        .storage-btn.warning {
+            background: #a03535;
+        }
+        .storage-btn.success {
+            background: #2a7a4d;
+        }
+
+        /* তিন কলাম ইনপুট */
+        .three-col {
+            display: flex;
+            flex-wrap: wrap;
+            background: #e9f2fc;
+            border-bottom: 3px solid #9cb9d7;
+            flex-shrink: 0;
+        }
+        .col {
+            padding: 1rem 0.9rem;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+        .col-left {
+            flex: 2 1 250px;
+            min-width: 230px;
+            border-right: 2px dashed #8aa7cc;
+        }
+        .col-middle {
+            flex: 2.5 1 320px;
+            min-width: 300px;
+            border-right: 2px dashed #8aa7cc;
+            background: #deecfa;
+        }
+        .col-right {
+            flex: 2 1 250px;
+            min-width: 230px;
+            background: #d7e6fb;
+        }
+        .col-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #08355c;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .col-title span {
+            background: #1b5385;
+            color: white;
+            padding: 0.1rem 1rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+        }
+        .selected-count {
+            background: #ffc107;
+            color: #08355c;
+            padding: 0.1rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .field-sm {
+            margin-bottom: 0.6rem;
+        }
+        .field-sm label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #123f67;
+            display: block;
+        }
+        .field-sm input, .field-sm select {
+            width: 100%;
+            padding: 0.3rem 0.8rem;
+            border: 1px solid #7f9fc7;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            background: white;
+        }
+        .field-sm input:focus, .field-sm select:focus {
+            outline: 2px solid #ffc107;
+            border-color: #08355c;
+        }
+        
+        /* Time Picker Styles */
+        .time-picker-container {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .time-select {
+            flex: 1;
+            padding: 0.3rem 0.5rem;
+            border: 1px solid #7f9fc7;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            background: white;
+            cursor: pointer;
+        }
+        .time-select:focus {
+            outline: 2px solid #ffc107;
+            border-color: #08355c;
+        }
+        .time-icon {
+            background: #1b5385;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid #598ac2;
+        }
+        .time-icon:hover {
+            background: #2a6a9e;
+        }
+        .time-display {
+            background: #f0f7ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #08355c;
+            border: 1px dashed #1b5385;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .inline-duo {
+            display: flex;
+            gap: 6px;
+        }
+        .required-field {
+            color: #a03535;
+            font-size: 0.55rem;
+            margin-left: 5px;
+        }
+
+        /* Selection Controls */
+        .selection-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .select-btn {
+            background: #1b5385;
+            color: white;
+            border: none;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            cursor: pointer;
+            border: 1px solid #598ac2;
+            flex: 1;
+            min-width: 80px;
+        }
+        .select-btn.all {
+            background: #2a7a4d;
+        }
+        .select-btn.none {
+            background: #a03535;
+        }
+        .search-box {
+            width: 100%;
+            padding: 0.3rem 1rem;
+            border: 1px solid #4e81b5;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            margin-bottom: 8px;
+            background: white;
+        }
+
+        /* চেকবক্স - শুধু নাম দেখাবে */
+        .checkbox-scroll {
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid #8daacd;
+            border-radius: 16px;
+            padding: 8px 6px;
+            background: #f6faff;
+            margin-bottom: 8px;
+        }
+        .member-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.65rem;
+            padding: 4px 0;
+            border-bottom: 1px dashed #c4d4ec;
+        }
+        .member-row input {
+            width: 16px;
+            height: 16px;
+            accent-color: #1b5589;
+            cursor: pointer;
+        }
+        .member-row label {
+            cursor: pointer;
+            flex: 1;
+        }
+        .selected-list {
+            background: #dde9f7;
+            border-radius: 16px;
+            padding: 8px;
+            border: 1px solid #5f8fc0;
+        }
+        .selected-list .mini-title {
+            font-weight: 700;
+            font-size: 0.65rem;
+            color: #0c345a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .selected-names {
+            max-height: 80px;
+            overflow-y: auto;
+            font-size: 0.6rem;
+            background: #f0f7ff;
+            border-radius: 12px;
+            padding: 5px;
+        }
+        .selected-names span {
+            display: block;
+            border-bottom: 1px dashed #acc6e3;
+            padding: 3px 5px;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+        .quick-btn {
+            background: #e9f2fc;
+            border: 1px solid #7f9fc7;
+            color: #08355c;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* এজেন্ডা ডায়নামিক */
+        .agenda-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: 8px 0;
+        }
+        .ag-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ag-row .num {
+            background: #275d91;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .ag-row input {
+            flex: 1;
+            padding: 0.3rem 0.9rem;
+            border: 1px solid #4e81b5;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            background: white;
+        }
+        .ag-row input:focus {
+            outline: 2px solid #ffc107;
+            border-color: #08355c;
+        }
+        .ag-note {
+            font-size: 0.55rem;
+            color: #1d4875;
+        }
+
+        /* বাটন গ্রুপ */
+        .button-row {
+            background: #e9f2fc;
+            padding: 0.7rem 2rem 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .gen-btn, .pdf-btn, .doc-btn, .save-btn, .view-btn, .update-btn, .close-btn, .export-csv-btn, .import-btn {
+            border: none;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px #0f3552;
+            cursor: pointer;
+            border: 1px solid #598ac2;
+        }
+        .gen-btn { background: #114977; }
+        .pdf-btn { background: #a03535; }
+        .doc-btn { background: #2f6b2f; }
+        .save-btn { background: #1f7a7a; }
+        .view-btn { background: #9d6b1f; }
+        .update-btn { background: #2a7a4d; }
+        .close-btn { background: #7a3e3e; }
+        .export-csv-btn { background: #4a6f8f; }
+        .import-btn { background: #6f4a8f; }
+
+        /* Error Message */
+        .error-message {
+            background: #f8e8dd;
+            color: #a03535;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: none;
+            margin: 0 2rem 0.5rem 2rem;
+            border: 1px solid #a03535;
+        }
+
+        /* প্রিন্ট প্রিভিউ (স্ক্রোল) */
+        .print-area {
+            background: #c8d9f0;
+            padding: 20px 15px;
+            max-height: 550px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            border-top: 3px solid #6f8db0;
+        }
+        .member-page {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 24px;
+            padding: 18px 15px;
+            box-shadow: 0 8px 20px rgba(0, 25, 45, 0.5);
+            page-break-after: always;
+            margin: 0 auto;
+        }
+        .double-letter {
+            display: flex;
+            background: #fefefc;
+            border: none;
+        }
+        .letter-half {
+            flex: 1 1 45%;
+            padding: 0.7rem 0.7rem;
+            font-size: 0.65rem;
+            line-height: 1.4;
+            background: white;
+        }
+        .vertical-dotted {
+            flex: 0 0 2px;
+            border-left: 2px dotted #4a6f8f;
+            height: auto;
+            margin: 5px 0;
+        }
+        .format-letter {
+            white-space: pre-line;
+        }
+        .center { text-align: center; }
+        .bold { font-weight: 700; }
+        .dotted-line { border-top: 1px dashed #2a2a2a; margin: 4px 0; }
+        .signature-line { display: flex; justify-content: space-between; margin-top: 10px; }
+        .copy-badge {
+            background: #1b5385; color: white; padding: 0.1rem 0.9rem; border-radius: 20px;
+            font-size: 0.5rem; display: inline-block; margin-bottom: 3px;
+        }
+        .agenda-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 2px 0;
+        }
+        .agenda-icon {
+            font-size: 0.7rem;
+            background: #275d91;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .member-detail-line {
+            margin: 2px 0;
+            font-size: 0.65rem;
+        }
+
+        /* পূর্ববর্তী সভা টেবিল */
+        .previous-meetings {
+            background: white;
+            margin: 15px 20px;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: inset 0 2px 8px #b0c7df;
+            max-height: 400px;
+            overflow: auto;
+            border: 2px solid #1b5385;
+        }
+        .prev-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .prev-header h3 {
+            color: #08355c;
+            font-size: 1rem;
+        }
+        .close-prev-btn {
+            background: #a03535;
+            color: white;
+            border: none;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+        th {
+            background: #1b5385;
+            color: white;
+            padding: 8px;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            border: 1px solid #acc6e3;
+            padding: 6px;
+        }
+        .action-icons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        .action-icons i {
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .fa-eye { color: #1f7a7a; }
+        .fa-edit { color: #b36b1e; }
+        .fa-trash-alt { color: #b33b3b; }
+        .fa-eye:hover { color: #0a4c4c; }
+        .fa-edit:hover { color: #8e4f0e; }
+        .fa-trash-alt:hover { color: #8f2a2a; }
+    </style>
+</head>
+<body>
+<div class="app-wrapper">
+    <div class="system-title">
+        📋 মিটিং ম্যানেজমেন্ট সিস্টেম <span>১০ MB স্টোরেজ</span>
+    </div>
+
+    <!-- Storage Indicator -->
+    <div class="storage-bar-container">
+        <div class="storage-info">
+            <span class="storage-label">💾 স্টোরেজ</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="storageProgress" style="width: 0%;"></div>
+            </div>
+            <span class="storage-text" id="storageText">০ MB / ১০ MB (০%)</span>
+            <div class="storage-actions">
+                <button class="storage-btn" id="exportDataBtn" title="ব্যাকআপ নিন">📥 ব্যাকআপ</button>
+                <button class="storage-btn" id="importDataBtn" title="পূর্ববর্তী ব্যাকআপ লোড করুন">📤 রিস্টোর</button>
+                <button class="storage-btn warning" id="clearOldBtn" title="পুরনো ডেটা মুছুন">🗑️ পুরনো ডেটা</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Message Display -->
+    <div class="error-message" id="errorMessage"></div>
+
+    <!-- তিন কলাম ইনপুট - ক্লিন ভার্সন -->
+    <div class="three-col">
+        <div class="col col-left">
+            <div class="col-title"><span>📅</span> সভার বিবরণ <span class="required-field">*সবগুলো পূরণ করুন</span></div>
+            <div class="field-sm"><label>📆 পত্র ইস্যুর তারিখ <span class="required-field">*</span></label><input type="date" id="issueDate"></div>
+            <div class="field-sm"><label>📅 সভার তারিখ <span class="required-field">*</span></label><input type="date" id="meetingDate"></div>
+            
+            <!-- Time Picker with Clock -->
+            <div class="field-sm">
+                <label>⏰ সভার সময় <span class="required-field">*</span></label>
+                <div class="time-picker-container">
+                    <select class="time-select" id="meetingHour">
+                        <option value="">ঘন্টা</option>
+                        <option value="০১">০১</option><option value="০২">০২</option><option value="০৩">০৩</option>
+                        <option value="০৪">০৪</option><option value="০৫">০৫</option><option value="০৬">০৬</option>
+                        <option value="০৭">০৭</option><option value="০৮">০৮</option><option value="০৯">০৯</option>
+                        <option value="১০">১০</option><option value="১১">১১</option><option value="১২">১২</option>
+                    </select>
+                    <span>:</span>
+                    <select class="time-select" id="meetingMinute">
+                        <option value="">মিনিট</option>
+                        <option value="০০">০০</option><option value="১৫">১৫</option><option value="৩০">৩০</option>
+                        <option value="৪৫">৪৫</option>
+                    </select>
+                    <select class="time-select" id="meetingAmPm">
+                        <option value="">AM/PM</option>
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                    </select>
+                    <div class="time-icon" id="setCurrentTimeBtn" title="বর্তমান সময় নিন">🕒</div>
+                </div>
+                <div class="time-display" id="meetingTimeDisplay">--:-- --</div>
+                <input type="hidden" id="meetingTime">
+            </div>
+            
+            <div class="field-sm"><label>📌 দিন (স্বয়ংক্রিয়)</label><input type="text" id="dayText" readonly></div>
+            <div class="field-sm"><label>🧩 সভার ধরন <span class="required-field">*</span></label>
+                <select id="meetingType">
+                    <option value="">-- সভার ধরন নির্বাচন করুন --</option>
+                    <option value="সাধারণ">সাধারণ</option>
+                    <option value="কৃষি ও প্রানি সম্পদ বিকাশ">কৃষি ও প্রানি</option>
+                    <option value="শিল্প ও পরিকাঠামো উপসমিতি">শিল্প ও পরিকাঠামো</option>
+                    <option value="জরুরি সাধারণ">জরুরি সাধারণ</option>
+                    <option value="অর্থ ও পরিকল্পনা উপসমিতি">অর্থ ও পরিকল্পনা</option>
+                    <option value="নারী শিশু উন্নয়ন ও সমাজ কল্যাণ উপসমিতি">নারী শিশু</option>
+                    <option value="শিক্ষা ও জন স্বাস্থ্য উপসমিতি">শিক্ষা ও স্বাস্থ্য</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col col-middle">
+            <div class="col-title">
+                <span>✅</span> সদস্য নির্বাচন <span class="required-field">*অন্তত ১ জন</span>
+                <span class="selected-count" id="selectedCount">০</span>
+            </div>
+            
+            <!-- Search Box -->
+            <input type="text" class="search-box" id="searchMember" placeholder="🔍 সদস্যের নাম খুঁজুন...">
+            
+            <!-- Selection Controls -->
+            <div class="selection-controls">
+                <button class="select-btn all" id="selectAllBtn">✅ সব নির্বাচন</button>
+                <button class="select-btn none" id="unselectAllBtn">❌ সব বাতিল</button>
+            </div>
+            
+            <div class="checkbox-scroll" id="checkboxContainer"></div>
+            
+            <!-- Quick Actions and Selected List -->
+            <div class="selected-list">
+                <div class="mini-title">
+                    নির্বাচিত সদস্য (ক্রমিক)
+                    <span style="background:#ffc107; padding:0.1rem 0.5rem; border-radius:20px; font-size:0.55rem;" id="miniCount">০</span>
+                </div>
+                <div class="selected-names" id="selectedOrderedList">—</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="copyNamesBtn">📋 কপি</button>
+                    <button class="quick-btn" id="clearSelectedBtn">🗑️ সব বাতিল</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col col-right">
+            <div class="col-title"><span>📋</span> এজেন্ডা ইনপুট <span class="required-field">*অন্তত ১ টি</span></div>
+            <div class="agenda-rows" id="agendaRows"></div>
+            <div class="ag-note">★ শেষ ঘরে লিখলে নতুন সারি যোগ হয়</div>
+        </div>
+    </div>
+
+    <!-- বাটন গ্রুপ -->
+    <div class="button-row" id="defaultButtons">
+        <button class="gen-btn" id="generateBtn">🖨️ জেনারেট</button>
+        <button class="save-btn" id="saveSheetBtn">💾 সেভ</button>
+        <button class="view-btn" id="viewPrevBtn">📋 পূর্ববর্তী সভা দেখুন</button>
+        <button class="pdf-btn" id="exportPdfBtn">📕 PDF</button>
+        <button class="doc-btn" id="exportDocBtn">📄 DOC</button>
+        <button class="export-csv-btn" id="exportCsvBtn">📊 CSV</button>
+    </div>
+
+    <!-- এডিট মোড বাটন -->
+    <div class="button-row" id="editModeButtons" style="display: none;">
+        <button class="update-btn" id="updateBtn">🔄 আপডেট</button>
+        <button class="close-btn" id="closeEditBtn">✖️ ক্লোজ</button>
+    </div>
+
+    <!-- পূর্ববর্তী সভা টেবিল -->
+    <div id="previousMeetingsPanel" class="previous-meetings" style="display: none;">
+        <div class="prev-header">
+            <h3>📋 পূর্ববর্তী সভার তালিকা <span id="meetingCount" style="font-size:0.7rem; background:#ffc107; padding:0.1rem 0.8rem; border-radius:20px;">০ টি</span></h3>
+            <button class="close-prev-btn" id="closePrevBtn">বন্ধ করুন</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="prevMeetingTable">
+                <thead>
+                    <tr>
+                        <th>SL NO</th>
+                        <th>DATE OF MEETING</th>
+                        <th>MEETING TIME</th>
+                        <th>LETTER ISSUE DATE</th>
+                        <th>MEETING TYPE</th>
+                        <th>AGENDA</th>
+                        <th>RECIPIENT</th>
+                        <th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody id="prevTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="importFile" accept=".json, .csv" style="display: none;">
+
+    <!-- প্রিন্ট প্রিভিউ - এখানেই সব ডিটেলস দেখাবে -->
+    <div class="print-area" id="printPreview"></div>
+</div>
+
+<script>
+    (function() {
+        // ---------- সম্পূর্ণ সদস্য ডেটাবেস (শুধু লেটারে ব্যবহার হবে) ----------
+        const fullMemberDatabase = [
+            { name: "FENSHI KHATUN", gender: "Female", mobile: "9800258147", designation: "MEMBER", sansad: "Bhagabanpur/I-1", village: "NIMGACHHI" },
+            { name: "REJAUL KARIM", gender: "Male", mobile: "9735992075", designation: "Artha O Parikalpana", sansad: "Bhagabanpur/I-2", village: "NIMGACHHI" },
+            { name: "NARGISH KHATUN", gender: "Female", mobile: "8670401859", designation: "MEMBER", sansad: "Bhagabanpur/II-3", village: "JASUA" },
+            { name: "KESHAMATI BARMAN DAS", gender: "Female", mobile: "8145001300", designation: "MEMBER", sansad: "Bhagabanpur/III-4", village: "BHAGABANPUR" },
+            { name: "ALO MAHALDA", gender: "Female", mobile: "7074721220", designation: "MEMBER", sansad: "Bhagabanpur/IV-5", village: "NAYANPUR" },
+            { name: "TAJMIRA YEASMIN", gender: "Female", mobile: "7074259477", designation: "Nari O Sishu Unnayan", sansad: "Bhagabanpur/V-6", village: "RAMDEBPUR" },
+            { name: "ANTARA KHATUN", gender: "Female", mobile: "9958450623", designation: "MEMBER", sansad: "Bhagabanpur/VI-7", village: "JOTCHANDI" },
+            { name: "ABU BAKKAR SIDDIQUE", gender: "Male", mobile: "9635836810", designation: "MEMBER", sansad: "Bhagabanpur/VII-8", village: "UTTAR KALIGUNJ" },
+            { name: "NASIMA BANU", gender: "Female", mobile: "9635836810", designation: "MEMBER", sansad: "Bhagabanpur/VII-9", village: "UTTAR KALIGUNJ" },
+            { name: "MD SHARIF ALI", gender: "Male", mobile: "9593700059", designation: "MEMBER", sansad: "Bhagabanpur/VIII-10", village: "DARAKANDI" },
+            { name: "HUSNARA KHATUN", gender: "Female", mobile: "9609561690", designation: "Krishna O Pransampad", sansad: "Bhagabanpur/IX-11", village: "BHEBA" },
+            { name: "MD ALAMIN", gender: "Male", mobile: "7407460244", designation: "MEMBER", sansad: "Bhagabanpur/X-12", village: "BHEBA" },
+            { name: "FIRDOUSI BEGAM", gender: "Female", mobile: "9342082930", designation: "MEMBER", sansad: "Bhagabanpur/XI-13", village: "SERBABAR" },
+            { name: "INJILA BIBI", gender: "Female", mobile: "9735929646", designation: "MEMBER", sansad: "Bhagabanpur/XII-14", village: "SERBABAR" },
+            { name: "GULAB ALI", gender: "Male", mobile: "7290835127", designation: "MEMBER", sansad: "Bhagabanpur/XIII-15", village: "CHARALU" },
+            { name: "BENEJI KHATUN", gender: "Female", mobile: "9593711972", designation: "MEMBER", sansad: "Bhagabanpur/XIV-16", village: "HARIPUR" },
+            { name: "MD ATAUR RAHMAN", gender: "Male", mobile: "9733042218", designation: "MEMBER", sansad: "Bhagabanpur/XV-17", village: "HARIPUR" },
+            { name: "KAUSARA BEGAM", gender: "Female", mobile: "9593309682", designation: "Sikha O Jana Swastha", sansad: "Bhagabanpur/XVI-18", village: "PANBARA" },
+            { name: "AFAJUDDIN AHAMMED", gender: "Male", mobile: "8145850297", designation: "MEMBER", sansad: "Bhagabanpur/XVII-19", village: "KHADIYARPUR" },
+            { name: "ZED REHAMAN", gender: "Male", mobile: "8327437767", designation: "VICE CHAIRMAN", sansad: "Bhagabanpur/XVIII-20", village: "ARBARA" },
+            { name: "MOUSUMI KHATUN", gender: "Female", mobile: "7076775066", designation: "MEMBER", sansad: "Bhagabanpur/XIX-21", village: "ARBARA" },
+            { name: "SYED NEAMUL HOQUE", gender: "Male", mobile: "9733951496", designation: "Shilpa O Parikathamho", sansad: "Bhagabanpur/XX-22", village: "KHASALPUR" },
+            { name: "MUNNI KHATUN", gender: "Female", mobile: "6297707133", designation: "PS Member", sansad: "Bhagabanpur-1", village: "BELPUKUR" },
+            { name: "SAHIN AKTAR HOSSAIN", gender: "Male", mobile: "9733131420", designation: "PS Member", sansad: "Bhagabanpur-2", village: "RAMDEBPUR" },
+            { name: "RUPSANA BEGAM", gender: "Female", mobile: "7872857624", designation: "PS Member", sansad: "Bhagabanpur-3", village: "PANBARA" }
+        ];
+
+        // এলিমেন্ট রেফারেন্স
+        const issueDate = document.getElementById('issueDate');
+        const meetingDate = document.getElementById('meetingDate');
+        const meetingHour = document.getElementById('meetingHour');
+        const meetingMinute = document.getElementById('meetingMinute');
+        const meetingAmPm = document.getElementById('meetingAmPm');
+        const meetingTimeDisplay = document.getElementById('meetingTimeDisplay');
+        const meetingTimeHidden = document.getElementById('meetingTime');
+        const setCurrentTimeBtn = document.getElementById('setCurrentTimeBtn');
+        const dayText = document.getElementById('dayText');
+        const meetingType = document.getElementById('meetingType');
+        const checkboxContainer = document.getElementById('checkboxContainer');
+        const selectedOrderedList = document.getElementById('selectedOrderedList');
+        const agendaRowsDiv = document.getElementById('agendaRows');
+        const selectedCount = document.getElementById('selectedCount');
+        const miniCount = document.getElementById('miniCount');
+        const meetingCount = document.getElementById('meetingCount');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Selection elements
+        const searchMember = document.getElementById('searchMember');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const unselectAllBtn = document.getElementById('unselectAllBtn');
+        const copyNamesBtn = document.getElementById('copyNamesBtn');
+        const clearSelectedBtn = document.getElementById('clearSelectedBtn');
+        
+        // Storage elements
+        const storageProgress = document.getElementById('storageProgress');
+        const storageText = document.getElementById('storageText');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const importDataBtn = document.getElementById('importDataBtn');
+        const clearOldBtn = document.getElementById('clearOldBtn');
+        const importFile = document.getElementById('importFile');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        
+        // বাটন
+        const generateBtn = document.getElementById('generateBtn');
+        const exportPdfBtn = document.getElementById('exportPdfBtn');
+        const exportDocBtn = document.getElementById('exportDocBtn');
+        const saveSheetBtn = document.getElementById('saveSheetBtn');
+        const viewPrevBtn = document.getElementById('viewPrevBtn');
+        const closePrevBtn = document.getElementById('closePrevBtn');
+        const updateBtn = document.getElementById('updateBtn');
+        const closeEditBtn = document.getElementById('closeEditBtn');
+        const defaultButtons = document.getElementById('defaultButtons');
+        const editModeButtons = document.getElementById('editModeButtons');
+        
+        const printPreview = document.getElementById('printPreview');
+        const prevPanel = document.getElementById('previousMeetingsPanel');
+        const prevTableBody = document.getElementById('prevTableBody');
+
+        let currentEditIndex = null;
+        let savedMeetings = JSON.parse(localStorage.getItem('meetingRecords')) || [];
+        
+        // Storage limit in MB
+        const STORAGE_LIMIT_MB = 10;
+        const STORAGE_LIMIT_BYTES = STORAGE_LIMIT_MB * 1024 * 1024;
+
+        // Set today's date as default for date fields
+        const today = new Date().toISOString().split('T')[0];
+        issueDate.value = today;
+        meetingDate.value = today;
+
+        // Time Picker Functions
+        function updateMeetingTime() {
+            const hour = meetingHour.value;
+            const minute = meetingMinute.value;
+            const ampm = meetingAmPm.value;
+            
+            if (hour && minute && ampm) {
+                const timeString = `${hour}:${minute} ${ampm}`;
+                meetingTimeDisplay.textContent = timeString;
+                meetingTimeHidden.value = timeString;
+            } else {
+                meetingTimeDisplay.textContent = '--:-- --';
+                meetingTimeHidden.value = '';
+            }
+        }
+
+        function setCurrentTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            // Convert to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 should be 12
+            
+            // Format with leading zeros
+            const hourStr = hours.toString().padStart(2, '0');
+            const minuteStr = Math.round(minutes / 15) * 15; // Round to nearest 15 min
+            const minuteFormatted = minuteStr.toString().padStart(2, '0');
+            
+            meetingHour.value = hourStr;
+            meetingMinute.value = minuteFormatted;
+            meetingAmPm.value = ampm;
+            
+            updateMeetingTime();
+        }
+
+        // Add event listeners for time pickers
+        meetingHour.addEventListener('change', updateMeetingTime);
+        meetingMinute.addEventListener('change', updateMeetingTime);
+        meetingAmPm.addEventListener('change', updateMeetingTime);
+        setCurrentTimeBtn.addEventListener('click', setCurrentTime);
+
+        // Set default time to current time
+        setCurrentTime();
+
+        // ---------- Validation Function ----------
+        function validateAllFields() {
+            // Check issue date
+            if (!issueDate.value) {
+                showError('পত্র ইস্যুর তারিখ নির্বাচন করুন');
+                issueDate.focus();
+                return false;
+            }
+            
+            // Check meeting date
+            if (!meetingDate.value) {
+                showError('সভার তারিখ নির্বাচন করুন');
+                meetingDate.focus();
+                return false;
+            }
+            
+            // Check meeting time
+            if (!meetingTimeHidden.value) {
+                showError('সভার সময় নির্বাচন করুন');
+                meetingHour.focus();
+                return false;
+            }
+            
+            // Check meeting type
+            if (!meetingType.value) {
+                showError('সভার ধরন নির্বাচন করুন');
+                meetingType.focus();
+                return false;
+            }
+            
+            // Check if at least one member selected
+            const checks = Array.from(document.querySelectorAll('.memberCheck:checked'));
+            if (checks.length === 0) {
+                showError('অন্তত ১ জন সদস্য নির্বাচন করুন');
+                return false;
+            }
+            
+            // Check if at least one agenda item
+            const agendaItems = getAgendaItems();
+            if (agendaItems.length === 0) {
+                showError('অন্তত ১ টি এজেন্ডা আইটেম লিখুন');
+                return false;
+            }
+            
+            hideError();
+            return true;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = '⚠️ ' + message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.opacity = '1';
+            }, 10);
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        // ---------- Storage Management Functions ----------
+        function getStorageUsage() {
+            const data = JSON.stringify(savedMeetings);
+            const sizeInBytes = new Blob([data]).size;
+            const sizeInMB = sizeInBytes / (1024 * 1024);
+            const percentage = (sizeInBytes / STORAGE_LIMIT_BYTES) * 100;
+            return { bytes: sizeInBytes, mb: sizeInMB, percentage: Math.min(percentage, 100) };
+        }
+
+        function updateStorageDisplay() {
+            const usage = getStorageUsage();
+            const percentage = usage.percentage;
+            const mbUsed = usage.mb.toFixed(2);
+            
+            storageProgress.style.width = percentage + '%';
+            
+            // Change color based on usage
+            if (percentage > 90) {
+                storageProgress.style.background = 'linear-gradient(90deg, #a03535, #c05a5a)';
+            } else if (percentage > 70) {
+                storageProgress.style.background = 'linear-gradient(90deg, #b36b1e, #d48b3a)';
+            } else {
+                storageProgress.style.background = 'linear-gradient(90deg, #1b5385, #2a7a4d)';
+            }
+            
+            storageText.textContent = `${mbUsed} MB / ${STORAGE_LIMIT_MB} MB (${percentage.toFixed(1)}%)`;
+            
+            // Update meeting count
+            meetingCount.textContent = savedMeetings.length + ' টি';
+        }
+
+        function checkStorageBeforeSave() {
+            const usage = getStorageUsage();
+            const estimatedNewSize = usage.bytes + 2000; // Estimate 2KB for new meeting
+            
+            if (estimatedNewSize > STORAGE_LIMIT_BYTES) {
+                if (confirm('⚠️ স্টোরেজ প্রায় পূর্ণ! পুরনো ডেটা ব্যাকআপ করে মুছতে চান?')) {
+                    exportBackup();
+                    return false;
+                } else {
+                    alert('স্টোরেজ ফুল! নতুন সেভ করা সম্ভব নয়।');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function exportBackup() {
+            const dataStr = JSON.stringify(savedMeetings, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `meeting_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('ব্যাকআপ সফল হয়েছে!');
+        }
+
+        function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        // Check size before importing
+                        const newSize = new Blob([JSON.stringify(importedData)]).size;
+                        if (newSize > STORAGE_LIMIT_BYTES) {
+                            alert('আমদানি করা ডেটা স্টোরেজ সীমা অতিক্রম করেছে!');
+                            return;
+                        }
+                        
+                        if (confirm(`${importedData.length} টি সভা আমদানি করা হবে। চলমান ডেটা প্রতিস্থাপিত হবে। নিশ্চিত?`)) {
+                            savedMeetings = importedData;
+                            savedMeetings.forEach((rec, idx) => rec.slNo = idx + 1);
+                            localStorage.setItem('meetingRecords', JSON.stringify(savedMeetings));
+                            updateStorageDisplay();
+                            displayPreviousMeetings();
+                            alert('আমদানি সফল হয়েছে!');
+                        }
+                    } else {
+                        alert('ভালিড ডেটা ফাইল নয়!');
+                    }
+                } catch (error) {
+                    alert('ফাইল পড়তে সমস্যা হয়েছে!');
+                }
+            };
+            reader.readAsText(file);
+            importFile.value = '';
+        }
+
+        function clearOldData() {
+            if (savedMeetings.length === 0) {
+                alert('কোনো ডেটা নেই!');
+                return;
+            }
+            
+            const months = prompt('কত মাসের পুরনো ডেটা মুছবেন? (যেমন: ৬ মাসের পুরনো)', '6');
+            if (!months) return;
+            
+            const monthsNum = parseInt(months);
+            if (isNaN(monthsNum) || monthsNum < 1) {
+                alert('বৈধ সংখ্যা দিন!');
+                return;
+            }
+            
+            const cutoffDate = new Date();
+            cutoffDate.setMonth(cutoffDate.getMonth() - monthsNum);
+            
+            const beforeCount = savedMeetings.length;
+            savedMeetings = savedMeetings.filter(meeting => {
+                const meetingDate = new Date(meeting.dateOfMeeting);
+                return meetingDate >= cutoffDate;
+            });
+            
+            const afterCount = savedMeetings.length;
+            const deletedCount = beforeCount - afterCount;
+            
+            if (deletedCount > 0) {
+                savedMeetings.forEach((rec, idx) => rec.slNo = idx + 1);
+                localStorage.setItem('meetingRecords', JSON.stringify(savedMeetings));
+                updateStorageDisplay();
+                displayPreviousMeetings();
+                alert(`${deletedCount} টি পুরনো সভা মুছে ফেলা হয়েছে!`);
+            } else {
+                alert('এই সময়ের মধ্যে কোনো পুরনো সভা নেই!');
+            }
+        }
+
+        function exportToCSV() {
+            if (savedMeetings.length === 0) {
+                alert('কোনো ডেটা নেই!');
+                return;
+            }
+            
+            let csv = 'SL No,Date of Meeting,Meeting Time,Letter Issue Date,Meeting Type,Agenda,Recipient\n';
+            
+            savedMeetings.forEach(meeting => {
+                csv += `"${meeting.slNo}","${meeting.dateOfMeeting}","${meeting.meetingTime}","${meeting.letterIssueDate}","${meeting.meetingType}","${meeting.agenda}","${meeting.recipient}"\n`;
+            });
+            
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `meetings_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ---------- Enhanced Selection Functions ----------
+        function renderCheckboxes(filterText = '') {
+            let html = '';
+            const filteredMembers = filterText 
+                ? fullMemberDatabase.filter(m => m.name.toLowerCase().includes(filterText.toLowerCase()))
+                : fullMemberDatabase;
+            
+            filteredMembers.forEach(member => {
+                const id = `chk_${member.name.replace(/\s/g,'_')}`;
+                html += `<div class="member-row">
+                    <input type="checkbox" value="${member.name}" id="${id}" class="memberCheck">
+                    <label for="${id}">${member.name}</label>
+                </div>`;
+            });
+            checkboxContainer.innerHTML = html;
+            
+            // Re-attach event listeners
+            document.querySelectorAll('.memberCheck').forEach(cb => {
+                cb.addEventListener('change', updateSelectedList);
+            });
+            
+            // Restore checked state from current selection
+            const currentChecks = Array.from(document.querySelectorAll('.memberCheck:checked'));
+            updateSelectedList();
+        }
+        
+        // Initial render
+        renderCheckboxes();
+
+        // Search functionality
+        searchMember.addEventListener('input', function(e) {
+            renderCheckboxes(e.target.value);
+        });
+
+        // Select All
+        selectAllBtn.addEventListener('click', function() {
+            document.querySelectorAll('.memberCheck').forEach(cb => cb.checked = true);
+            updateSelectedList();
+        });
+
+        // Unselect All
+        unselectAllBtn.addEventListener('click', function() {
+            document.querySelectorAll('.memberCheck').forEach(cb => cb.checked = false);
+            updateSelectedList();
+        });
+
+        // Clear Selected (same as Unselect All)
+        clearSelectedBtn.addEventListener('click', function() {
+            document.querySelectorAll('.memberCheck').forEach(cb => cb.checked = false);
+            updateSelectedList();
+        });
+
+        // Copy selected names to clipboard
+        copyNamesBtn.addEventListener('click', function() {
+            const checks = Array.from(document.querySelectorAll('.memberCheck:checked'));
+            if (!checks.length) {
+                alert('কোনো সদস্য নির্বাচিত নেই!');
+                return;
+            }
+            const names = checks.map(cb => cb.value).join(', ');
+            navigator.clipboard.writeText(names).then(() => {
+                alert('✅ নাম কপি হয়েছে!');
+            }).catch(() => {
+                alert('কপি করতে সমস্যা হয়েছে');
+            });
+        });
+
+        function updateSelectedList() {
+            const checks = Array.from(document.querySelectorAll('.memberCheck:checked'));
+            const count = checks.length;
+            
+            selectedCount.textContent = count;
+            miniCount.textContent = count;
+            
+            if (!checks.length) {
+                selectedOrderedList.innerHTML = '<span>— কাউকে নয়</span>';
+                return;
+            }
+            let html = '';
+            checks.forEach((cb, idx) => { 
+                html += `<span>${idx+1}. ${cb.value}</span>`; 
+            });
+            selectedOrderedList.innerHTML = html;
+        }
+
+        // Day calculation
+        function updateDayFromDate() {
+            const dateVal = meetingDate.value;
+            if (!dateVal) { dayText.value = ''; return; }
+            const parts = dateVal.split('-');
+            const d = new Date(parts[0], parts[1]-1, parts[2]);
+            if (isNaN(d)) return;
+            const weekdays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+            dayText.value = weekdays[d.getDay()];
+        }
+        meetingDate.addEventListener('change', updateDayFromDate);
+        updateDayFromDate();
+
+        // Agenda functions
+        function createAgendaRow(value = '') {
+            const row = document.createElement('div');
+            row.className = 'ag-row';
+            const num = document.createElement('span');
+            num.className = 'num';
+            row.appendChild(num);
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.placeholder = 'আলোচ্য বিষয় লিখুন';
+            inp.value = value;
+            inp.addEventListener('input', function() { handleAgendaInput(row); });
+            row.appendChild(inp);
+            return row;
+        }
+        
+        function renumberAgenda() {
+            const rows = Array.from(agendaRowsDiv.querySelectorAll('.ag-row'));
+            rows.forEach((r, i) => { const s = r.querySelector('.num'); if (s) s.textContent = i + 1; });
+        }
+        
+        function handleAgendaInput(currentRow) {
+            const rows = Array.from(agendaRowsDiv.querySelectorAll('.ag-row'));
+            const lastRow = rows[rows.length - 1];
+            const lastInp = lastRow.querySelector('input');
+            if (currentRow === lastRow && lastInp.value.trim() !== '') {
+                agendaRowsDiv.appendChild(createAgendaRow(''));
+            }
+            renumberAgenda();
+        }
+        
+        function initAgenda() {
+            agendaRowsDiv.innerHTML = '';
+            agendaRowsDiv.appendChild(createAgendaRow(''));
+            renumberAgenda();
+        }
+        initAgenda();
+
+        function getAgendaItems() {
+            return Array.from(agendaRowsDiv.querySelectorAll('.ag-row input'))
+                .map(i => i.value.trim())
+                .filter(v => v !== '');
+        }
+
+        function getMemberDetails(memberName) {
+            return fullMemberDatabase.find(m => m.name === memberName) || {
+                mobile: '____',
+                designation: '____',
+                sansad: '____',
+                village: '____'
+            };
+        }
+
+        function setCheckedMembersFromString(recipientStr) {
+            const names = recipientStr.split(',').map(s => s.trim());
+            document.querySelectorAll('.memberCheck').forEach(cb => {
+                cb.checked = names.includes(cb.value);
+            });
+            updateSelectedList();
+        }
+
+        function setAgendaFromString(agendaStr) {
+            const items = agendaStr.split(',').map(s => s.trim()).filter(s => s);
+            agendaRowsDiv.innerHTML = '';
+            if (items.length === 0) {
+                agendaRowsDiv.appendChild(createAgendaRow(''));
+            } else {
+                items.forEach(item => agendaRowsDiv.appendChild(createAgendaRow(item)));
+                agendaRowsDiv.appendChild(createAgendaRow(''));
+            }
+            renumberAgenda();
+        }
+
+        function setTimeFromString(timeStr) {
+            if (!timeStr) return;
+            
+            // Parse time string like "০৩:৩০ PM"
+            const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/);
+            if (match) {
+                meetingHour.value = match[1];
+                meetingMinute.value = match[2];
+                meetingAmPm.value = match[3];
+                updateMeetingTime();
+            }
+        }
+
+        function formatAgendaWithIcons() {
+            const items = getAgendaItems();
+            if (!items.length) return '<div class="agenda-item"><span class="agenda-icon">•</span> কোনো এজেন্ডা নেই</div>';
+            return items.map((item, idx) => 
+                `<div class="agenda-item"><span class="agenda-icon">${idx+1}</span> ${item}</div>`
+            ).join('');
+        }
+
+        function formatDateBangla(ds) {
+            if (!ds) return '____';
+            const p = ds.split('-');
+            const d = new Date(p[0], p[1]-1, p[2]);
+            if (isNaN(d)) return ds;
+            try { return d.toLocaleDateString('bn-BD', {day:'numeric', month:'long', year:'numeric'}); }
+            catch { return d.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'}); }
+        }
+
+        function generateLetterPair(memberName) {
+            const member = getMemberDetails(memberName);
+            const typeVal = meetingType.value || '____';
+            const mDate = formatDateBangla(meetingDate.value);
+            const day = dayText.value.trim() || '____';
+            const time = meetingTimeHidden.value || '____';
+            const iDate = formatDateBangla(issueDate.value);
+            const agendaHTML = formatAgendaWithIcons();
+
+            function copy(label) {
+                return `<div class="copy-badge">${label}</div>
+                    <div class="format-letter">
+                        <div class="center bold">ফর্ম নং-১</div>
+                        <div class="center">৫ নিয়ম দ্রষ্টব্য</div>
+                        <div class="center bold">গ্রাম পঞ্চায়েতের ${typeVal} সভার নোটিশ</div>
+                        <div class="dotted-line"></div>
+                        <div>
+                            <span class="bold">প্রতি,</span><br>
+                            <span class="bold">${member.name}</span><br>
+                            পদ- ${member.designation}<br>
+                            সংসদ- ${member.sansad}<br>
+                            গ্রাম- ${member.village}<br>
+                            ☎ মোবাইল- ${member.mobile}
+                        </div>
+                        <p>মহাশয় /মহাশয়া,</p>
+                        <p>এত দ্বারা আপনাকে জানানো যাইতেছে যে নিম্ন লিখিত বিষয়গুলি আলোচনা ও সিদ্ধান্ত গ্রহণের নিমিত্ত ভগবানপুর গ্রাম পঞ্চায়েতে একটি সভার আয়োজন করা হয়েছে ।</p>
+                        <p><span class="bold">সভার ধরন-</span> ${typeVal}<br>
+                           <span class="bold">সভার তাং-</span> ${mDate}, ${day}<br>
+                           <span class="bold">সময়-</span> ${time}</p>
+                        <p>অতএব উক্ত দিবসে নির্ধারিত সময়ে নিম্ন লিখিত বিষয় গুলির আলোচনায় যোগদান করার জন্য আপনাকে একান্ত ভাবে অনুরোধ করিতেছে।</p>
+                        <p><span class="bold">আলোচ্য বিষয়-</span></p>
+                        ${agendaHTML}
+                        <div class="signature-line">
+                            <span>তারিখ- ${iDate}</span>
+                            <span>সচিব<br>ভগবানপুর গ্রাম পঞ্চায়েত</span>
+                        </div>
+                    </div>`;
+            }
+            
+            return `<div class="double-letter">
+                <div class="letter-half">${copy('🏢 অফিস কপি')}</div>
+                <div class="vertical-dotted"></div>
+                <div class="letter-half">${copy('📨 প্রাপক কপি')}</div>
+            </div>`;
+        }
+
+        function renderPrintPreview() {
+            if (!validateAllFields()) {
+                return;
+            }
+            
+            const checks = Array.from(document.querySelectorAll('.memberCheck:checked'));
+            let pages = '';
+            checks.forEach((cb) => { 
+                pages += `<div class="member-page">${generateLetterPair(cb.value)}</div>`; 
+            });
+            printPreview.innerHTML = pages;
+        }
+
+        function saveToLocalStorage(editIndex = null) {
+            // Validate all fields before saving
+            if (!validateAllFields()) {
+                return;
+            }
+            
+            // Check storage before saving
+            if (!checkStorageBeforeSave() && editIndex === null) {
+                return;
+            }
+            
+            const checks = Array.from(document.querySelectorAll('.memberCheck:checked'));
+            const recipients = checks.map(cb => cb.value).join(', ');
+            const agendaList = getAgendaItems().join(', ');
+            
+            const newRecord = {
+                slNo: editIndex !== null ? editIndex + 1 : savedMeetings.length + 1,
+                dateOfMeeting: meetingDate.value,
+                meetingTime: meetingTimeHidden.value,
+                letterIssueDate: issueDate.value,
+                meetingType: meetingType.value,
+                agenda: agendaList,
+                recipient: recipients
+            };
+            
+            if (editIndex !== null) {
+                savedMeetings[editIndex] = newRecord;
+            } else {
+                savedMeetings.push(newRecord);
+            }
+            
+            savedMeetings.forEach((rec, idx) => rec.slNo = idx + 1);
+            localStorage.setItem('meetingRecords', JSON.stringify(savedMeetings));
+            updateStorageDisplay();
+            alert('সভার তথ্য সেভ করা হয়েছে');
+            exitEditMode();
+        }
+
+        function exitEditMode() {
+            currentEditIndex = null;
+            defaultButtons.style.display = 'flex';
+            editModeButtons.style.display = 'none';
+        }
+
+        function displayPreviousMeetings() {
+            if (savedMeetings.length === 0) {
+                prevTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">কোনো পূর্ববর্তী সভা নেই</td></tr>';
+            } else {
+                let rows = '';
+                savedMeetings.forEach((rec, idx) => {
+                    rows += `<tr>
+                        <td>${idx+1}</td>
+                        <td>${rec.dateOfMeeting}</td>
+                        <td>${rec.meetingTime}</td>
+                        <td>${rec.letterIssueDate}</td>
+                        <td>${rec.meetingType}</td>
+                        <td>${rec.agenda.substring(0, 30)}${rec.agenda.length > 30 ? '...' : ''}</td>
+                        <td>${rec.recipient.substring(0, 20)}${rec.recipient.length > 20 ? '...' : ''}</td>
+                        <td class="action-icons">
+                            <i class="fas fa-eye" title="দেখুন" onclick="viewMeeting(${idx})"></i>
+                            <i class="fas fa-edit" title="সম্পাদনা" onclick="editMeeting(${idx})"></i>
+                            <i class="fas fa-trash-alt" title="মুছুন" onclick="deleteMeeting(${idx})"></i>
+                        </td>
+                    </tr>`;
+                });
+                prevTableBody.innerHTML = rows;
+            }
+            prevPanel.style.display = 'block';
+            printPreview.style.display = 'none';
+        }
+
+        window.viewMeeting = function(index) {
+            const rec = savedMeetings[index];
+            issueDate.value = rec.letterIssueDate;
+            meetingDate.value = rec.dateOfMeeting;
+            setTimeFromString(rec.meetingTime);
+            meetingType.value = rec.meetingType;
+            updateDayFromDate();
+            setCheckedMembersFromString(rec.recipient);
+            setAgendaFromString(rec.agenda);
+            
+            printPreview.style.display = 'flex';
+            renderPrintPreview();
+            prevPanel.style.display = 'none';
+            exitEditMode();
+        };
+
+        window.editMeeting = function(index) {
+            const rec = savedMeetings[index];
+            issueDate.value = rec.letterIssueDate;
+            meetingDate.value = rec.dateOfMeeting;
+            setTimeFromString(rec.meetingTime);
+            meetingType.value = rec.meetingType;
+            updateDayFromDate();
+            setCheckedMembersFromString(rec.recipient);
+            setAgendaFromString(rec.agenda);
+            
+            currentEditIndex = index;
+            defaultButtons.style.display = 'none';
+            editModeButtons.style.display = 'flex';
+            prevPanel.style.display = 'none';
+            printPreview.style.display = 'flex';
+            renderPrintPreview();
+        };
+
+        window.deleteMeeting = function(index) {
+            if (confirm('নিশ্চিতভাবে মুছবেন?')) {
+                savedMeetings.splice(index, 1);
+                savedMeetings.forEach((rec, i) => rec.slNo = i + 1);
+                localStorage.setItem('meetingRecords', JSON.stringify(savedMeetings));
+                updateStorageDisplay();
+                displayPreviousMeetings();
+                exitEditMode();
+            }
+        };
+
+        // Event listeners
+        generateBtn.addEventListener('click', function() {
+            printPreview.style.display = 'flex';
+            prevPanel.style.display = 'none';
+            updateSelectedList();
+            renderPrintPreview();
+            exitEditMode();
+        });
+
+        saveSheetBtn.addEventListener('click', function() {
+            saveToLocalStorage();
+        });
+
+        viewPrevBtn.addEventListener('click', function() {
+            displayPreviousMeetings();
+            exitEditMode();
+        });
+
+        closePrevBtn.addEventListener('click', function() {
+            prevPanel.style.display = 'none';
+            printPreview.style.display = 'flex';
+        });
+
+        updateBtn.addEventListener('click', function() {
+            if (currentEditIndex !== null) {
+                saveToLocalStorage(currentEditIndex);
+            } else {
+                alert('কোনো এডিট সেশন নেই');
+                exitEditMode();
+            }
+        });
+
+        closeEditBtn.addEventListener('click', function() {
+            exitEditMode();
+            prevPanel.style.display = 'none';
+            printPreview.style.display = 'flex';
+        });
+
+        // PDF and DOC export
+        function getExportHTML() {
+            if (!validateAllFields()) {
+                return '<p>সব ফিল্ড পূরণ করুন</p>';
+            }
+            
+            const checks = Array.from(document.querySelectorAll('.memberCheck:checked'));
+            let pages = '';
+            checks.forEach((cb) => { 
+                pages += `<div style="page-break-after: always;">${generateLetterPair(cb.value)}</div>`; 
+            });
+            return pages;
+        }
+
+        exportDocBtn.addEventListener('click', function() {
+            if (!validateAllFields()) {
+                return;
+            }
+            
+            const content = getExportHTML();
+            if (content.includes('সব ফিল্ড পূরণ করুন')) return;
+            
+            const style = `<style>
+                body{font-family:'Noto Sans Bengali','Times New Roman',serif;margin:0.5in;}
+                .double-letter{display:flex;}
+                .letter-half{flex:1;padding:10px;font-size:11pt;}
+                .vertical-dotted{border-left:2px dotted #4a6f8f;margin:0 5px;}
+                .copy-badge{background:#1b5385;color:white;padding:2px 12px;border-radius:20px;display:inline-block;}
+                .dotted-line{border-top:1px dashed #000;margin:5px 0;}
+                .signature-line{display:flex;justify-content:space-between;margin-top:15px;}
+                .bold{font-weight:700;}
+                .center{text-align:center;}
+                .agenda-item{display:flex;align-items:center;gap:5px;margin:2px 0;}
+                .agenda-icon{background:#275d91;color:white;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;}
+            </style>`;
+            const fullHtml = `<html><head><meta charset="UTF-8">${style}</head><body>${content}</body></html>`;
+            const blob = new Blob([fullHtml], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `pancayat_notice_${new Date().toISOString().slice(0,10)}.doc`;
+            link.click();
+        });
+
+        exportPdfBtn.addEventListener('click', function() {
+            if (!validateAllFields()) {
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank', 'width=1100,height=700');
+            if (!printWindow) { alert('পপ-আপ ব্লকার সক্রিয়'); return; }
+            const content = getExportHTML();
+            const style = `<style>
+                body{font-family:'Noto Sans Bengali','Times New Roman',serif;margin:0.4in;}
+                .double-letter{display:flex;}
+                .letter-half{flex:1;padding:10px;font-size:11pt;}
+                .vertical-dotted{border-left:2px dotted #4a6f8f;margin:0 5px;}
+                .copy-badge{background:#1b5385;color:white;padding:2px 12px;border-radius:20px;display:inline-block;}
+                .dotted-line{border-top:1px dashed #000;margin:5px 0;}
+                .signature-line{display:flex;justify-content:space-between;margin-top:15px;}
+                .bold{font-weight:700;}
+                .center{text-align:center;}
+                .agenda-item{display:flex;align-items:center;gap:5px;margin:2px 0;}
+                .agenda-icon{background:#275d91;color:white;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;}
+                @media print{@page{size:A4 landscape;margin:0.5in;}}
+            </style>`;
+            printWindow.document.write(`<html><head><meta charset="UTF-8">${style}</head><body>${content}</body></html>`);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => { printWindow.print(); }, 300);
+        });
+
+        // Storage event listeners
+        exportDataBtn.addEventListener('click', exportBackup);
+        importDataBtn.addEventListener('click', () => importFile.click());
+        importFile.addEventListener('change', importBackup);
+        clearOldBtn.addEventListener('click', clearOldData);
+        exportCsvBtn.addEventListener('click', exportToCSV);
+
+        // Initialize storage display
+        updateStorageDisplay();
+
+        // Set initial selected members
+        window.addEventListener('load', function() {
+            const chks = document.querySelectorAll('.memberCheck');
+            if (chks.length) {
+                // Don't auto-select any members - user must select
+                // chks[0].checked = true;
+                // chks[1].checked = true;
+                // chks[2].checked = true;
+            }
+            updateSelectedList();
+            // Don't auto-render print preview
+            // renderPrintPreview();
+        });
+    })();
+</script>
+</body>
+</html>

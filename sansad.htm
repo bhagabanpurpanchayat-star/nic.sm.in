@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gram Sansad · ROUND TIMES · EXPORT FIXED</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+        }
+        body {
+            background: #e0efe9;
+            margin: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            padding: 20px 18px 30px 18px;
+            box-shadow: 0 10px 30px rgba(0, 40, 20, 0.12);
+        }
+
+        /* OFFICE HEADER */
+        .office-header {
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+        .office-header .line1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #04362b;
+            text-transform: uppercase;
+        }
+        .office-header .line2 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1b5f4d;
+        }
+        .office-header .line3 {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #2e7a65;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            margin: 10px 0 5px 0;
+            color: #1d5b4b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        h1 small {
+            font-size: 0.85rem;
+            background: #c5eadc;
+            padding: 5px 16px;
+            border-radius: 30px;
+            font-weight: 400;
+        }
+        .control-panel {
+            background: #effbf6;
+            border-radius: 40px;
+            padding: 20px 25px;
+            margin: 20px 0 25px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 25px 40px;
+            border: 1px solid #b9e0d2;
+        }
+        .range-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .range-item label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+            color: #236b58;
+            text-transform: uppercase;
+        }
+        input[type="date"], input[type="time"] {
+            padding: 9px 16px;
+            border-radius: 40px;
+            border: 1px solid #96cfbb;
+            background: white;
+            font-size: 0.95rem;
+            min-width: 170px;
+        }
+        .generate-btn {
+            background: #1d6e5b;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 32px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(0,50,20,0.25);
+            cursor: pointer;
+            transition: 0.1s;
+            margin-left: auto;
+        }
+        .generate-btn:hover { background: #0f5847; }
+
+        /* TABLE WRAPPED COMPACT */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 18px;
+            border: 1px solid #b7dcd0;
+            background: white;
+            margin: 20px 0 25px;
+            max-width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            table-layout: auto;
+            min-width: 700px;
+            white-space: normal;
+        }
+        th {
+            background: #c0e2d6;
+            color: #0d4236;
+            font-weight: 600;
+            padding: 12px 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            border-right: 1px solid #9fcfbf;
+            vertical-align: bottom;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+        th:last-child { border-right: none; }
+        td {
+            padding: 10px 6px;
+            border-bottom: 1px solid #cce8df;
+            border-right: 1px solid #d3ece2;
+            vertical-align: top;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+        td:last-child { border-right: none; }
+
+        /* column width hints */
+        th:nth-child(1) { width: 4%; }
+        th:nth-child(2) { width: 12%; }
+        th:nth-child(3) { width: 15%; }
+        th:nth-child(4) { width: 10%; }
+        th:nth-child(5) { width: 13%; }
+        th:nth-child(6) { width: 18%; }
+        th:nth-child(7) { width: 8%; }
+        th:nth-child(8) { width: 7%; }
+
+        .editable-place, .editable-date, .editable-time {
+            width: 100%;
+            border: 1px dashed #3fa786;
+            background-color: #fcfef9;
+            border-radius: 12px;
+            padding: 8px 8px;
+            font-size: 0.78rem;
+            font-family: inherit;
+            resize: vertical;
+            word-break: break-word;
+            line-height: 1.3;
+            box-sizing: border-box;
+        }
+        .editable-place { min-width: 130px; }
+        .editable-date, .editable-time {
+            background-color: #f2fcf7;
+            border: 1px solid #62bb9b;
+            text-align: center;
+        }
+        .editable-place:focus, .editable-date:focus, .editable-time:focus {
+            outline: 2px solid #2b8369;
+            background-color: #ffffec;
+        }
+        .member-cell {
+            font-weight: 500;
+            color: #0e4c3c;
+            white-space: normal;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .print-btn, .export-btn {
+            background: white;
+            border: 2px solid #1d6e5b;
+            color: #1d6e5b;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+        }
+        .print-btn:hover, .export-btn:hover {
+            background: #e0f2ea;
+            border-color: #0b5342;
+        }
+        .footnote {
+            margin-top: 20px;
+            background: #e1f3ec;
+            padding: 10px 25px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            color: #246454;
+        }
+
+        @media print {
+            body { background: white; margin: 0.4in; }
+            .control-panel, .action-buttons, .generate-btn, .footnote, h1 small { display: none; }
+            .container { box-shadow: none; padding: 0; }
+            .table-wrapper { border: 1px solid #000; }
+            th { background: #ddd; }
+            .editable-place, .editable-date, .editable-time {
+                border: none; background: transparent; padding: 2px;
+                box-shadow: none;
+            }
+            input { border: none; background: transparent; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="appContainer">
+
+    <!-- OFFICE HEADER -->
+    <div class="office-header">
+        <div class="line1">Office of the</div>
+        <div class="line2">BHAGABANPUR GRAM PANCHAYAT</div>
+        <div class="line3">P.O. - Arbara, Dist.- Malda, (W. B.)</div>
+    </div>
+
+    <h1>
+        📋 ग्राम संसद · round time
+        <small>2, 2.30, 3, 3.30 PM only</small>
+    </h1>
+
+    <div class="control-panel">
+        <div class="range-item">
+            <label>📅 FROM DATE</label>
+            <input type="date" id="fromDate" value="2025-06-09">
+        </div>
+        <div class="range-item">
+            <label>📅 TO DATE</label>
+            <input type="date" id="toDate" value="2025-06-18">
+        </div>
+        <div class="range-item">
+            <label>⏱️ FROM TIME</label>
+            <input type="time" id="fromTime" value="14:00">
+        </div>
+        <div class="range-item">
+            <label>⏱️ TO TIME</label>
+            <input type="time" id="toTime" value="16:30">
+        </div>
+        <button class="generate-btn" id="generateRandom">✨ randomize round times</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="gramTable">
+            <thead>
+                <tr>
+                    <th>SL NO</th>
+                    <th>NAME GRAM SANSAD & No</th>
+                    <th>Gram Panchayat Seat</th>
+                    <th>Area</th>
+                    <th>Member</th>
+                    <th>Meeting Place (editable)</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="action-buttons">
+        <button class="print-btn" id="printTable">🖨️ Print</button>
+        <button class="export-btn" id="exportDoc">📄 Export .doc (COMPLETE DATA)</button>
+    </div>
+    <div class="footnote">
+        ✅ Times: 2 PM, 2.30 PM, 3 PM, 3.30 PM, 4 PM only. Export now shows ALL data.
+    </div>
+</div>
+
+<script>
+(function() {
+    const baseRows = [
+        { slno: "1", gramName: "Bhagabanpur/I", seat: "BHAGABANPUR/I-1, BHAGABANPUR/I-2", area: "GHAGARPAR, NIMGACHHI", member: "FENSHI KHATUN, REJAUL KARIM", place: "Nimgachhi SS" },
+        { slno: "2", gramName: "Bhagabanpur/II", seat: "BHAGABANPUR/II-3", area: "JASUYA", member: "NARGISH KHATUN", place: "Jasua Pry School" },
+        { slno: "3", gramName: "Bhagabanpur/III", seat: "BHAGABANPUR/III-4", area: "BHAGABANPUR", member: "KESHOMATI BARMAN", place: "Bhagabanpur Pry School" },
+        { slno: "4", gramName: "Bhagabanpur/IV", seat: "BHAGABANPUR/IV-5", area: "NAYANPUR", member: "ALO MAHALDAR", place: "Nayanpur Pry School" },
+        { slno: "5", gramName: "Bhagabanpur/V", seat: "BHAGABANPUR/V-6", area: "RAMDEBPUR", member: "TAJMIRA YEASMIN", place: "Ramdebpur Pry School" },
+        { slno: "6", gramName: "Bhagabanpur/VI", seat: "BHAGABANPUR/VI-7", area: "JOTCHANDI", member: "ANTARA KHATUN BIBI", place: "Jotchandi Bullet Club & Library" },
+        { slno: "7", gramName: "Bhagabanpur/VII", seat: "BHAGABANPUR/VII-8, BHAGABANPUR/VII-9", area: "D KALIGUNJ, UTTAR KALIGUNJ", member: "ABU BAKKAR SIDDIQUE, NASIMA BANU", place: "D. Kaligunj Pry School" },
+        { slno: "8", gramName: "Bhagabanpur/VIII", seat: "BHAGABANPUR/VIII-10", area: "DARAKANDI", member: "MD SARIF ALI", place: "Chandipur Pry School" },
+        { slno: "9", gramName: "Bhagabanpur/IX", seat: "BHAGABANPUR/IX-11", area: "BHEBA", member: "HUSNARA KHATUN", place: "Bheba Pry School(E)" },
+        { slno: "10", gramName: "Bhagabanpur/X", seat: "BHAGABANPUR/X-12", area: "BHEBA", member: "MD ALAMIN", place: "Bheba Pry School(W)" },
+        { slno: "11", gramName: "Bhagabanpur/XI", seat: "BHAGABANPUR/XI-13", area: "SERBABAR", member: "FERDOUSI BEGAM", place: "Serbabar MSK" },
+        { slno: "12", gramName: "Bhagabanpur/XII", seat: "BHAGABANPUR/XII-14", area: "SERBABAR", member: "INJILA BIBI", place: "Serbabar Pry School" },
+        { slno: "13", gramName: "Bhagabanpur/XIII", seat: "BHAGABANPUR/XIII-15", area: "CHARALU", member: "GULAB ALI", place: "Charalu Pry School" },
+        { slno: "14", gramName: "Bhagabanpur/XIV", seat: "BHAGABANPUR/XIV-16", area: "HARIPUR", member: "BENEJI KHATUN", place: "Purba Nichitpur School(E)" },
+        { slno: "15", gramName: "Bhagabanpur/XV", seat: "BHAGABANPUR/XV-17", area: "HARIPUR", member: "MD ATAUR RAHAMAN", place: "Purba Nichitpur School(W)" },
+        { slno: "16", gramName: "Bhagabanpur/XXI", seat: "BHAGABANPUR/XXI-18", area: "PANBARA", member: "KAWSARA BEGAM", place: "Bagunj Pry School" },
+        { slno: "17", gramName: "Bhagabanpur/XXII", seat: "BHAGABANPUR/XXII-19", area: "KHADIYARPUR", member: "AFAJUDDIN AHAMED", place: "Arbara High School" },
+        { slno: "18", gramName: "Bhagabanpur/XXIII", seat: "BHAGABANPUR/XXIII-20", area: "ARBARA", member: "ZED RAHAMAN", place: "Arbara High School" },
+        { slno: "19", gramName: "Bhagabanpur/XXIX", seat: "BHAGABANPUR/XXIX-21", area: "ARBARA", member: "MOUSUMI KHATUN", place: "Arbara High School" },
+        { slno: "20", gramName: "Bhagabanpur/XXX", seat: "BHAGABANPUR/XXX-22", area: "KHASALPUR", member: "SYED NEAMUL HOQUE", place: "Arbara High School" }
+    ];
+
+    const tbody = document.getElementById('tableBody');
+
+    // Function to get current date in dd/mm/yyyy format
+    function getCurrentDate() {
+        const today = new Date();
+        const d = String(today.getDate()).padStart(2, '0');
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const y = today.getFullYear();
+        return `${d}/${m}/${y}`;
+    }
+
+    // Initial render with original dates
+    function renderInitial() {
+        let html = '';
+        baseRows.forEach((r, idx) => {
+            let initDate = '';
+            if (idx+1 === 1) initDate = '09/06/2025';
+            else if (idx+1 === 2) initDate = '09/06/2025';
+            else if (idx+1 === 3) initDate = '09/06/2025';
+            else if (idx+1 === 4) initDate = '10/06/2025';
+            else if (idx+1 === 5) initDate = '10/06/2025';
+            else if (idx+1 === 6) initDate = '10/06/2025';
+            else if (idx+1 === 7) initDate = '11/06/2025';
+            else if (idx+1 === 8) initDate = '11/06/2025';
+            else if (idx+1 === 9) initDate = '11/06/2025';
+            else if (idx+1 === 10) initDate = '12/06/2025';
+            else if (idx+1 === 11) initDate = '12/06/2025';
+            else if (idx+1 === 12) initDate = '12/06/2025';
+            else if (idx+1 === 13) initDate = '13/06/2025';
+            else if (idx+1 === 14) initDate = '13/06/2025';
+            else if (idx+1 === 15) initDate = '13/06/2025';
+            else if (idx+1 === 16) initDate = '16/06/2025';
+            else if (idx+1 === 17) initDate = '16/06/2025';
+            else if (idx+1 === 18) initDate = '16/06/2025';
+            else if (idx+1 === 19) initDate = '17/06/2025';
+            else if (idx+1 === 20) initDate = '17/06/2025';
+
+            html += `<tr data-index="${idx}">
+                <td>${r.slno}</td>
+                <td>${r.gramName}</td>
+                <td>${r.seat}</td>
+                <td>${r.area}</td>
+                <td class="member-cell">${r.member}</td>
+                <td><input type="text" class="editable-place" value="${r.place.replace(/"/g, '&quot;')}" onchange="updateData(${idx}, 'place', this.value)"></td>
+                <td><input type="text" class="editable-date" value="${initDate}" onchange="updateData(${idx}, 'date', this.value)"></td>
+                <td><input type="text" class="editable-time" value="2 PM" onchange="updateData(${idx}, 'time', this.value)"></td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+    
+    renderInitial();
+
+    // Store current values
+    let currentData = [];
+    for(let i = 0; i < baseRows.length; i++) {
+        currentData.push({
+            place: baseRows[i].place,
+            date: i < 3 ? '09/06/2025' : i < 6 ? '10/06/2025' : i < 9 ? '11/06/2025' : i < 12 ? '12/06/2025' : i < 15 ? '13/06/2025' : i < 18 ? '16/06/2025' : '17/06/2025',
+            time: '2 PM'
+        });
+    }
+
+    // Update function
+    window.updateData = function(index, field, value) {
+        if(!currentData[index]) currentData[index] = {};
+        currentData[index][field] = value;
+    };
+
+    // Get all current values from DOM
+    function refreshCurrentData() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach((row, idx) => {
+            if(!currentData[idx]) currentData[idx] = {};
+            const placeInput = row.querySelector('.editable-place');
+            const dateInput = row.querySelector('.editable-date');
+            const timeInput = row.querySelector('.editable-time');
+            
+            if(placeInput) currentData[idx].place = placeInput.value;
+            if(dateInput) currentData[idx].date = dateInput.value;
+            if(timeInput) currentData[idx].time = timeInput.value;
+        });
+    }
+
+    // Round time generator (only :00 or :30)
+    function getRandomRoundTime(fromTime, toTime) {
+        const [fh, fm] = fromTime.split(':').map(Number);
+        const [th, tm] = toTime.split(':').map(Number);
+        
+        let fromMin = fh * 60 + fm;
+        let toMin = th * 60 + tm;
+        
+        // Generate only :00 and :30 times
+        const possibleTimes = [];
+        
+        // Round up fromMin to nearest :00 or :30
+        let startMin = Math.ceil(fromMin / 30) * 30;
+        
+        // Add all :00 and :30 times between startMin and toMin
+        for(let mins = startMin; mins <= toMin; mins += 30) {
+            possibleTimes.push(mins);
+        }
+        
+        // If no times, use fromMin rounded to nearest 30
+        if(possibleTimes.length === 0) {
+            let fallback = Math.round(fromMin / 30) * 30;
+            if(fallback < fromMin) fallback += 30;
+            if(fallback > toMin) fallback = toMin;
+            possibleTimes.push(fallback);
+        }
+        
+        const selectedMins = possibleTimes[Math.floor(Math.random() * possibleTimes.length)];
+        const hours24 = Math.floor(selectedMins / 60);
+        const minutes = selectedMins % 60;
+        const period = hours24 >= 12 ? 'PM' : 'AM';
+        let hours12 = hours24 % 12;
+        if(hours12 === 0) hours12 = 12;
+        
+        if(minutes === 0) {
+            return `${hours12} ${period}`;
+        } else {
+            return `${hours12}.${minutes} ${period}`;
+        }
+    }
+
+    // Random date generator
+    function getRandomDate(fromStr, toStr) {
+        const start = new Date(fromStr + 'T12:00:00');
+        const end = new Date(toStr + 'T12:00:00');
+        const randomTime = start.getTime() + Math.random() * (end.getTime() - start.getTime());
+        const randomDate = new Date(randomTime);
+        const d = String(randomDate.getDate()).padStart(2, '0');
+        const m = String(randomDate.getMonth() + 1).padStart(2, '0');
+        const y = randomDate.getFullYear();
+        return `${d}/${m}/${y}`;
+    }
+
+    // Randomize button
+    document.getElementById('generateRandom').addEventListener('click', function() {
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+        const fromTime = document.getElementById('fromTime').value;
+        const toTime = document.getElementById('toTime').value;
+
+        if(!fromDate || !toDate || !fromTime || !toTime) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+            const dateInput = row.querySelector('.editable-date');
+            const timeInput = row.querySelector('.editable-time');
+            
+            if(dateInput && timeInput) {
+                dateInput.value = getRandomDate(fromDate, toDate);
+                timeInput.value = getRandomRoundTime(fromTime, toTime);
+                
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                dateInput.dispatchEvent(event);
+                timeInput.dispatchEvent(event);
+            }
+        });
+        
+        refreshCurrentData();
+    });
+
+    // Print
+    document.getElementById('printTable').addEventListener('click', () => window.print());
+
+    // SIMPLE, FOOLPROOF EXPORT
+    document.getElementById('exportDoc').addEventListener('click', function() {
+        // Get fresh data from DOM
+        refreshCurrentData();
+        
+        // Get header
+        const headerHtml = document.querySelector('.office-header').outerHTML;
+        
+        // Build table with PLAIN TEXT, no inputs
+        let tableRows = '';
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td');
+            const slno = cells[0].innerText;
+            const gramName = cells[1].innerText;
+            const seat = cells[2].innerText;
+            const area = cells[3].innerText;
+            const member = cells[4].innerText;
+            
+            // Get values from currentData (which we refreshed)
+            const place = currentData[index]?.place || cells[5].querySelector('input')?.value || '';
+            const date = currentData[index]?.date || cells[6].querySelector('input')?.value || '';
+            const time = currentData[index]?.time || cells[7].querySelector('input')?.value || '';
+            
+            tableRows += `
+                <tr>
+                    <td style="border: 1px solid black; padding: 5px;">${slno}</td>
+                    <td style="border: 1px solid black; padding: 5px;">${gramName}</td>
+                    <td style="border: 1px solid black; padding: 5px;">${seat}</td>
+                    <td style="border: 1px solid black; padding: 5px;">${area}</td>
+                    <td style="border: 1px solid black; padding: 5px;">${member}</td>
+                    <td style="border: 1px solid black; padding: 5px;">${place}</td>
+                    <td style="border: 1px solid black; padding: 5px;">${date}</td>
+                    <td style="border: 1px solid black; padding: 5px;">${time}</td>
+                </tr>
+            `;
+        });
+
+        const tableHTML = `
+            <table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11pt;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">SL NO</th>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">NAME GRAM SANSAD & No</th>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">Gram Panchayat Seat</th>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">Area</th>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">Member</th>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">Meeting Place</th>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">Date</th>
+                        <th style="border: 1px solid black; padding: 8px; background: #c0e2d6;">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        `;
+
+        // Complete HTML document
+        const fullHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Gram Sansad Meeting Schedule</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        .office-header { text-align: center; margin-bottom: 30px; }
+        .office-header .line1 { font-size: 24px; font-weight: bold; color: #04362b; }
+        .office-header .line2 { font-size: 20px; color: #1b5f4d; }
+        .office-header .line3 { font-size: 16px; color: #2e7a65; }
+    </style>
+</head>
+<body>
+    ${headerHtml}
+    ${tableHTML}
+    <p style="margin-top: 20px; font-style: italic;">Generated on ${new Date().toLocaleString()}</p>
+</body>
+</html>`;
+
+        // Download
+        const blob = new Blob([fullHTML], { type: 'application/msword' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'gram_sansad_schedule.doc';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vendor Entry Form</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .glass-container {
+      width: 100%;
+      max-width: 1600px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s ease-in-out;
+    }
+    .refresh-btn:hover { background: rgba(0,123,255,0.2); }
+    .progress-wrapper {
+      flex-grow: 1;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .progress-bar {
+      flex-grow: 1;
+      height: 14px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        #ff9800 0%,
+        #ffeb3b 30%,
+        #ffffff 50%,
+        #ffeb3b 70%,
+        #ff9800 100%
+      );
+      background-size: 200% 100%;
+      animation: spark 0.5s linear infinite;
+    }
+    @keyframes spark {
+      from { background-position: 200% 0; }
+      to   { background-position: 0 0; }
+    }
+    .progress-text {
+      min-width: 50px;
+      font-size: 14px;
+      color: #333;
+      font-weight: 600;
+    }
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1200px;
+    }
+    th, td {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 14px 10px;
+      text-align: center;
+      vertical-align: middle;
+      color: #333;
+      font-size: 14px;
+    }
+    thead th {
+      background: #2c3e50;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.7); }
+    input, textarea {
+      width: 95%;
+      box-sizing: border-box;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 8px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+    }
+    textarea { resize: none; height: 36px; }
+    .actions { min-width: 150px; white-space: nowrap; }
+    .actions button,
+    .add-row {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 0 2px;
+      transition: all 0.2s ease;
+    }
+    .actions button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .save-btn { color: #007BFF; }
+    .edit-btn { color: #FF9800; }
+    .delete-btn { color: #E91E63; }
+    .add-row { margin-top: 15px; color: #28a745; }
+  </style>
+</head>
+<body>
+
+<div class="glass-container">
+  <h2>Vendor Entry Form</h2>
+
+  <div class="toolbar">
+    <div class="progress-wrapper">
+      <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+      <div class="progress-text">0%</div>
+    </div>
+    <button type="button" class="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+  </div>
+
+  <form id="vendorForm">
+    <div class="table-container">
+      <table id="vendorTable">
+        <thead>
+          <tr>
+            <th>SL No</th>
+            <th>Vendor</th>
+            <th>PAN No</th>
+            <th>GST No</th>
+            <th>Mobile No</th>
+            <th>Address</th>
+            <th>Email ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button type="button" class="add-row" onclick="addRow()">+ Add Row</button>
+  </form>
+</div>
+
+<script>
+  const endpoint = "https://script.google.com/macros/s/AKfycbzAuQ6CFFqQa9k3ey1wVgMI1KujHdX0TyYSczmCNI8W3DeElMzeP3_4wS22ASkiubgZ/exec"; 
+  let progressInterval;
+
+  function startProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    let percent = 0;
+    wrapper.style.display = "flex";
+    fill.style.width = "0%";
+    text.textContent = "0%";
+
+    progressInterval = setInterval(() => {
+      percent += 2;
+      if (percent > 100) percent = 100;
+      fill.style.width = percent + "%";
+      text.textContent = percent + "%";
+      if (percent === 100) clearInterval(progressInterval);
+    }, 80);
+  }
+
+  function endProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    clearInterval(progressInterval);
+    fill.style.width = "100%";
+    text.textContent = "100%";
+    setTimeout(() => { wrapper.style.display = "none"; }, 600);
+  }
+
+  async function refreshData() {
+    startProgress();
+    await loadData();
+    endProgress();
+  }
+
+  async function loadData() {
+    const tbody = document.querySelector("#vendorTable tbody");
+    tbody.innerHTML = "";
+    const res = await fetch(endpoint);
+    let records = await res.json();
+
+    // sort by Vendor Name
+    records.sort((a, b) => (a["Vendor"] || "").localeCompare(b["Vendor"] || ""));
+
+    if (!records.length) { addRow(); return; }
+
+    records.forEach((data, i) => {
+      const tr = document.createElement("tr");
+      tr.setAttribute("data-rowindex", data.rowIndex);
+
+      tr.innerHTML = `
+        <td class="slno">${i+1}</td>
+        <td><input type="text" name="vendor[]" value="${data["Vendor"]||""}"></td>
+        <td><input type="text" name="pan[]" value="${data["PAN No"]||""}"></td>
+        <td><input type="text" name="gst[]" value="${data["GST No"]||""}"></td>
+        <td><input type="text" name="mobile[]" value="${data["Mobile No"]||""}"></td>
+        <td><textarea name="address[]">${data["Address"]||""}</textarea></td>
+        <td><input type="email" name="email[]" value="${data["Email ID"]||""}"></td>
+        <td class="actions">
+          <button type="button" class="save-btn" disabled>💾 Save</button>
+          <button type="button" class="edit-btn" onclick="updateRow(this)">✏️ Update</button>
+          <button type="button" class="delete-btn" onclick="deleteRow(this)">🗑️ Delete</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+    renumberRows();
+  }
+
+  function renumberRows() {
+    const rows = document.querySelectorAll("#vendorTable tbody tr");
+    rows.forEach((row, idx) => {
+      row.querySelector(".slno").textContent = idx + 1;
+    });
+  }
+
+  function addRow() {
+    const tbody = document.querySelector("#vendorTable tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="slno"></td>
+      <td><input type="text" name="vendor[]"></td>
+      <td><input type="text" name="pan[]"></td>
+      <td><input type="text" name="gst[]"></td>
+      <td><input type="text" name="mobile[]"></td>
+      <td><textarea name="address[]"></textarea></td>
+      <td><input type="email" name="email[]"></td>
+      <td class="actions">
+        <button type="button" class="save-btn" onclick="saveRow(this)">💾 Save</button>
+        <button type="button" class="edit-btn" disabled>✏️ Update</button>
+        <button type="button" class="delete-btn" disabled>🗑️ Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+    renumberRows();
+  }
+
+  async function saveRow(btn) {
+    btn.disabled = true; btn.textContent = "💾 Saving...";
+    const row = btn.closest("tr");
+    const inputs = row.querySelectorAll("input, textarea");
+    const formData = new FormData();
+    formData.append("action", "save");
+    inputs.forEach(el => formData.append(el.name.replace("[]",""), el.value));
+    await fetch(endpoint, { method: "POST", body: formData });
+    await refreshData();
+  }
+
+  async function updateRow(btn) {
+    btn.disabled = true; btn.textContent = "✏️ Updating...";
+    const row = btn.closest("tr");
+    const rowIndex = row.getAttribute("data-rowindex");
+    const inputs = row.querySelectorAll("input, textarea");
+    const formData = new FormData();
+    formData.append("action", "update");
+    formData.append("rowIndex", rowIndex);
+    inputs.forEach(el => formData.append(el.name.replace("[]",""), el.value));
+    await fetch(endpoint, { method: "POST", body: formData });
+    await refreshData();
+  }
+
+  async function deleteRow(btn) {
+    if (!confirm("Delete this row?")) return;
+    btn.disabled = true; btn.textContent = "🗑️ Deleting...";
+    const row = btn.closest("tr");
+    const rowIndex = row.getAttribute("data-rowindex");
+    const formData = new FormData();
+    formData.append("action", "delete");
+    formData.append("rowIndex", rowIndex);
+    await fetch(endpoint, { method: "POST", body: formData });
+    await refreshData();
+  }
+
+  // Auto load on page open
+  window.addEventListener("load", () => refreshData());
+</script>
+</body>
+</html>
+
+

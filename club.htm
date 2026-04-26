@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Club Entry Form</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .glass-container {
+      width: 100%;
+      max-width: 1600px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s ease-in-out;
+    }
+    .refresh-btn:hover { background: rgba(0,123,255,0.2); }
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1200px;
+    }
+    th, td {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    thead th {
+      background: #2c3e50;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.7); }
+    input, select {
+      width: 95%;
+      padding: 6px;
+      font-size: 13px;
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 6px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8);
+    }
+    input[readonly] {
+      background: rgba(230,230,230,0.8);
+      cursor: not-allowed;
+    }
+    .actions div { display: flex; gap: 6px; justify-content: center; }
+    .actions button {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .save-btn { color: #007BFF; }
+    .edit-btn { color: #FF9800; }
+    .delete-btn { color: #E91E63; }
+    .add-row { margin-top: 12px; color: #28a745; }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+<div class="glass-container">
+  <h2>Club Entry Module</h2>
+
+  <div class="toolbar">
+    <button type="button" class="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+  </div>
+
+  <form id="clubForm">
+    <div class="table-container">
+      <table id="clubTable">
+        <thead>
+          <tr>
+            <th>SL NO</th>
+            <th>Name of Club</th>
+            <th>Village Name</th>
+            <th>Sansad</th>
+            <th>Mouja</th>
+            <th>Name of Secretary</th>
+            <th>Name of President</th>
+            <th>Name of Cashier</th>
+            <th>Status</th>
+            <th>Contact No</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button type="button" class="add-row" onclick="addRow()">+ Add Row</button>
+  </form>
+</div>
+
+<script>
+  const endpoint = "https://script.google.com/macros/s/AKfycbyrh1j3X-PliPZnD-CFnSoVrv479w7YlqUIGH1Rte2QcCkAJc7QHSNdHRdTdwAq971h/exec"; 
+
+  let existingClubs = []; // store clubs from sheet
+
+  async function refreshData() {
+    const tbody = document.querySelector("#clubTable tbody");
+    tbody.innerHTML = "";
+    const res = await fetch(endpoint);
+    const records = await res.json();
+
+    existingClubs = records.map(r => (r["Name of Club"] || "").trim().toLowerCase());
+
+    if (!records.length) { addRow(); return; }
+
+    records.forEach((data, i) => {
+      const tr = document.createElement("tr");
+      tr.setAttribute("data-rowindex", data.rowIndex);
+
+      tr.innerHTML = `
+        <td><input type="text" value="${i+1}" readonly></td>
+        <td><input type="text" name="club[]" value="${data["Name of Club"]||""}"></td>
+        <td><input type="text" name="village[]" value="${data["Village Name"]||""}"></td>
+        <td><input type="text" name="sansad[]" value="${data["Sansad"]||""}"></td>
+        <td><input type="text" name="mouja[]" value="${data["Mouja"]||""}"></td>
+        <td><input type="text" name="secretary[]" value="${data["Name of Secretary"]||""}"></td>
+        <td><input type="text" name="president[]" value="${data["Name of President"]||""}"></td>
+        <td><input type="text" name="cashier[]" value="${data["Name of Cashier"]||""}"></td>
+        <td>
+          <select name="status[]">
+            <option ${data["Status"]=="Registered"?"selected":""}>Registered</option>
+            <option ${data["Status"]=="Non Registered"?"selected":""}>Non Registered</option>
+          </select>
+        </td>
+        <td><input type="text" name="contact[]" value="${data["Contact No"]||""}"></td>
+        <td class="actions">
+          <div>
+            <button type="button" class="save-btn" disabled>💾 Save</button>
+            <button type="button" class="edit-btn" onclick="updateRow(this)">✏️ Update</button>
+            <button type="button" class="delete-btn" onclick="deleteRow(this)">🗑️ Delete</button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addRow() {
+    const tbody = document.querySelector("#clubTable tbody");
+    const rowCount = tbody.rows.length + 1;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${rowCount}" readonly></td>
+      <td><input type="text" name="club[]" oninput="toggleSaveButton(this)"></td>
+      <td><input type="text" name="village[]"></td>
+      <td><input type="text" name="sansad[]"></td>
+      <td><input type="text" name="mouja[]"></td>
+      <td><input type="text" name="secretary[]"></td>
+      <td><input type="text" name="president[]"></td>
+      <td><input type="text" name="cashier[]"></td>
+      <td>
+        <select name="status[]">
+          <option>Registered</option>
+          <option>Non Registered</option>
+        </select>
+      </td>
+      <td><input type="text" name="contact[]"></td>
+      <td class="actions">
+        <div>
+          <button type="button" class="save-btn" onclick="saveRow(this)">💾 Save</button>
+          <button type="button" class="edit-btn" disabled>✏️ Update</button>
+          <button type="button" class="delete-btn" onclick="deleteRow(this)">🗑️ Delete</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  }
+
+  function toggleSaveButton(input) {
+    const clubName = input.value.trim().toLowerCase();
+    const row = input.closest("tr");
+    const saveBtn = row.querySelector(".save-btn");
+    if (existingClubs.includes(clubName) && clubName !== "") {
+      saveBtn.disabled = true;
+    } else {
+      saveBtn.disabled = false;
+    }
+  }
+
+  async function saveRow(btn) {
+    const row = btn.closest("tr");
+    const inputs = row.querySelectorAll("input, select");
+    const formData = new FormData();
+    formData.append("action", "save");
+    inputs.forEach(el => formData.append(el.name.replace("[]",""), el.value));
+    btn.textContent = "⏳ Saving...";
+    btn.disabled = true;
+    const res = await fetch(endpoint, { method: "POST", body: formData });
+    const msg = await res.text();
+    btn.textContent = "✅ Saved";
+    alert(msg);
+    refreshData();
+  }
+
+  async function updateRow(btn) {
+    const row = btn.closest("tr");
+    const rowIndex = row.getAttribute("data-rowindex");
+    const inputs = row.querySelectorAll("input, select");
+    const formData = new FormData();
+    formData.append("action", "update");
+    formData.append("rowIndex", rowIndex);
+    inputs.forEach(el => formData.append(el.name.replace("[]",""), el.value));
+    btn.textContent = "⏳ Updating...";
+    btn.disabled = true;
+    const res = await fetch(endpoint, { method: "POST", body: formData });
+    const msg = await res.text();
+    btn.textContent = "✅ Updated";
+    alert(msg);
+    refreshData();
+  }
+
+  async function deleteRow(btn) {
+    if (!confirm("Delete this row?")) return;
+    const row = btn.closest("tr");
+    const rowIndex = row.getAttribute("data-rowindex");
+    const formData = new FormData();
+    formData.append("action", "delete");
+    formData.append("rowIndex", rowIndex);
+    btn.textContent = "⏳ Deleting...";
+    btn.disabled = true;
+    const res = await fetch(endpoint, { method: "POST", body: formData });
+    const msg = await res.text();
+    btn.textContent = "✅ Deleted";
+    alert(msg);
+    refreshData();
+  }
+
+  window.addEventListener("load", refreshData);
+</script>
+</body>
+</html>

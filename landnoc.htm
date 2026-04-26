@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Bhagabanpur Gram Panchayat - Land Conversion NOC | Official Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #5a626e;
+            font-family: 'Courier New', 'Times New Roman', 'Georgia', monospace, serif;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1100px;
+            width: 100%;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .form-panel {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 1.5rem 2rem;
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.15);
+        }
+
+        .form-panel h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-bottom: 2px solid black;
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .form-section {
+            margin-top: 1.2rem;
+            margin-bottom: 1.8rem;
+            border-left: 4px solid #222;
+            padding-left: 1rem;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: #eaeaea;
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid black;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 1rem 1.8rem;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .input-group label {
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+        }
+        .input-group input, .input-group select {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #111;
+            background: white;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            border-radius: 0px;
+        }
+        .info-hint {
+            font-size: 0.7rem;
+            color: #555;
+            margin-top: 0.2rem;
+            font-style: italic;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid #aaa;
+            padding-top: 1.2rem;
+        }
+        .btn {
+            padding: 0.6rem 1.8rem;
+            border: 1px solid black;
+            background: #eaeaea;
+            font-weight: bold;
+            font-family: monospace;
+            cursor: pointer;
+            transition: 0.1s linear;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        .btn-primary {
+            background: #111;
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #333;
+        }
+        .btn-primary:disabled {
+            background: #aaa;
+            border-color: #666;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn-green {
+            background: #2c5e2e;
+            color: white;
+            border: 1px solid #1a3b1a;
+        }
+        .btn-green:hover:not(:disabled) {
+            background: #1e4620;
+        }
+        .btn-secondary:hover {
+            background: #ccc;
+        }
+        .validation-note {
+            font-size: 0.7rem;
+            margin-top: 10px;
+            color: #444;
+            font-family: monospace;
+            border-top: 1px dashed #888;
+            padding-top: 8px;
+        }
+
+        .certificate-wrapper {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 0.2rem;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+        }
+        .certificate {
+            background: white;
+            padding: 1.6rem 2rem 2rem 2rem;
+            font-family: 'Times New Roman', 'Courier New', 'Georgia', serif;
+            color: black;
+        }
+        .office-header {
+            text-align: center;
+            border-bottom: 2px solid black;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+        }
+        .office-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.3;
+        }
+        .office-header .sub {
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .address-block {
+            text-align: center;
+            font-size: 0.8rem;
+            font-family: monospace;
+            margin-top: 0.25rem;
+        }
+        .letter-ref {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.8rem 0 0.8rem 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+        .title-doc {
+            text-align: center;
+            margin: 0.8rem 0 1rem 0;
+        }
+        .title-doc h2 {
+            font-size: 1.6rem;
+            text-decoration: underline;
+            text-underline-offset: 6px;
+            font-weight: bold;
+        }
+        .certificate p {
+            margin: 0.6rem 0;
+            line-height: 1.4;
+            font-size: 0.95rem;
+            text-align: justify;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.8rem 0;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+        }
+        .info-table td, .info-table th {
+            border: 1px solid black;
+            padding: 8px 12px;
+            vertical-align: top;
+        }
+        .info-table td:first-child {
+            font-weight: 700;
+            background-color: #f5f5f5;
+            width: 34%;
+        }
+        .signature {
+            margin-top: 1.8rem;
+            display: flex;
+            justify-content: flex-end;
+            text-align: right;
+            padding-top: 0.5rem;
+        }
+        .stamp-area {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .footer-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1rem;
+            border-top: 1px dashed black;
+            padding-top: 0.5rem;
+        }
+        .print-btn {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .badge-watermark {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 0.6rem;
+            color: #2c2c2c;
+            font-family: monospace;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .form-panel, .print-btn button, .btn-group, .no-print {
+                display: none !important;
+            }
+            .certificate-wrapper {
+                border: 2px solid black;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            .certificate {
+                padding: 0.8in;
+            }
+            .info-table td:first-child {
+                background-color: #eee !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="form-panel no-print">
+        <h2>⛯ BHAGABANPUR GP · LAND CONVERSION NOC</h2>
+        
+        <!-- SECTION 1: APPLICANT RESIDENTIAL DETAILS -->
+        <div class="form-section">
+            <div class="section-title">📄 APPLICANT RESIDENTIAL DETAILS</div>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="name" value="Sadek Ali">
+                </div>
+                <div class="input-group">
+                    <label>W/o- / S/o- (Relative) *</label>
+                    <input type="text" id="relative" value="Late Estab Ali">
+                </div>
+                <div class="input-group">
+                    <label>Residential Village *</label>
+                    <select id="villageSelect">
+                        <option value="">-- Select Village --</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Residential Mouja *</label>
+                    <select id="residentialMoujaSelect">
+                        <option value="">-- Select Mouja --</option>
+                    </select>
+                    <div class="info-hint">Mouja where applicant resides</div>
+                </div>
+                <div class="input-group">
+                    <label>P.O. *</label>
+                    <input type="text" id="po" value="Bhagabanpur">
+                </div>
+                <div class="input-group">
+                    <label>P.S. *</label>
+                    <input type="text" id="ps" value="Chanchal">
+                </div>
+                <div class="input-group">
+                    <label>District *</label>
+                    <input type="text" id="district" value="Malda">
+                </div>
+                <div class="input-group">
+                    <label>State *</label>
+                    <input type="text" id="state" value="West Bengal">
+                </div>
+                <div class="input-group">
+                    <label>PIN Code *</label>
+                    <input type="text" id="pin" value="732123">
+                </div>
+                <div class="input-group">
+                    <label>AADHAR Number *</label>
+                    <input type="text" id="aadhar" value="469748408090">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: EXISTING LAND DETAILS -->
+        <div class="form-section">
+            <div class="section-title">🗺️ EXISTING LAND DETAILS (LAND LOCATION)</div>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Land Mouja *</label>
+                    <select id="landMoujaSelect">
+                        <option value="">-- Select Land Mouja --</option>
+                    </select>
+                    <div class="info-hint">Mouja where the actual land is situated</div>
+                </div>
+                <div class="input-group">
+                    <label>Plot No. *</label>
+                    <input type="text" id="plot" value="1746">
+                </div>
+                <div class="input-group">
+                    <label>Khaitan No. *</label>
+                    <input type="text" id="khaitan" value="7405">
+                </div>
+                <div class="input-group">
+                    <label>Area (Hectare/Acre) *</label>
+                    <input type="text" id="area" value="0.0062">
+                </div>
+                <div class="input-group">
+                    <label>Existing Land Class *</label>
+                    <select id="existingType">
+                        <!-- Will be populated by JavaScript -->
+                    </select>
+                    <div class="info-hint">Current recorded land classification</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: PROPOSED LAND DETAILS -->
+        <div class="form-section">
+            <div class="section-title">🏡 PROPOSED LAND DETAILS</div>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Proposed Land Class *</label>
+                    <select id="proposedType">
+                        <!-- Will be populated by JavaScript -->
+                    </select>
+                    <div class="info-hint">Target land classification after conversion</div>
+                </div>
+                <div class="input-group">
+                    <label>Purpose / Self Interest Statement *</label>
+                    <input type="text" id="purposeText" value="for his/her self interest">
+                </div>
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-secondary" id="resetBtn">⟳ RESET TO DEFAULT</button>
+            <button class="btn btn-green" id="generateLetterBtn" disabled>✅ GENERATE LETTER</button>
+        </div>
+        <div class="validation-note" id="validationMsg">* All fields required. Select Residential Mouja and Land Mouja. Fill all to enable Generate.</div>
+    </div>
+
+    <div class="certificate-wrapper" id="certificateWrapper">
+        <div class="certificate" id="certificateContent">
+            <div style="text-align:center; padding: 2rem; color: #444;">📜 Fill all details and click 'GENERATE LETTER' to issue NOC</div>
+        </div>
+        <div class="print-btn no-print">
+            <button class="btn btn-primary" id="printBtn" disabled>🖨️ PRINT CERTIFICATE</button>
+        </div>
+        <div class="badge-watermark no-print">Bhagabanpur Gram Panchayat, Chanchal-I, Malda – Official Land Conversion NOC</div>
+    </div>
+</div>
+
+<script>
+    // ======================= COMPLETE WEST BENGAL LAND CLASSES LIST =======================
+    const landClasses = [
+        // Agricultural & Cultivable Lands
+        "Shali / Sali (Paddy land / Rice cultivation)",
+        "Shal (Cultivable agricultural land - general)",
+        "Danga (Agricultural) (High land used for cultivation - non-irrigated)",
+        "Bastu (Agricultural) (Agricultural land within homestead premises)",
+        "Patit (Fallow land / uncultivated but capable of cultivation)",
+        "Barapatit (Extensive fallow land)",
+        "Tal (Low-lying marshy land - seasonally waterlogged)",
+        "Nijabad (Self-cultivated land - owner cultivates personally)",
+        "Pabitra / Debottar (Land owned by religious institutions / deities)",
+        "Khas (Government-owned cultivable land)",
+        
+        // Non-Agricultural / Residential Lands
+        "Bastu (Non-Agricultural) (Residential homestead land)",
+        "Viti (Non-agricultural homestead land)",
+        "Danga (Non-Agricultural) (Non-agricultural high land suitable for construction)",
+        "Gorast (Cattle grazing land / pasture land)",
+        "Poth (Pathways / village roads)",
+        "Gorur Poth (Cattle track / passage for cattle)",
+        "Nala / Khal (Drainage channel / small canal)",
+        "Pokhor / Pukur (Pond / water body - excavated or natural)",
+        "Dighi (Large tank / reservoir)",
+        "Bil (Wetlands / marshy depressions - seasonally flooded)",
+        
+        // Forest & Wastelands
+        "Jungle (Forest land / scrub jungle)",
+        "Aranya (Dense forest / reserved forest area)",
+        "Char (Riverine sandy land / sandbars - river islands)",
+        "Balu (Sandy land / sand dunes)",
+        "Khayer (Saline / alkaline barren land)",
+        "Bhangar (Broken / uneven wasteland)",
+        "Mouan (Cemeteries / burial grounds)",
+        "Usar (Alkaline / saline barren land - unproductive)",
+        "Pagol / Doba (Swamp / permanently waterlogged marshland)",
+        
+        // Commercial & Institutional Lands
+        "Hat / Bazar (Market place / weekly market ground)",
+        "School / Madrasa (Educational institution land)",
+        "Hospital (Healthcare facility land)",
+        "Panchayat (Local government / Gram Panchayat land)",
+        "Puja Mandap (Religious / worship structure land)",
+        "Idgah / Masjid (Muslim religious institution land)",
+        "Kalibari / Temple (Hindu religious institution land)",
+        "Church (Christian religious institution land)",
+        
+        // Water & Waterlogged Areas
+        "Nodi (River / main river course)",
+        "Jol / Jala (Waterbody / permanent water area)",
+        "Bheel / Beel (Large natural wetland / oxbow lake)",
+        "Nala (Stream / seasonal water channel)",
+        "Canal (Irrigation canal / man-made water channel)",
+        
+        // Special / Protected Lands
+        "Debottar (Land owned by a deity - temple property)",
+        "Wakf (Muslim religious endowment property)",
+        "Bidhan / Biddut (Land under electricity / power infrastructure)",
+        "Rail (Railway land)",
+        "Sadak (Road / highway land - government)",
+        "Gomasta (Land under zamindar / landlord's agent historically)"
+    ];
+    
+    // Mouja list (English only)
+    const moujaList = [
+        { code: "007", name: "Paschim Bhagabanpur" },
+        { code: "020", name: "Haripur" },
+        { code: "021", name: "Khadiarpur" },
+        { code: "023", name: "Baltar" },
+        { code: "024", name: "Gouripur" },
+        { code: "025", name: "Raighata" },
+        { code: "032", name: "Nayanpur" },
+        { code: "033", name: "Ramdevpur" },
+        { code: "034", name: "Ranapur" },
+        { code: "035", name: "Jotchandi" },
+        { code: "036", name: "Purba Bhagabanpur" },
+        { code: "037", name: "Serbabar Balrampur" },
+        { code: "038", name: "Bagunj" },
+        { code: "040", name: "Chandipur" },
+        { code: "041", name: "Bhebakaliganj" },
+        { code: "056", name: "Khoshalpur" },
+        { code: "057", name: "Arbara" }
+    ];
+    
+    // Village to Residential Mouja mapping
+    const villageToMoujaCode = {
+        "Nimgachhi": "007", "Ghagarpar": "007", "Jasua": "007", "JahirKhan": "007",
+        "Molla Para": "007", "Bhagabanpur": "007", "Belpukur": "007", "Charalu": "007",
+        "Serbabar": "037", "Gouripur": "024", "Ranapur": "034", "Nayanpur": "032",
+        "Ramdevpur": "033", "Jotchandi": "035", "Bheba": "036", "Uttar Kaligunj": "041",
+        "Dakshin Kaligunj": "041", "Bagunj": "038", "Panbara": "038", "Choto Haripur": "020",
+        "Haripur": "020", "Hridanpur": "036", "Khadiarpur": "021", "Bagunj (Khadiarpur)": "021",
+        "Arbara": "057", "Khoshalpur": "056", "Bagunj (Khoshalpur)": "056", "NamajGaon": "056",
+        "Barator": "023", "Raighata": "025", "Darakandi": "040", "Chandipur": "040"
+    };
+    
+    const villageList = [...new Set(Object.keys(villageToMoujaCode))].sort();
+    
+    // Populate village dropdown
+    const villageSelect = document.getElementById('villageSelect');
+    villageList.forEach(village => {
+        const option = document.createElement('option');
+        option.value = village;
+        option.textContent = village;
+        villageSelect.appendChild(option);
+    });
+    
+    // Populate mouja dropdowns
+    function populateMoujaDropdown(selectElement) {
+        selectElement.innerHTML = '<option value="">-- Select Mouja --</option>';
+        moujaList.forEach(mouja => {
+            const option = document.createElement('option');
+            option.value = mouja.code;
+            option.textContent = `[${mouja.code}] ${mouja.name}`;
+            selectElement.appendChild(option);
+        });
+    }
+    
+    // Populate land classes dropdowns
+    function populateLandClassesDropdown(selectElement, defaultSelected = null) {
+        selectElement.innerHTML = '';
+        landClasses.forEach(landClass => {
+            const option = document.createElement('option');
+            option.value = landClass;
+            option.textContent = landClass;
+            selectElement.appendChild(option);
+        });
+        if (defaultSelected && landClasses.includes(defaultSelected)) {
+            selectElement.value = defaultSelected;
+        } else if (defaultSelected === "Danga (Non-Agricultural) (Non-agricultural high land suitable for construction)") {
+            selectElement.value = defaultSelected;
+        }
+    }
+    
+    const residentialMoujaSelect = document.getElementById('residentialMoujaSelect');
+    const landMoujaSelect = document.getElementById('landMoujaSelect');
+    populateMoujaDropdown(residentialMoujaSelect);
+    populateMoujaDropdown(landMoujaSelect);
+    
+    const existingTypeSelect = document.getElementById('existingType');
+    const proposedTypeSelect = document.getElementById('proposedType');
+    populateLandClassesDropdown(existingTypeSelect, "Danga (Non-Agricultural) (Non-agricultural high land suitable for construction)");
+    populateLandClassesDropdown(proposedTypeSelect, "Bastu (Non-Agricultural) (Residential homestead land)");
+    
+    function getMoujaTextByCode(code) {
+        const mouja = moujaList.find(m => m.code === code);
+        if(mouja) return `[${mouja.code}] ${mouja.name}`;
+        return code;
+    }
+    
+    // Auto-fill residential mouja when village is selected
+    villageSelect.addEventListener('change', function() {
+        const selectedVillage = villageSelect.value;
+        if (selectedVillage && villageToMoujaCode[selectedVillage]) {
+            residentialMoujaSelect.value = villageToMoujaCode[selectedVillage];
+        } else {
+            residentialMoujaSelect.value = "";
+        }
+        updateGenerateButtonState();
+    });
+    
+    residentialMoujaSelect.addEventListener('change', updateGenerateButtonState);
+    landMoujaSelect.addEventListener('change', updateGenerateButtonState);
+    
+    // DOM Elements
+    const nameInput = document.getElementById('name');
+    const relativeInput = document.getElementById('relative');
+    const poInput = document.getElementById('po');
+    const psInput = document.getElementById('ps');
+    const districtInput = document.getElementById('district');
+    const stateInput = document.getElementById('state');
+    const pinInput = document.getElementById('pin');
+    const aadharInput = document.getElementById('aadhar');
+    const plotInput = document.getElementById('plot');
+    const khaitanInput = document.getElementById('khaitan');
+    const areaInput = document.getElementById('area');
+    const purposeText = document.getElementById('purposeText');
+    
+    const generateBtn = document.getElementById('generateLetterBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const printBtn = document.getElementById('printBtn');
+    const certContainer = document.getElementById('certificateContent');
+    const validationMsgSpan = document.getElementById('validationMsg');
+    
+    function getCurrentDate() {
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    }
+    
+    function getMemoNoDisplay() {
+        return "Memo No. _________________";
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function isFormComplete() {
+        const fields = [
+            nameInput.value.trim(), relativeInput.value.trim(),
+            villageSelect.value, residentialMoujaSelect.value, landMoujaSelect.value,
+            poInput.value.trim(), psInput.value.trim(), districtInput.value.trim(),
+            stateInput.value.trim(), pinInput.value.trim(), aadharInput.value.trim(),
+            plotInput.value.trim(), khaitanInput.value.trim(), areaInput.value.trim(),
+            purposeText.value.trim(), existingTypeSelect.value, proposedTypeSelect.value
+        ];
+        for(let f of fields) {
+            if(f === "" || f === null) return false;
+        }
+        return true;
+    }
+    
+    function updateGenerateButtonState() {
+        const complete = isFormComplete();
+        generateBtn.disabled = !complete;
+        printBtn.disabled = !complete;
+        if(complete) {
+            validationMsgSpan.innerHTML = "✓ All fields filled. You can now generate the certificate.";
+            validationMsgSpan.style.color = "#1e4620";
+        } else {
+            validationMsgSpan.innerHTML = "* All fields required. Select Residential Mouja and Land Mouja. Fill all to enable Generate.";
+            validationMsgSpan.style.color = "#444";
+        }
+    }
+    
+    const allTextInputs = [nameInput, relativeInput, poInput, psInput, districtInput, stateInput, pinInput, aadharInput, plotInput, khaitanInput, areaInput, purposeText];
+    allTextInputs.forEach(inp => {
+        inp.addEventListener('input', updateGenerateButtonState);
+        inp.addEventListener('change', updateGenerateButtonState);
+    });
+    existingTypeSelect.addEventListener('change', updateGenerateButtonState);
+    proposedTypeSelect.addEventListener('change', updateGenerateButtonState);
+    villageSelect.addEventListener('change', updateGenerateButtonState);
+    residentialMoujaSelect.addEventListener('change', updateGenerateButtonState);
+    landMoujaSelect.addEventListener('change', updateGenerateButtonState);
+    
+    function renderCertificate() {
+        if(!isFormComplete()) {
+            certContainer.innerHTML = `<div style="text-align:center; padding: 2rem; color: #b91c1c;">⚠️ Incomplete details. Please fill all fields.</div>`;
+            return;
+        }
+        
+        let name = nameInput.value.trim();
+        let relative = relativeInput.value.trim();
+        let village = villageSelect.value;
+        let residentialMoujaCode = residentialMoujaSelect.value;
+        let residentialMoujaText = getMoujaTextByCode(residentialMoujaCode);
+        let landMoujaCode = landMoujaSelect.value;
+        let landMoujaText = getMoujaTextByCode(landMoujaCode);
+        let po = poInput.value.trim();
+        let ps = psInput.value.trim();
+        let district = districtInput.value.trim();
+        let state = stateInput.value.trim();
+        let pin = pinInput.value.trim();
+        let aadhar = aadharInput.value.trim();
+        let plotNo = plotInput.value.trim();
+        let khaitan = khaitanInput.value.trim();
+        let area = areaInput.value.trim();
+        let existingType = existingTypeSelect.value;
+        let proposedType = proposedTypeSelect.value;
+        let purpose = purposeText.value.trim();
+        if(purpose === "") purpose = "for his/her self interest";
+        
+        const currentDate = getCurrentDate();
+        const memoLine = getMemoNoDisplay();
+        
+        let relationPrefix = "W/o-";
+        if(relative.toLowerCase().includes('late')) relationPrefix = "W/o-";
+        else if(relative.toLowerCase().includes('s/o')) relationPrefix = "S/o-";
+        else relationPrefix = "W/o-";
+        
+        const certHtml = `
+            <div class="office-header">
+                <h1>OFFICE OF THE<br>BHAGABANPUR GRAM PANCHAYAT</h1>
+                <div class="sub">VILL+P.O - ARBARA, CHANCHAL-I</div>
+                <div class="address-block">MALDA  •  WEST BENGAL<br>Email: bhagabanpur.gp@gmail.com</div>
+            </div>
+            
+            <div class="letter-ref">
+                <span>${escapeHtml(memoLine)}</span>
+                <span>Date: ${escapeHtml(currentDate)}</span>
+            </div>
+            
+            <div class="title-doc">
+                <h2>Land Conversion NOC</h2>
+            </div>
+            
+            <p>This is to certify that the below mentioned person is a permanent resident of Bhagabanpur Gram Panchayat under Chanchal-I Dev Block, Malda, West Bengal whose address is stated as below ......</p>
+            
+            <table class="info-table">
+                <tr><td>Name</td><td>${escapeHtml(name)}</td>
+                <tr><td>${relationPrefix}</td><td>${escapeHtml(relative)}</td>
+                <tr><td>Residential Village</td><td>${escapeHtml(village)}</td>
+                <tr><td>Residential Mouja</td><td>${escapeHtml(residentialMoujaText)}</td>
+                <tr><td>P.O.</td><td>${escapeHtml(po)}</td>
+                <tr><td>P.S.</td><td>${escapeHtml(ps)}</td>
+                <tr><td>District</td><td>${escapeHtml(district)}</td>
+                <tr><td>State</td><td>${escapeHtml(state)}</td>
+                <tr><td>Pin</td><td>${escapeHtml(pin)}</td>
+                <tr><td>AADHAR</td><td>${escapeHtml(aadhar)}</td>
+            </table>
+            
+            <p><strong>The mentioned person possesses a land situated at the following location, details of which are given below:</strong></p>
+            
+            <table class="info-table">
+                <tr><td>Land Mouja</td><td>${escapeHtml(landMoujaText)}</td>
+                <tr><td>Plot No.</td><td>${escapeHtml(plotNo)}</td>
+                <tr><td>Khaitan No.</td><td>${escapeHtml(khaitan)}</td>
+                <tr><td>Area</td><td>${escapeHtml(area)} (Hectare/Acre approx)</td>
+                <tr><td>Existing Land Class</td><td>${escapeHtml(existingType)}</td>
+            </table>
+            
+            <p>Now the person wishes to convert the land from <strong>${escapeHtml(existingType)}</strong> to <strong>${escapeHtml(proposedType)}</strong> ${escapeHtml(purpose)} which will not cause any kind of lawful situations as it appears in my local enquiry.</p>
+            
+            <table class="info-table">
+                <tr><td>Proposed Land Class</td><td>${escapeHtml(proposedType)}</td>
+            </table>
+            
+            <p>The above information is true to my knowledge and information.</p>
+            
+            <div class="signature">
+                <div class="stamp-area">
+                    <strong>Prodhan</strong><br>
+                    Bhagabanpur Gram Panchayat<br>
+                    (Authorised Signature & Official Stamp)
+                </div>
+            </div>
+            <div class="footer-note">
+                ** This No Objection Certificate is issued for land conversion purpose only. **
+            </div>
+        `;
+        
+        certContainer.innerHTML = certHtml;
+    }
+    
+    function resetToDefault() {
+        nameInput.value = "Sadek Ali";
+        relativeInput.value = "Late Estab Ali";
+        if(villageList.length > 0) {
+            villageSelect.value = "Nimgachhi";
+            if(villageToMoujaCode["Nimgachhi"]) {
+                residentialMoujaSelect.value = villageToMoujaCode["Nimgachhi"];
+            }
+        } else {
+            villageSelect.value = "";
+            residentialMoujaSelect.value = "";
+        }
+        landMoujaSelect.value = "007";
+        
+        poInput.value = "Bhagabanpur";
+        psInput.value = "Chanchal";
+        districtInput.value = "Malda";
+        stateInput.value = "West Bengal";
+        pinInput.value = "732123";
+        aadharInput.value = "469748408090";
+        plotInput.value = "1746";
+        khaitanInput.value = "7405";
+        areaInput.value = "0.0062";
+        
+        existingTypeSelect.value = "Danga (Non-Agricultural) (Non-agricultural high land suitable for construction)";
+        proposedTypeSelect.value = "Bastu (Non-Agricultural) (Residential homestead land)";
+        purposeText.value = "for his/her self interest";
+        
+        updateGenerateButtonState();
+        certContainer.innerHTML = `<div style="text-align:center; padding: 2rem; color: #444;">📜 Fill all details and click 'GENERATE LETTER' to issue NOC</div>`;
+    }
+    
+    function handleGenerate() {
+        if(!isFormComplete()) {
+            alert("Please fill all mandatory fields before generating the certificate.");
+            return;
+        }
+        renderCertificate();
+        validationMsgSpan.innerHTML = "✓ Certificate generated successfully. You can now print.";
+        validationMsgSpan.style.color = "#1e4620";
+    }
+    
+    generateBtn.addEventListener('click', handleGenerate);
+    resetBtn.addEventListener('click', resetToDefault);
+    printBtn.addEventListener('click', () => {
+        if(isFormComplete()) {
+            window.print();
+        } else {
+            alert("Please generate the certificate first.");
+        }
+    });
+    
+    resetToDefault();
+</script>
+</body>
+</html>

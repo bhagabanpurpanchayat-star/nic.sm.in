@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bill Payment Module</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #2b2b2b; color: #eee; margin: 0; padding: 10px; font-size: 13px; }
+    h2 { color: #fff; font-size: 18px; margin: 0 0 10px 0; }
+    .toolbar { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; clear: both; }
+    .toolbar input { padding: 4px; border-radius: 4px; border: 1px solid #555; width: 250px; font-size: 13px; background: #3b3b3b; color: #eee; }
+    .toolbar button { padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s ease; font-size: 13px; }
+    .toolbar button:hover { background: #218838; }
+    .spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+
+    .table-container { height: calc(100vh - 120px); overflow-y: auto; border: 1px solid #555; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border: 1px solid #555; padding: 6px; text-align: center; white-space: normal; word-wrap: break-word; overflow-wrap: break-word; }
+    thead th { position: sticky; top: 0; background: #003366; color: #fff; z-index: 2; font-size: 12px; }
+
+    button.action-btn { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    #message { margin-bottom: 8px; padding: 8px; display: none; border-radius: 5px; font-weight: bold; text-align: center; font-size: 13px; }
+    #message.success { background: #28a745; color: white; }
+    #message.error { background: #dc3545; color: white; }
+    #message.loading { background: #007bff; color: white; }
+
+    td input, td select { width: 100%; box-sizing: border-box; font-size: 12px; padding: 4px; background: #3b3b3b; color: #eee; border: 1px solid #555; }
+    td input[readonly] { background-color: #555; color: #ccc; cursor: not-allowed; }
+    
+    /* Neon green color for SECURITY column */
+    .security-value {
+      color: #39ff14;
+      font-weight: bold;
+      text-shadow: 0 0 5px #39ff14;
+      font-size: 13px;
+    }
+    
+    /* Highlight row when SDM Payment Reference has a value */
+    tr.highlight-row {
+      background-color: #1a4d2a !important;
+      border-left: 3px solid #39ff14;
+      border-right: 3px solid #39ff14;
+    }
+    
+    tr.highlight-row td {
+      background-color: #1a4d2a !important;
+    }
+    
+    /* Hover effect for highlighted rows */
+    tr.highlight-row:hover td {
+      background-color: #236b3a !important;
+    }
+    
+    /* Normal row hover effect */
+    tr:hover td {
+      background-color: #3a3a3a;
+    }
+    
+    .debug-info {
+      font-size: 10px;
+      color: #888;
+      margin-top: 5px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Security Money (SDM) Payment Module</h2>
+
+  <div id="message"></div>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="🔍 Search by UNIQUE NIT, NIT, Vendor..." oninput="filterTable()" />
+    <button id="refreshBtn" onclick="refreshData()">⟳ Refresh</button>
+  </div>
+
+  <div class="table-container">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>UNIQUE NIT</th>
+          <th>NIT</th>
+          <th>SL</th>
+          <th>NIT DATE</th>
+          <th>VENDOR</th>
+          <th>Name of the work</th>
+          <th>Source of Fund</th>
+          <th>GROSS BILL</th>
+          <th>Completion Date</th>
+          <th>SECURITY</th>
+          <th>PAYMENT MODE</th>
+          <th>REFERENCE</th>
+          <th>SECURITY PAYMENT DATE</th>
+          <th>SDM Payment Reference</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    // REPLACE THIS URL WITH YOUR DEPLOYED WEB APP URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw1vVpJleI2n_VO8oc9675kTYrna_GKawfPYKTQl3tc_5yacCO3kKCASPCHR3HqdUjU5w/exec";
+    let tableData = [];
+    let allData = []; // Store all data with original indices
+    
+    // Column indices based on actual sheet structure
+    const COLUMN_MAPPING = {
+      TIMESTAMP: 0,
+      UNIQUE_NIT: 1,
+      NIT: 2,
+      SL: 3,
+      NIT_DATE: 4,
+      ACTIVITY_ID: 5,
+      NAME_OF_WORK: 6,
+      VENDOR: 7,
+      EARNEST_MONEY: 8,
+      PAYMENT_STATUS: 9,
+      TENDER_STATUS: 10,
+      CHEQUE_NO: 11,
+      DATE: 12,
+      SOURCE_OF_FUND: 13,
+      WORK_ORDER_NO: 14,
+      WORK_ORDER_DATE: 15,
+      ESTIMATE_VALUE: 16,
+      GROSS_BILL: 17,
+      COMPLETION_DATE: 18,
+      TDS: 19,
+      CGST: 20,
+      SGST: 21,
+      LABOUR_CESS: 22,
+      ROYALTY: 23,
+      SECURITY: 24,
+      NET_PAYMENT: 25,
+      PAYMENT_MODE: 26,
+      REFERENCE: 27,
+      SECURITY_PAYMENT_DATE: 28,
+      BID_AMOUNT: 29,
+      SDM_PAYMENT_REFERENCE: 30
+    };
+
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    function formatDisplayDate(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return value;
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      return day + "/" + month + "/" + year;
+    }
+
+    function formatTimestamp(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return value;
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      const hours = String(d.getHours()).padStart(2, "0");
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+      const seconds = String(d.getSeconds()).padStart(2, "0");
+      return day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+    }
+
+    function getDurationText(dateStr) {
+      try {
+        const parts = dateStr.split("/").map(Number);
+        const day = parts[0];
+        const month = parts[1];
+        const year = parts[2];
+        const past = new Date(year, month - 1, day);
+        const now = new Date();
+        if (isNaN(past.getTime())) return "";
+
+        let years = now.getFullYear() - past.getFullYear();
+        let months = now.getMonth() - past.getMonth();
+        let days = now.getDate() - past.getDate();
+
+        if (days < 0) {
+          months--;
+          const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+          days += prevMonth.getDate();
+        }
+        if (months < 0) {
+          years--;
+          months += 12;
+        }
+
+        let partsArray = [];
+        if (years > 0) partsArray.push(years + " year" + (years > 1 ? "s" : ""));
+        if (months > 0) partsArray.push(months + " month" + (months > 1 ? "s" : ""));
+        if (days > 0) partsArray.push(days + " day" + (days > 1 ? "s" : ""));
+        return partsArray.length ? partsArray.join(" ") : "0 days";
+      } catch(e) {
+        return "";
+      }
+    }
+
+    // Function to create a consistent unique key
+    function createUniqueKey(uniqueNit, vendor) {
+      // Trim and convert to string, then replace special characters
+      const nit = (uniqueNit || "").toString().trim();
+      const ven = (vendor || "").toString().trim();
+      // Use a pipe separator that's unlikely to appear in data
+      return nit + "|" + ven;
+    }
+
+    // Function to create a safe ID from unique key
+    function createSafeId(uniqueKey) {
+      // Replace any non-alphanumeric characters with underscore
+      return uniqueKey.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    // Function to check if SDM Payment Reference has a value
+    function hasSdmReferenceValue(sdmReference) {
+      return sdmReference && sdmReference.toString().trim() !== "";
+    }
+
+    async function refreshData() {
+      const btn = document.getElementById("refreshBtn");
+      const oldText = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner"></span> Refreshing...';
+      btn.disabled = true;
+      showMessage("Refreshing data...", "loading");
+      await loadData();
+      btn.innerHTML = oldText;
+      btn.disabled = false;
+      showMessage("Data loaded successfully ✅", "success");
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(scriptURL + "?action=getBillPaymentData");
+        let json = await res.json();
+
+        if (Array.isArray(json) && json.length > 0) {
+          const firstRow = json[0];
+          if (firstRow[0] && firstRow[0].toString().toLowerCase().includes('timestamp')) {
+            json = json.slice(1);
+          }
+        }
+
+        console.log("Total rows loaded:", json.length);
+        
+        // Store all data with original indices and unique key
+        allData = json.map((row, index) => {
+          const uniqueNit = row[COLUMN_MAPPING.UNIQUE_NIT] || "";
+          const vendor = row[COLUMN_MAPPING.VENDOR] || "";
+          const uniqueKey = createUniqueKey(uniqueNit, vendor);
+          
+          console.log(`Row ${index}: UNIQUE NIT="${uniqueNit}", VENDOR="${vendor}", Key="${uniqueKey}"`);
+          
+          return {
+            originalIndex: index,
+            rowData: row,
+            uniqueKey: uniqueKey,
+            uniqueNit: uniqueNit,
+            vendor: vendor
+          };
+        });
+        
+        // Filter only rows with SECURITY value
+        tableData = allData.filter(item => {
+          const security = item.rowData[COLUMN_MAPPING.SECURITY];
+          const hasSecurity = security && security.toString().trim() !== "";
+          return hasSecurity;
+        });
+        
+        console.log("Rows with SECURITY values:", tableData.length);
+        
+        if (tableData.length === 0) {
+          showMessage("No rows found with SECURITY values. Please check your data.", "error");
+        }
+        
+        renderTable(tableData);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showMessage("Error loading data: " + error.message, "error");
+      }
+    }
+
+    function renderTable(data) {
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+      const todayDate = getTodayDate();
+
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="16" style="color:#ff6666; font-weight:bold;">⚠ No records found with SECURITY value</td></tr>';
+        return;
+      }
+
+      data.forEach(function(item, idx) {
+        const row = item.rowData;
+        const uniqueKey = item.uniqueKey;
+        const safeId = createSafeId(uniqueKey);
+        
+        // Check if SDM Payment Reference has a value
+        const sdmReferenceValue = row[COLUMN_MAPPING.SDM_PAYMENT_REFERENCE] || "";
+        const hasReference = hasSdmReferenceValue(sdmReferenceValue);
+        
+        let tr = document.createElement("tr");
+        tr.setAttribute('data-unique-key', uniqueKey);
+        tr.setAttribute('data-safe-id', safeId);
+        
+        // Add highlight class if SDM Payment Reference has a value
+        if (hasReference) {
+          tr.classList.add('highlight-row');
+        }
+
+        // Column 0: Timestamp
+        let td0 = document.createElement("td");
+        td0.textContent = formatTimestamp(row[COLUMN_MAPPING.TIMESTAMP] || "");
+        tr.appendChild(td0);
+
+        // Column 1: UNIQUE NIT
+        let td1 = document.createElement("td");
+        td1.textContent = row[COLUMN_MAPPING.UNIQUE_NIT] || "";
+        tr.appendChild(td1);
+
+        // Column 2: NIT
+        let td2 = document.createElement("td");
+        td2.textContent = row[COLUMN_MAPPING.NIT] || "";
+        tr.appendChild(td2);
+
+        // Column 3: SL
+        let td3 = document.createElement("td");
+        td3.textContent = row[COLUMN_MAPPING.SL] || "";
+        tr.appendChild(td3);
+
+        // Column 4: NIT DATE
+        let td4 = document.createElement("td");
+        td4.textContent = formatDisplayDate(row[COLUMN_MAPPING.NIT_DATE] || "");
+        tr.appendChild(td4);
+
+        // Column 5: VENDOR
+        let td5 = document.createElement("td");
+        td5.textContent = row[COLUMN_MAPPING.VENDOR] || "";
+        tr.appendChild(td5);
+
+        // Column 6: Name of the work
+        let td6 = document.createElement("td");
+        td6.textContent = row[COLUMN_MAPPING.NAME_OF_WORK] || "";
+        tr.appendChild(td6);
+
+        // Column 7: Source of Fund
+        let td7 = document.createElement("td");
+        td7.textContent = row[COLUMN_MAPPING.SOURCE_OF_FUND] || "";
+        tr.appendChild(td7);
+
+        // Column 8: GROSS BILL
+        let td8 = document.createElement("td");
+        td8.textContent = row[COLUMN_MAPPING.GROSS_BILL] || "";
+        tr.appendChild(td8);
+
+        // Column 9: Completion Date with duration
+        let td9 = document.createElement("td");
+        let completionDate = formatDisplayDate(row[COLUMN_MAPPING.COMPLETION_DATE] || "");
+        if (completionDate) {
+          const duration = getDurationText(completionDate);
+          td9.innerHTML = completionDate + '<br><span style="color:#80ff80; font-size:11px;">(' + duration + ')</span>';
+        } else {
+          td9.textContent = "";
+        }
+        tr.appendChild(td9);
+
+        // Column 10: SECURITY (display only with neon green color)
+        let td10 = document.createElement("td");
+        let securityValue = row[COLUMN_MAPPING.SECURITY] || "";
+        td10.innerHTML = '<span class="security-value">' + securityValue + '</span>';
+        tr.appendChild(td10);
+
+        // Column 11: PAYMENT MODE (NON-EDITABLE - text display only)
+        let td11 = document.createElement("td");
+        let paymentModeValue = row[COLUMN_MAPPING.PAYMENT_MODE] || "";
+        td11.textContent = paymentModeValue;
+        tr.appendChild(td11);
+
+        // Column 12: REFERENCE (NON-EDITABLE - readonly)
+        let td12 = document.createElement("td");
+        let referenceValue = row[COLUMN_MAPPING.REFERENCE] || "";
+        td12.innerHTML = '<input type="text" value="' + referenceValue.replace(/"/g, '&quot;') + '" readonly style="background-color:#555; color:#ccc; cursor:not-allowed;">';
+        tr.appendChild(td12);
+
+        // Column 13: SECURITY PAYMENT DATE (editable date picker)
+        let td13 = document.createElement("td");
+        let securityPaymentDateValue = row[COLUMN_MAPPING.SECURITY_PAYMENT_DATE] || "";
+        let formattedDate = securityPaymentDateValue ? formatToInputDate(securityPaymentDateValue) : todayDate;
+        td13.innerHTML = '<input type="date" value="' + formattedDate + '" id="security_payment_date_' + safeId + '" onchange="toggleButton(\'' + safeId + '\')">';
+        tr.appendChild(td13);
+
+        // Column 14: SDM Payment Reference (editable)
+        let td14 = document.createElement("td");
+        let sdmReferenceValueCurrent = row[COLUMN_MAPPING.SDM_PAYMENT_REFERENCE] || "";
+        td14.innerHTML = '<input type="text" value="' + sdmReferenceValueCurrent.replace(/"/g, '&quot;') + '" placeholder="Enter SDM Reference" id="sdm_reference_' + safeId + '" oninput="toggleButton(\'' + safeId + '\'); checkAndHighlightRow(\'' + safeId + '\', this.value);">';
+        tr.appendChild(td14);
+
+        // Column 15: Action button
+        let tdAction = document.createElement("td");
+        tdAction.innerHTML = '<button class="action-btn" id="btn_' + safeId + '" onclick="updateRow(\'' + safeId + '\')">SAVE</button>';
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+        toggleButton(safeId);
+      });
+    }
+    
+    // Function to check and highlight row based on SDM Reference value
+    function checkAndHighlightRow(safeId, sdmValue) {
+      const row = document.querySelector(`tr[data-safe-id="${safeId}"]`);
+      if (row) {
+        if (sdmValue && sdmValue.trim() !== "") {
+          row.classList.add('highlight-row');
+        } else {
+          row.classList.remove('highlight-row');
+        }
+      }
+    }
+
+    function formatToInputDate(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return "";
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, "0") + '-' + String(d.getDate()).padStart(2, "0");
+    }
+
+    function filterTable() {
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = allData.filter(function(item) {
+        const row = item.rowData;
+        // First filter by SECURITY presence
+        if (!row[COLUMN_MAPPING.SECURITY] || row[COLUMN_MAPPING.SECURITY].toString().trim() === "") {
+          return false;
+        }
+        // Then filter by search term
+        return (row[COLUMN_MAPPING.UNIQUE_NIT] && row[COLUMN_MAPPING.UNIQUE_NIT].toString().toLowerCase().includes(search)) ||
+               (row[COLUMN_MAPPING.NIT] && row[COLUMN_MAPPING.NIT].toString().toLowerCase().includes(search)) ||
+               (row[COLUMN_MAPPING.VENDOR] && row[COLUMN_MAPPING.VENDOR].toString().toLowerCase().includes(search));
+      });
+      renderTable(filtered);
+    }
+
+    function toggleButton(safeId) {
+      const btn = document.getElementById('btn_' + safeId);
+      if (!btn) return;
+      btn.textContent = "UPDATE";
+      btn.style.background = "blue";
+      btn.style.color = "white";
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById("message");
+      msg.textContent = text;
+      msg.className = type;
+      msg.style.display = "block";
+      setTimeout(function() { msg.style.display = "none"; }, 3000);
+    }
+
+    async function updateRow(safeId) {
+      const btn = document.getElementById('btn_' + safeId);
+      btn.disabled = true; 
+      btn.textContent = "Saving...";
+
+      try {
+        // Find the row data by searching through allData using the safeId
+        let foundItem = null;
+        
+        for (let item of allData) {
+          if (createSafeId(item.uniqueKey) === safeId) {
+            foundItem = item;
+            break;
+          }
+        }
+        
+        if (!foundItem) {
+          throw new Error(`Row data not found for ID: ${safeId}`);
+        }
+        
+        const uniqueNit = foundItem.uniqueNit;
+        const vendor = foundItem.vendor;
+        
+        if (!uniqueNit || !vendor) {
+          throw new Error(`Missing data: UNIQUE NIT="${uniqueNit}", VENDOR="${vendor}"`);
+        }
+        
+        const securityPaymentDate = document.getElementById('security_payment_date_' + safeId).value;
+        const sdmReference = document.getElementById('sdm_reference_' + safeId).value;
+        
+        console.log("Updating row:", { uniqueNit, vendor, securityPaymentDate, sdmReference });
+        
+        const formData = new FormData();
+        formData.append("action", "updateBillPayment");
+        formData.append("uniqueNit", uniqueNit);
+        formData.append("vendor", vendor);
+        formData.append("security_payment_date", securityPaymentDate);
+        formData.append("sdm_payment_reference", sdmReference);
+
+        const res = await fetch(scriptURL, { method: "POST", body: formData });
+        const result = await res.json();
+
+        if (result.success) {
+          btn.textContent = "Saved ✔"; 
+          btn.style.background = "green";
+          showMessage(`✅ Updated: ${uniqueNit} - ${vendor}`, "success");
+          const rowEl = btn.closest("tr");
+          rowEl.style.backgroundColor = "#d4edda";
+          
+          // Update highlight based on new SDM reference value
+          if (sdmReference && sdmReference.trim() !== "") {
+            rowEl.classList.add('highlight-row');
+          } else {
+            rowEl.classList.remove('highlight-row');
+          }
+          
+          setTimeout(function() {
+            rowEl.style.backgroundColor = ""; 
+            toggleButton(safeId);
+          }, 1500);
+          // Reload data to reflect changes
+          setTimeout(function() { loadData(); }, 2000);
+        } else {
+          btn.textContent = "Failed ✖"; 
+          btn.style.background = "red";
+          showMessage(`❌ Update failed: ${result.error || "Unknown error"}`, "error");
+          console.error("Update error:", result);
+        }
+      } catch (err) {
+        console.error("Update error:", err);
+        btn.textContent = "Error ✖"; 
+        btn.style.background = "red";
+        showMessage(`❌ Error: ${err.message}`, "error");
+      } finally {
+        setTimeout(function() {
+          btn.disabled = false; 
+          if (btn.textContent !== "Saved ✔") {
+            toggleButton(safeId);
+          }
+        }, 2000);
+      }
+    }
+
+    // Initialize the page
+    loadData();
+  </script>
+</body>
+</html>

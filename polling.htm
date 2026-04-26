@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Polling Station View Only</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .glass-container {
+      width: 100%;
+      max-width: 1600px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s ease-in-out;
+    }
+    .refresh-btn:hover { background: rgba(0,123,255,0.2); }
+    .progress-wrapper {
+      flex-grow: 1;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .progress-bar {
+      flex-grow: 1;
+      height: 14px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        #ff9800 0%,
+        #ffeb3b 30%,
+        #ffffff 50%,
+        #ffeb3b 70%,
+        #ff9800 100%
+      );
+      background-size: 200% 100%;
+      animation: spark 0.5s linear infinite;
+    }
+    @keyframes spark {
+      from { background-position: 200% 0; }
+      to   { background-position: 0 0; }
+    }
+    .progress-text {
+      min-width: 50px;
+      font-size: 14px;
+      color: #333;
+      font-weight: 600;
+    }
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1100px;
+    }
+    th, td {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 14px 10px;
+      text-align: center;
+      vertical-align: middle;
+      color: #333;
+      font-size: 14px;
+    }
+    thead th {
+      background: #2c3e50;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.7); }
+  </style>
+</head>
+<body>
+
+<div class="glass-container">
+  <h2>Polling Station Data </h2>
+
+  <div class="toolbar">
+    <div class="progress-wrapper">
+      <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+      <div class="progress-text">0%</div>
+    </div>
+    <button type="button" class="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+  </div>
+
+  <div class="table-container">
+    <table id="pollingTable">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Name Of the Polling Station</th>
+          <th>Assigned BLO</th>
+          <th>Contact No</th>
+          <th>Area Assigned</th>
+          <th>Male Voter</th>
+          <th>Female Voter</th>
+          <th>Third Gender Voter</th>
+          <th>Total Voter</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const endpoint = "https://script.google.com/macros/s/AKfycbyAqa_V0CSa5XCo4ksJjvhMBOEhJFTjJP8wyGXPuG3SiuADULa0Np6_rY_gLVqcWd-fSw/exec";
+  let progressInterval;
+
+  function startProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    let percent = 0;
+    wrapper.style.display = "flex";
+    fill.style.width = "0%";
+    text.textContent = "0%";
+
+    progressInterval = setInterval(() => {
+      percent += 2;
+      if (percent > 100) percent = 100;
+      fill.style.width = percent + "%";
+      text.textContent = percent + "%";
+      if (percent === 100) clearInterval(progressInterval);
+    }, 80);
+  }
+
+  function endProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    clearInterval(progressInterval);
+    fill.style.width = "100%";
+    text.textContent = "100%";
+    setTimeout(() => { wrapper.style.display = "none"; }, 600);
+  }
+
+  async function refreshData() {
+    startProgress();
+    await loadData();
+    endProgress();
+  }
+
+  async function loadData() {
+    const tbody = document.querySelector("#pollingTable tbody");
+    tbody.innerHTML = "";
+    const res = await fetch(endpoint);
+    const records = await res.json();
+
+    if (!records.length) return;
+
+    records.forEach((data, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${data["Name Of the Polling Station"]||""}</td>
+        <td>${data["Assigned BLO"]||""}</td>
+        <td>${data["Contact No"]||""}</td>
+        <td>${data["Area Assigned"]||""}</td>
+        <td>${data["Male Voter"]||""}</td>
+        <td>${data["Female Voter"]||""}</td>
+        <td>${data["Third Gender Voter"]||""}</td>
+        <td>${data["Total Voter"]||""}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  window.addEventListener("load", () => refreshData());
+</script>
+</body>
+</html>

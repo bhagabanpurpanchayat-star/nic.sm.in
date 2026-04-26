@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ডাটা এন্ট্রি অপারেটর বিল – সৈয়দ রেহান আলী (অর্ধ-প্রস্থ টেবিল)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SolaimanLipi', 'Arial Unicode MS', 'Likhan', 'Noto Sans Bengali', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .form-container {
+            max-width: 760px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .form-body {
+            padding: 30px 30px 35px;
+        }
+
+        /* address line minimal */
+        .address-line {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 12px 10px;
+            background: #f1f5f9;
+            border-radius: 40px;
+            font-size: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        .address-line .to {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .address-line .name {
+            font-weight: 700;
+            color: #0f3b5e;
+        }
+        .address-line .details {
+            color: #334155;
+        }
+
+        /* applicant badge minimal */
+        .applicant-badge {
+            background: #eef2ff;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            border: 1px solid #cbd5e1;
+        }
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .badge-label {
+            font-size: 11px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0c4a6e;
+        }
+
+        /* selection row clean */
+        .selection-row {
+            background: #ffffff;
+            padding: 15px 0 5px 0;
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            border-bottom: 1px solid #e9eef2;
+        }
+        .field {
+            flex: 1 1 160px;
+        }
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'SolaimanLipi', sans-serif;
+            background: white;
+            transition: 0.15s;
+        }
+        .field input:focus, .field select:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30,60,114,0.1);
+        }
+
+        .month-preview {
+            background: #e6f0fa;
+            padding: 12px 16px;
+            border-radius: 30px;
+            margin: 20px 0 20px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #0b3b5c;
+            text-align: center;
+            border: 1px solid #b9d4f0;
+        }
+
+        /* words box minimal - kept as requested */
+        .words-box {
+            background: #f0f9f0;
+            padding: 14px 18px;
+            border-radius: 40px;
+            margin: 16px 0 16px;
+            border: 1px solid #b8d8b8;
+            text-align: center;
+        }
+        .words-box .label {
+            font-size: 13px;
+            color: #2d6a4f;
+        }
+        .words-box .words {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1b4d3e;
+            letter-spacing: 0.02em;
+        }
+
+        /* declaration minimal */
+        .declaration-box {
+            background: #fefce6;
+            padding: 14px 18px;
+            border-radius: 30px;
+            margin: 20px 0 20px;
+            border: 1px solid #eadfa0;
+        }
+        .declaration-box label {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 15px;
+            color: #3f3a1a;
+            cursor: pointer;
+        }
+        .declaration-box input {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: #1e3c72;
+        }
+
+        /* button group clean */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin: 18px 0 12px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 12px;
+            border: none;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'SolaimanLipi', sans-serif;
+            background: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid #cfdfee;
+        }
+        .btn-primary {
+            background: #1e3c72;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #143157;
+        }
+        .btn-secondary {
+            background: #ffb347;
+            color: #1e2b3a;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background: #ffa01e;
+        }
+        .export-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .export-btn {
+            flex: 1;
+            background: #e4eaf1;
+            border: none;
+            border-radius: 30px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            color: #1e3c72;
+            border: 1px solid #cbd5e1;
+        }
+        .export-btn:hover {
+            background: #d2ddee;
+        }
+
+        /* ========== PREVIEW SECTION ========== */
+        .preview-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fafdff;
+            border-radius: 24px;
+            border: 2px dashed #3b6c9c;
+            display: none;
+        }
+        .preview-section.show {
+            display: block;
+        }
+
+        /* ===== NARROW TABLE (half width, left aligned) WITH BORDERS ===== */
+        .preview-bill-table {
+            width: 55%;              /* roughly half the page, but not tiny */
+            min-width: 280px;
+            border-collapse: collapse;
+            margin: 18px 0 18px 0;   /* left aligned automatically */
+            font-size: 16px;          /* same as body text */
+            background: white;
+            border: 2px solid #1e3c5a;
+        }
+        .preview-bill-table th,
+        .preview-bill-table td {
+            border: 2px solid #1e3c5a;    /* solid border every cell */
+            padding: 10px 6px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 16px;               /* matches rest of text */
+        }
+        .preview-bill-table th {
+            background: #d9e6f2;
+            color: #1e3c5a;
+            font-weight: 700;
+        }
+        .preview-bill-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+        .preview-bill-table td:last-child {
+            font-weight: 700;
+            color: #075985;
+        }
+
+        /* total row: also half width, left aligned, matching border style */
+        .preview-total-row {
+            width: 55%;
+            min-width: 280px;
+            background: #e8f0fa;
+            padding: 12px 18px;
+            border: 2px solid #1e3c5a;
+            border-top: none;            /* connects to table above */
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 17px;
+            color: #003153;
+            margin: 0 0 20px 0;          /* left aligned */
+            box-sizing: border-box;
+        }
+
+        .preview-content {
+            font-family: 'SolaimanLipi', 'Courier New', monospace;
+            line-height: 1.6;
+            color: #0b2a41;
+        }
+        .preview-content p {
+            margin: 12px 0;
+        }
+
+        /* closing lines right aligned */
+        .closing-right {
+            text-align: right;
+            margin-top: 25px;
+            line-height: 2;
+            padding-right: 10px;
+        }
+        .closing-right .signature-name {
+            font-weight: 600;
+            color: #0b2a41;
+            font-size: 16px;
+        }
+        .closing-right .address-line-small {
+            font-size: 15px;
+            color: #2c3e50;
+        }
+
+        /* receipt line - now WITHOUT text box (just plain text) */
+        .receipt-plain {
+            margin-top: 25px;
+            font-size: 16px;
+            color: #1e3c5a;
+            line-height: 1.8;
+            border: none;
+            background: transparent;
+            padding: 0;
+        }
+
+        /* print adjustments */
+        @media print {
+            body {
+                background: white;
+                padding: 0.3in;
+            }
+            .form-body > *:not(.preview-section) {
+                display: none !important;
+            }
+            .preview-section {
+                display: block !important;
+                border: none;
+                padding: 0;
+                margin: 0;
+                background: white;
+            }
+            .preview-bill-table, .preview-total-row {
+                width: 55%;
+                border: 2px solid black;
+            }
+            .preview-bill-table th, 
+            .preview-bill-table td {
+                border: 2px solid black !important;
+            }
+            .receipt-plain {
+                background: transparent;
+                border: none;
+            }
+            @page {
+                margin: 0.7in;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-body">
+
+            <!-- address line -->
+            <div class="address-line">
+                <span class="to">বরাবর,</span>
+                <span class="name"> প্রধান, ভগবানপুর গ্রাম পঞ্চায়েত</span>
+                <span class="details"> | অরবরা, চাঁচল, মালদা - ৭৩২১২৩</span>
+            </div>
+
+            <!-- applicant badge -->
+            <div class="applicant-badge">
+                <div class="badge-item">
+                    <span class="badge-label">আবেদনকারী</span>
+                    <span class="badge-value">সৈয়দ রেহান আলী</span>
+                </div>
+                <div class="badge-item">
+                    <span class="badge-label">গ্রাম</span>
+                    <span class="badge-value">অরবরা</span>
+                </div>
+                <div class="badge-item">
+                    <span class="badge-label">ব্লক/জেলা</span>
+                    <span class="badge-value">চাঁচল, মালদা</span>
+                </div>
+            </div>
+
+            <!-- selection fields -->
+            <div class="selection-row">
+                <div class="field">
+                    <label>📅 আবেদনের তারিখ</label>
+                    <input type="date" id="appDate" value="2026-03-02">
+                </div>
+                <div class="field">
+                    <label>🗓 বিলের মাস (শুরু)</label>
+                    <input type="month" id="billingStartMonth" value="2026-02">
+                </div>
+                <div class="field">
+                    <label>🔢 মাস সংখ্যা</label>
+                    <select id="monthCount" onchange="updateUI()">
+                        <option value="1">১ মাস</option>
+                        <option value="2">২ মাস</option>
+                        <option value="3">৩ মাস</option>
+                        <option value="4">৪ মাস</option>
+                        <option value="5">৫ মাস</option>
+                        <option value="6">৬ মাস</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- month preview (just for info) -->
+            <div id="monthPreview" class="month-preview">
+                ফেব্রুয়ারি ২০২৬ মাসের জন্য বিল (ডাটা এন্ট্রি অপারেটর)
+            </div>
+
+            <!-- words box (interactive) -->
+            <div class="words-box">
+                <div class="label">শব্দে টাকার পরিমাণ</div>
+                <div class="words" id="amountInWords">নয় হাজার টাকা মাত্র</div>
+            </div>
+
+            <!-- declaration checkbox -->
+            <div class="declaration-box">
+                <label>
+                    <input type="checkbox" id="declaration" required>
+                    <span>আমি, সৈয়দ রেহান আলী, ঘোষণা করছি যে উল্লেখিত মাস/সমূহে ডাটা এন্ট্রি অপারেটর হিসেবে কাজ সঠিকভাবে সম্পন্ন হয়েছে। বিলের টাকা নির্ধারিত হারে যথাযথ।</span>
+                </label>
+            </div>
+
+            <!-- action buttons -->
+            <div class="actions">
+                <button class="btn btn-primary" onclick="generateFinalBill()">📄 বিল তৈরি করুন</button>
+                <button class="btn btn-secondary" onclick="printBill()">🖨️ প্রিন্ট</button>
+            </div>
+            <div class="export-group">
+                <button class="export-btn" onclick="exportAsDoc()">📝 ডক এক্সপোর্ট</button>
+                <button class="export-btn" onclick="exportAsPDF()">📕 পিডিএফ এক্সপোর্ট</button>
+            </div>
+
+            <!-- ===== PREVIEW AREA: final bill with HALF-WIDTH TABLE ===== -->
+            <div id="previewSection" class="preview-section">
+                <div id="previewContent" class="preview-content">
+                    <!-- dynamic HTML table inserted here -->
+                </div>
+                <!-- receipt line - now plain, no background/box -->
+                <div class="receipt-plain" id="receiptLinePlain">
+                    আমি ৯,০০০.০০ টাকা বুঝিয়া পাইলাম।<br>সৈয়দ রেহান আলী
+                </div>
+            </div>
+
+        </div> <!-- end form-body -->
+    </div> <!-- end container -->
+
+    <script>
+        // Utility functions
+        function getBengaliMonthName(index) {
+            return ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'][index];
+        }
+
+        function getMonthRangeFromStart(start, count) {
+            const [y, m] = start.split('-').map(Number);
+            const months = [];
+            for (let i = 0; i < count; i++) {
+                const d = new Date(y, m-1-i, 1);
+                months.unshift({ name: getBengaliMonthName(d.getMonth()), year: d.getFullYear() });
+            }
+            return months;
+        }
+
+        function formatMonthsRange(months) {
+            if (months.length === 1) return `${months[0].name} ${months[0].year}`;
+            const first = months[0], last = months[months.length-1];
+            return (first.year === last.year) ? `${first.name} থেকে ${last.name} ${last.year}` : `${first.name} ${first.year} থেকে ${last.name} ${last.year}`;
+        }
+
+        function formatBengaliNumber(num) {
+            return num.toLocaleString('bn-IN');
+        }
+
+        function numberToBengaliWords(num) {
+            if (num === 0) return 'শূন্য';
+            const ones = ['','এক','দুই','তিন','চার','পাঁচ','ছয়','সাত','আট','নয়','দশ','এগারো','বারো','তেরো','চৌদ্দ','পনেরো','ষোল','সতেরো','আঠারো','ঊনিশ'];
+            const tens = ['','','বিশ','ত্রিশ','চল্লিশ','পঞ্চাশ','ষাট','সত্তর','আশি','নব্বই'];
+            if (num < 20) return ones[num];
+            if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? ' '+ones[num%10] : '');
+            if (num < 1000) return ones[Math.floor(num/100)] + ' শত' + (num%100 ? ' '+numberToBengaliWords(num%100) : '');
+            if (num < 100000) return numberToBengaliWords(Math.floor(num/1000)) + ' হাজার' + (num%1000 ? ' '+numberToBengaliWords(num%1000) : '');
+            return 'অনেক';
+        }
+
+        // update UI elements (month preview and words)
+        function updateUI() {
+            const count = parseInt(document.getElementById('monthCount').value);
+            const start = document.getElementById('billingStartMonth').value;
+            if (!start) return;
+            const total = 9000 * count;
+            const formattedTotal = formatBengaliNumber(total);
+            const months = getMonthRangeFromStart(start, count);
+            const range = formatMonthsRange(months);
+            document.getElementById('monthPreview').innerText = `গত ${count} মাসের জন্য বিল (${range}) - ডাটা এন্ট্রি অপারেটর`;
+            document.getElementById('amountInWords').innerText = numberToBengaliWords(total) + ' টাকা মাত্র';
+            document.getElementById('receiptLinePlain').innerHTML = `আমি  ${formattedTotal}.০০ টাকা বুঝিয়া পাইলাম।<br>সৈয়দ রেহান আলী`;
+        }
+
+        // generate final bill with HALF-WIDTH table (55%)
+        function generateFinalBill() {
+            if (!document.getElementById('declaration').checked) {
+                alert('দয়া করে ঘোষণাটি স্বীকার করুন');
+                return;
+            }
+            const appDate = document.getElementById('appDate').value;
+            const count = parseInt(document.getElementById('monthCount').value);
+            const start = document.getElementById('billingStartMonth').value;
+            if (!appDate || !start) { alert('তারিখ ও মাস নির্বাচন করুন'); return; }
+
+            const d = new Date(appDate);
+            const day = d.getDate();
+            const monthName = getBengaliMonthName(d.getMonth());
+            const year = d.getFullYear();
+            const formattedDate = `${day} ${monthName}, ${year}`;
+
+            const months = getMonthRangeFromStart(start, count);
+            const monthText = (count === 1) ? `${months[0].name} ${months[0].year} মাসে` : `${formatMonthsRange(months)} মাসে`;
+            const total = 9000 * count;
+            const words = numberToBengaliWords(total);
+            const formattedTotal = formatBengaliNumber(total);
+
+            // Build half‑width table (inline style width:55% already in class)
+            const tableHTML = `
+                <div style="margin: 18px 0 6px; font-weight:600;">বিলের বিবরণ:</div>
+                <table class="preview-bill-table">
+                    <thead>
+                        <tr>
+                            <th>ডাটা এন্ট্রি অপারেটর<br>পারিশ্রমিক / মাস</th>
+                            <th>মোট মাস</th>
+                            <th>হিসাব</th>
+                            <th>মোট টাকা</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>৯,০০০/-</td>
+                            <td>${count}</td>
+                            <td>৯,০০০×${count}</td>
+                            <td>₹ ${formattedTotal}/-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="preview-total-row">
+                    <span>মোট টাকা</span>
+                    <span>₹ ${formattedTotal}/-</span>
+                </div>
+                <div style="margin: 6px 0 12px; font-size:16px;">শব্দে: ${words} টাকা মাত্র</div>
+            `;
+
+            // Full preview with header, address, table, closing, and plain receipt
+            const previewHTML = `
+                <p>মাননীয়া প্রধান,<br>ভগবানপুর গ্রাম পঞ্চায়েত<br>অরবরা, চাঁচল, মালদা</p>
+                <p>তারিখ: ${formattedDate}</p>
+                <p><strong>বিষয়: ${monthText} ডাটা এন্ট্রি অপারেটর হিসাবে পারিশ্রমিক প্রদানের আবেদন</strong></p>
+                <p>মহাশয়া,</p>
+                <p>সবিনয় নিবেদন এই যে, আমি, সৈয়দ রেহান আলী, আপনার নির্দেশ মতে গত ${monthText} ডাটা এন্ট্রি অপারেটর হিসাবে কাজ করিয়াছি। উক্ত কাজের পারিশ্রমিক বাবদ ৯,০০০/- টাকা মাস হিসাবে ${count} মাসের জন্য মোট ${formattedTotal}/- টাকা (${words}) প্রদানের জন্য অনুরোধ করছি।</p>
+                ${tableHTML}
+                <p>অতএব, উক্ত টাকা প্রদান করার জন্য অনুরোধ করছি।</p>
+                <div class="closing-right">
+                    <div>বিনীত,</div>
+                    <div class="signature-name">(সৈয়দ রেহান আলী)</div>
+                    <div class="address-line-small">অরবরা, চাঁচল, মালদা</div>
+                    <div class="address-line-small">তারিখ: ${formattedDate}</div>
+                </div>
+            `;
+
+            document.getElementById('previewContent').innerHTML = previewHTML;
+            document.getElementById('previewSection').classList.add('show');
+        }
+
+        function printBill() {
+            if (!document.getElementById('declaration').checked) { alert('ঘোষণা স্বীকার করুন'); return; }
+            generateFinalBill();
+            setTimeout(() => window.print(), 80);
+        }
+
+        function exportAsDoc() {
+            if (!document.getElementById('declaration').checked) { alert('ঘোষণা স্বীকার করুন'); return; }
+            generateFinalBill();
+            setTimeout(() => {
+                const previewHTML = document.getElementById('previewContent').innerHTML;
+                const receiptText = document.getElementById('receiptLinePlain').outerHTML;
+                const fullHTML = `
+                    <html>
+                    <head><meta charset="UTF-8"><title>ডাটা এন্ট্রি অপারেটর বিল</title>
+                    <style>
+                        .preview-bill-table { border-collapse: collapse; width:55%; border:2px solid black; }
+                        .preview-bill-table th, .preview-bill-table td { border:2px solid black; padding:8px; font-size:16px; }
+                        .preview-total-row { width:55%; border:2px solid black; border-top:none; padding:10px 18px; display:flex; justify-content:space-between; font-weight:bold; background:#e8f0fa; }
+                        .closing-right { text-align:right; margin-top:25px; }
+                        .receipt-plain { margin-top:25px; font-size:16px; border:none; background:transparent; }
+                    </style>
+                    </head>
+                    <body>
+                        ${previewHTML}
+                        ${receiptText}
+                    </body>
+                    </html>
+                `;
+                const blob = new Blob([fullHTML], { type: 'application/msword' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Bill_Syed_Rohan_Ali.doc`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function exportAsPDF() {
+            printBill(); 
+        }
+
+        // initial update
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('appDate').value = '2026-03-02';
+            document.getElementById('billingStartMonth').value = '2026-02';
+            updateUI();
+        });
+    </script>
+</body>
+</html>

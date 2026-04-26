@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Order Module</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; background: #2b2b2b; color: #eee; font-size: 12px; }
+    body { display: flex; flex-direction: column; }
+    h2 { color: #fff; font-size: 16px; margin: 10px; text-align: center; }
+
+    .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 8px; }
+    .toolbar input { padding: 3px; border-radius: 4px; border: 1px solid #555; width: 200px; font-size: 12px; background: #3a3a3a; color: #eee; }
+    .toolbar button { padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left:4px; transition: background 0.2s; }
+    .toolbar button:hover { background: #218838; }
+
+    .spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+
+    #message { margin: 0 10px 6px; padding: 6px; display: none; border-radius: 4px; font-weight: bold; text-align: center; font-size: 12px; }
+    #message.success { background: #28a745; color: white; }
+    #message.error { background: #dc3545; color: white; }
+    #message.loading { background: #007bff; color: white; }
+
+    .table-container { flex: 1; overflow-y: auto; border: 1px solid #555; margin: 0 10px 10px; }
+    table { border-collapse: collapse; font-size: 12px; width: 100%; table-layout: auto; }
+    th, td { border: 1px solid #555; padding: 4px 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    thead th { position: sticky; top: 0; background: #003366; color: #fff; z-index: 2; }
+
+    /* Column width classes (adjusted for new Bid Amount) */
+    .col-timestamp { width: 120px; }
+    .col-unique { width: 100px; }
+    .col-nit { width: 80px; cursor:pointer; }
+    .col-sl { width: 40px; }
+    .col-nitdate { width: 90px; }
+    .col-vendor { width: 120px; }
+    .col-work { width: 150px; text-align: left; white-space: normal; }
+    .col-source { width: 120px; }
+    .col-wo-no { width: 80px; }
+    .col-wo-date { width: 90px; }
+    .col-estimate { width: 80px; }
+    .col-bid { width: 80px; }        /* New column */
+    .col-action { width: 70px; }
+
+    tbody tr { transition: background-color 0.2s, transform 0.2s; }
+    tbody tr:hover { background-color: #444; transform: scale(1.01); }
+
+    button.action-btn { padding: 3px 6px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; transition: background 0.3s ease; }
+
+    td input { width: 100%; box-sizing: border-box; font-size: 12px; padding: 2px; text-align: center; background: #3a3a3a; color: #eee; border: 1px solid #555; border-radius: 2px; }
+    td input[type="date"] { padding: 2px; }
+    td input[readonly] { background-color: #555; color: #ccc; border: none; cursor: default; }
+
+    /* modal */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:999;align-items:center;justify-content:center;transition:0.3s}
+    .modal.show{display:flex}
+    .modal-card{background:#2f2f2f;color:#eee;border-radius:8px;padding:14px;min-width:420px;max-width:760px;box-shadow:0 6px 24px rgba(0,0,0,0.6);animation:fadeIn 0.3s ease}
+    @keyframes fadeIn{0%{opacity:0;transform:translateY(-10px)}100%{opacity:1;transform:translateY(0)}}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .modal-head h3{margin:0;font-size:16px}
+    .close-btn{cursor:pointer;font-size:18px;padding:0 6px}
+    .modal-body{max-height:60vh;overflow:auto;margin-bottom:10px}
+    .modal-body table{width:100%;border-collapse:collapse}
+    .modal-body th,.modal-body td{border:1px solid #555;padding:6px;font-size:13px;background:#222}
+    .modal-footer{display:flex;justify-content:flex-end;gap:8px}
+    .btn-primary{background:#28a745;color:#fff;border:none;border-radius:4px;padding:6px 10px;cursor:pointer}
+    .btn-secondary{background:#555;color:#fff;border:none;border-radius:4px;padding:6px 10px;cursor:pointer}
+    .small-muted{font-size:12px;color:#bbb;margin-bottom:8px}
+    .tick-cell{color:#28a745;font-size:16px;font-weight:bold}
+  </style>
+</head>
+<body>
+<h2>Work Order Module</h2>
+<div id="message"></div>
+
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="filterTable()" />
+  <button id="refreshBtn" onclick="refreshData()">⟳ Refresh</button>
+  <button id="syncBtn" onclick="syncDataWithReload()">🔄 Sync</button>
+</div>
+
+<div class="table-container">
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th class="col-timestamp">Timestamp</th>
+        <th class="col-unique">UNIQUE NIT</th>
+        <th class="col-nit">NIT</th>
+        <th class="col-sl">SL</th>
+        <th class="col-nitdate">NIT DATE</th>
+        <th class="col-vendor">VENDOR</th>
+        <th class="col-work">Name of the work</th>
+        <th class="col-source">Source of Fund</th>
+        <th class="col-wo-no">WORK ORDER NO</th>
+        <th class="col-wo-date">WORK ORDER DATE</th>
+        <th class="col-estimate">ESTIMATE VALUE</th>
+        <th class="col-bid">BID AMOUNT</th>      <!-- New column inserted here -->
+        <th class="col-action">Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div id="nitModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="modalNitTitle">NIT</h3>
+      <span class="close-btn" onclick="closeModal()">✕</span>
+    </div>
+    <div class="small-muted">
+      Only rows with blank <strong>WORK ORDER NO</strong> are shown. Fill Work Order No & Date, then click <strong>Save All</strong>.
+    </div>
+    <div class="modal-body">
+      <table id="modalTable">
+        <thead>
+          <tr>
+            <th>Unique NIT</th>
+            <th>Vendor</th>
+            <th>Work Order NO</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveModalAll()">Save All</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbx-YMfdhjbCJy4_Afr1moRbeXnbDDD0TGHGih1pMP7hEy93TFEAZebYQruvt47TL8Bu/exec";
+let tableData = [];
+let modalRows = [];
+// Updated widthClasses: added col-bid at index 11 (originally 0-10, now 0-11)
+const widthClasses = ["col-timestamp","col-unique","col-nit","col-sl","col-nitdate","col-vendor","col-work","col-source","col-wo-no","col-wo-date","col-estimate","col-bid"];
+
+// --- Load table data
+async function loadData(){
+  const res=await fetch(scriptURL+"?action=getBillPaymentData");
+  tableData=await res.json();
+  renderTable(tableData);
+}
+
+// --- Render table (with Bid Amount column)
+function renderTable(data){
+  const tbody=document.querySelector("#dataTable tbody");
+  tbody.innerHTML="";
+  data.forEach((row,i)=>{
+    let tr=document.createElement("tr");
+    // columns 0 to 10 (original 11 columns) + new Bid Amount column at index 11 (if exists in row)
+    // row length might be 11 originally; after adding bid amount, expected length 12. But we handle dynamically.
+    for(let j=0; j<=11; j++){   // now total 12 data columns (0..11) + action = 13 columns overall
+      let td=document.createElement("td");
+      td.className = widthClasses[j] || "col-bid"; // fallback
+
+      if(j===8){ // WORK ORDER NO (editable)
+        td.innerHTML=`<input type="text" value="${row[j]||''}" id="col_${i}_${j}" oninput="toggleButton(${i})">`;
+      } else if(j===9){ // WORK ORDER DATE (editable)
+        let dateVal="";
+        if(row[j]){ const d=new Date(row[j]); if(!isNaN(d)) dateVal=d.toISOString().split("T")[0]; }
+        td.innerHTML=`<input type="date" value="${dateVal}" id="col_${i}_${j}" oninput="toggleButton(${i})">`;
+      } else if(j===7||j===10){ // SOURCE OF FUND (index 7) and ESTIMATE VALUE (index 10) are readonly
+        td.innerHTML=`<input type="text" value="${row[j]||''}" readonly>`;
+      } else if(j===11){ // **** BID AMOUNT (new column) ****
+        // Editable only if blank? according to request: "editable if blank". We'll allow editing always for simplicity,
+        // but we can also condition: if empty or user wants to edit. We'll keep it as editable input (not readonly).
+        // We'll use oninput to enable SAVE button.
+        td.innerHTML=`<input type="text" value="${row[j]||''}" id="col_${i}_${j}" oninput="toggleButton(${i})" placeholder="Bid Amt">`;
+      } else if(j===2){ // NIT clickable
+        td.innerHTML=`<span style="color:lightblue;cursor:pointer" onclick="openNitModal('${row[j]}')">${row[j]}</span>`;
+      } else {
+        td.textContent = row[j] || "";
+      }
+      tr.appendChild(td);
+    }
+    // Action cell
+    const tdAct=document.createElement("td");
+    tdAct.className="col-action";
+    tdAct.innerHTML=`<button class="action-btn" id="btn_${i}" onclick="updateRow(${i})">SAVE</button>`;
+    tr.appendChild(tdAct);
+    tbody.appendChild(tr);
+    toggleButton(i);
+  });
+}
+
+// --- Toggle button (enable UPDATE after any edit)
+function toggleButton(i){
+  const btn=document.getElementById(`btn_${i}`);
+  if(btn) { btn.textContent="UPDATE"; btn.style.background="blue"; btn.style.color="white"; }
+}
+
+// --- Show message
+function showMessage(text,type){
+  const msg=document.getElementById("message");
+  msg.textContent=text; msg.className=type; msg.style.display="block";
+  setTimeout(()=>{msg.style.display="none";},2500);
+}
+
+// --- Update row (includes Bid Amount now)
+async function updateRow(i){
+  const btn=document.getElementById(`btn_${i}`);
+  btn.disabled=true; btn.textContent="Saving...";
+  try{
+    const rowData=tableData[i];
+    const formData=new FormData();
+    formData.append("action","updateBillPayment");
+    formData.append("uniqueNIT", rowData[1]);
+    formData.append("vendor", rowData[5]);
+    // Send columns: work order no (8), work order date (9), and bid amount (11)
+    for(let j of [8,9,11]){
+      const inputEl=document.getElementById(`col_${i}_${j}`);
+      if(inputEl) formData.append(`col${j}`,inputEl.value);
+    }
+    const res=await fetch(scriptURL,{method:"POST",body:formData});
+    const result=await res.json();
+    if(result.success){
+      btn.textContent="Saved ✔"; btn.style.background="green";
+      // update local tableData for Bid Amount as well
+      const bidInput = document.getElementById(`col_${i}_11`);
+      if(bidInput) tableData[i][11] = bidInput.value;
+      showMessage(`Row ${result.row} updated successfully ✅`,"success");
+    } else {
+      btn.textContent="Failed ✖"; btn.style.background="red";
+      showMessage("Update failed: "+(result.error||"Unknown"),"error");
+    }
+  } catch(err){
+    btn.textContent="Error ✖"; btn.style.background="red";
+    showMessage("Network error: "+err.message,"error");
+  } finally{
+    setTimeout(()=>{btn.disabled=false; toggleButton(i);},2000);
+  }
+}
+
+// --- Modal functions (unchanged, they work with existing data structure)
+function openNitModal(nit){
+  document.getElementById("modalNitTitle").textContent=`NIT: ${nit}`;
+  const modal=document.getElementById("nitModal");
+  const tbody=document.querySelector("#modalTable tbody");
+  tbody.innerHTML="";
+  const group=tableData.filter(r=>r[2]==nit);
+  const blanks=group.filter(r=>!r[8]); // work order no blank
+  if(blanks.length===0){ tbody.innerHTML=`<tr><td colspan="5">All rows already filled</td></tr>`; modal.classList.add("show"); return; }
+
+  const fy=getFinancialYear();
+  let start=1;
+  const existing=group.map(r=>r[8]).filter(v=>v);
+  if(existing.length>0){
+    const nums=existing.map(v=>parseInt(v.split("/")[0])).filter(n=>!isNaN(n));
+    if(nums.length>0) start=Math.max(...nums)+1;
+  }
+  modalRows=[];
+  blanks.forEach((r,idx)=>{
+    const uniq=r[1]; const vendor=r[5]; const orderNo=(start+idx)+"/BGP/"+fy; const date=today();
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${uniq}</td>
+      <td>${vendor}</td>
+      <td><input type="text" value="${orderNo}" onchange="modalSet(${idx},'woNo',this.value)"></td>
+      <td><input type="date" value="${date}" onchange="modalSet(${idx},'woDate',this.value)"></td>
+      <td class="status"></td>`;
+    tbody.appendChild(tr);
+    modalRows.push({tableIndex:tableData.indexOf(r),woNo:orderNo,woDate:date,uniqueNIT:uniq,vendor:vendor});
+  });
+  modal.classList.add("show");
+}
+function modalSet(idx,field,val){ modalRows[idx][field]=val; }
+function closeModal(){ document.getElementById("nitModal").classList.remove("show"); }
+function today(){ return new Date().toISOString().split("T")[0]; }
+function getFinancialYear(){ const d=new Date(); const y=d.getFullYear(); return d.getMonth()>=3?y+"-"+(y+1):(y-1)+"-"+y; }
+
+// --- Save modal all (does not affect bid amount; remains as is)
+async function saveModalAll(){
+  if(modalRows.length===0) return;
+  const btn=document.querySelector("#nitModal .btn-primary");
+  btn.disabled=true; btn.innerHTML=`<span class="spinner"></span> Saving All...`;
+  let successCount=0;
+  for(let i=0;i<modalRows.length;i++){
+    const row=modalRows[i];
+    try{
+      const formData=new FormData();
+      formData.append("action","updateBillPayment");
+      formData.append("uniqueNIT", row.uniqueNIT);
+      formData.append("vendor", row.vendor);
+      formData.append("col8", row.woNo);
+      formData.append("col9", row.woDate);
+      // No bid amount sent (keeps existing)
+      const res=await fetch(scriptURL,{method:"POST",body:formData});
+      const result=await res.json();
+      if(result.success){
+        successCount++;
+        tableData[row.tableIndex][8]=row.woNo;
+        tableData[row.tableIndex][9]=row.woDate;
+        const modalRow=document.querySelector(`#modalTable tbody tr:nth-child(${i+1}) td.status`);
+        if(modalRow) modalRow.innerHTML="✅";
+        const mainRow=document.querySelector(`#dataTable tbody tr:nth-child(${row.tableIndex+1})`);
+        if(mainRow) mainRow.style.backgroundColor="#d4edda";
+      }
+    } catch(err){ console.error("Network error:",err); }
+  }
+  btn.innerHTML=`Saved ${successCount}/${modalRows.length} ✅`;
+  showMessage(`Saved ${successCount} out of ${modalRows.length} rows`,"success");
+  setTimeout(()=>{ btn.disabled=false; btn.innerHTML="Save All"; closeModal(); renderTable(tableData); },2000);
+}
+
+// --- Search filter (includes bid amount column now)
+function filterTable(){
+  const search=document.getElementById("searchInput").value.toLowerCase();
+  const filtered=tableData.filter(row=>
+    (row[1] && row[1].toString().toLowerCase().includes(search)) ||
+    (row[2] && row[2].toString().toLowerCase().includes(search)) ||
+    (row[5] && row[5].toString().toLowerCase().includes(search)) ||
+    (row[6] && row[6].toString().toLowerCase().includes(search)) ||
+    (row[7] && row[7].toString().toLowerCase().includes(search)) ||
+    (row[8] && row[8].toString().toLowerCase().includes(search)) ||
+    (row[11] && row[11].toString().toLowerCase().includes(search)) // bid amount search
+  );
+  renderTable(filtered);
+}
+
+// --- Sync functions (same)
+async function syncData(auto=false){
+  const btn = document.getElementById("syncBtn");
+  if(!auto){ btn.disabled=true; btn.innerHTML=`<span class="spinner"></span> Syncing...`; }
+  showMessage("Syncing data...","loading");
+  try{
+    const res=await fetch(scriptURL+"?action=manualSync");
+    const result=await res.json();
+    if(result.success){
+      showMessage(`Data synced successfully ✅ (${result.updatedRows} rows updated)`,"success");
+      if(auto) await loadData();
+    } else {
+      showMessage("Sync failed: "+(result.error||"Unknown"),"error");
+    }
+  } catch(err){
+    showMessage("Network error: "+err.message,"error");
+  } finally{
+    if(!auto){ btn.disabled=false; btn.innerHTML="🔄 Sync"; }
+  }
+}
+async function syncDataWithReload(){ await syncData(true); }
+
+// --- Refresh = sync+reload
+async function refreshData(){ await syncData(true); }
+
+// --- Ensure tableData rows have at least 12 elements (if not, extend for bid amount)
+async function loadDataAndExtend(){
+  const res=await fetch(scriptURL+"?action=getBillPaymentData");
+  let data=await res.json();
+  // Ensure each row has at least 12 columns (index 0..11). If less, push empty for bid amount.
+  tableData = data.map(row => {
+    if(row.length < 12) {
+      // create new array with length 12, copy existing, fill rest with empty string
+      let newRow = new Array(12).fill("");
+      for(let i=0; i<row.length; i++) newRow[i] = row[i];
+      return newRow;
+    }
+    return row;
+  });
+  renderTable(tableData);
+}
+
+// Override loadData to use extended version
+loadData = loadDataAndExtend;
+
+// Auto load on page load
+loadData();
+</script>
+</body>
+</html>

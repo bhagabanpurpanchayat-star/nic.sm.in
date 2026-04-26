@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bill Payment Request – Single Select · Work Order Mandatory</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --secondary-dark: #27ae60;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --dark: #2c3e50;
+      --darker: #1a2530;
+      --light: #ecf0f1;
+      --gray: #95a5a6;
+      --border: #34495e;
+      --card-bg: #243447;
+      --table-header: #2c3e50;
+      --table-row: #2a3c4f;
+      --table-alt: #253544;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    h1 i {
+      color: var(--primary);
+    }
+    
+    h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: white;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #bdc3c7;
+    }
+    
+    select, input[type="date"], input[type="text"] {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      width: 100%;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    #vendorSelect {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid var(--primary);
+      color: white;
+      font-weight: 500;
+      font-size: 15px;
+    }
+    
+    #vendorSelect option {
+      background: var(--card-bg);
+      color: white;
+      padding: 10px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    button.secondary {
+      background: var(--secondary);
+    }
+    
+    button.secondary:hover {
+      background: var(--secondary-dark);
+    }
+    
+    button.ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--light);
+    }
+    
+    .note {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 8px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      border-left: 3px solid var(--warning);
+    }
+    
+    .success-note {
+      border-left-color: var(--secondary);
+      background: rgba(46, 204, 113, 0.1);
+    }
+    
+    table.data {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    
+    table.data th, table.data td {
+      border: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: left;
+    }
+    
+    table.data th {
+      background: var(--table-header);
+      color: white;
+      font-weight: 600;
+    }
+    
+    table.data tbody tr {
+      background: var(--table-row);
+    }
+    
+    table.data tbody tr:nth-child(even) {
+      background: var(--table-alt);
+    }
+    
+    .preview-area {
+      margin-top: 24px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    
+    /* EXACT LETTER STYLE – also used for print */
+    .letter {
+      background: white;
+      color: #333;
+      padding: 40px;
+      border-radius: 8px;
+      margin: 0 auto;
+      max-width: 1000px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      font-family: 'Courier New', Courier, monospace;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    
+    .letter p {
+      margin: 12px 0;
+    }
+    
+    .letter .date-right {
+      text-align: right;
+      margin-bottom: 20px;
+    }
+    
+    .letter .subject {
+      text-align: center;
+      font-weight: bold;
+      margin: 30px 0 20px;
+      text-decoration: underline;
+    }
+    
+    /* Reference block – two lines with three-column grid */
+    .ref-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 20px 0;
+      font-weight: normal;
+    }
+    .ref-item {
+      white-space: nowrap;
+    }
+    .ref-label {
+      font-weight: bold;
+    }
+    
+    .scheme-details {
+      margin-top: 30px;
+    }
+    
+    .scheme-details table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border: 1px solid #333;
+    }
+    
+    .scheme-details th, .scheme-details td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: left;
+    }
+    
+    .scheme-details th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    
+    .signature {
+      margin-top: 60px;
+      text-align: right;
+    }
+    
+    .print-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 24px;
+      margin-left: auto;
+    }
+    
+    .stat-box {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px 16px;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 120px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* badge removed (EMD status hidden) */
+    
+    @media print {
+      body { background: white; margin: 0; padding: 0; }
+      .card > *:not(.preview-area) { display: none !important; }
+      .preview-area { display: block !important; margin: 0; padding: 0; }
+      .letter { box-shadow: none; padding: 0.5in; max-width: 100%; border-radius: 0; }
+      .print-buttons, .card-header button, .card-header i, .card-header h2 { display: none !important; }
+      /* ensure A4 portrait – browser will handle if set in print dialog */
+    }
+    
+    /* page size hint */
+    @page {
+      size: A4 portrait;
+      margin: 1.5cm;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <header>
+        <h1><i class="fas fa-file-invoice"></i> Bill Payment – Single NIT (WO mandatory)</h1>
+        <div class="stats">
+          <div class="stat-box">
+            <div class="stat-value" id="totalSelected">0</div>
+            <div class="stat-label">Selected</div>
+          </div>
+        </div>
+      </header>
+
+      <div id="connectionStatus" class="note success-note" style="display: none;">
+        <i class="fas fa-check-circle"></i> <span id="statusMessage">Connected</span>
+      </div>
+
+      <div class="form-group">
+        <label for="vendorSelect">Vendor/Contractor</label>
+        <div class="row" style="display: flex; gap: 16px;">
+          <div style="flex: 1;">
+            <select id="vendorSelect" required>
+              <option value="">-- Loading vendors... --</option>
+            </select>
+          </div>
+          <div>
+            <button id="refreshBtn" class="secondary"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div style="flex: 1;">
+          <label>Letter Date</label>
+          <input type="date" id="letterDate"/>
+        </div>
+        <div style="flex: 1;">
+          <label>Firm Name</label>
+          <input type="text" id="firmName" placeholder="Auto-filled"/>
+        </div>
+        <div style="flex: 1;">
+          <label>Place (for address)</label>
+          <input type="text" id="place" value="Arbara, Chanchal, Malda"/>
+        </div>
+        <div style="flex: 1;">
+          <label>Source of Fund (fallback)</label>
+          <input type="text" id="sourceFund" placeholder="Used if not in sheet"/>
+        </div>
+      </div>
+
+      <div class="note">
+        <i class="fas fa-info-circle"></i> Showing entries with <strong>Work Order No not blank</strong>. Select only one item.
+        <span id="rowCount" style="float: right;"></span>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="data" id="sheetTable">
+          <thead>
+            <tr>
+              <th style="width: 50px"><input type="checkbox" id="selectAll"/></th>
+              <th>UNIQUE NIT</th><th>NIT</th><th>SL</th><th>NIT DATE</th><th>Activity ID</th>
+              <th>Name of Work</th><th>Work Order No</th><th>WO Date</th>
+              <!-- EMD and Status columns removed -->
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="9" class="empty-state">Select a vendor</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="controls">
+        <button id="generateBtn"><i class="fas fa-file-pdf"></i> Generate Letter</button>
+        <button id="clearBtn" class="ghost"><i class="fas fa-times"></i> Clear Selection</button>
+        <!-- "Mark EMD Paid" removed as per requirement (EMD column hidden) -->
+      </div>
+
+      <!-- Preview Area -->
+      <div class="preview-area" id="previewArea" style="display:none">
+        <div class="card-header">
+          <h2><i class="fas fa-eye"></i> Letter Preview (A4 · portrait)</h2>
+          <div class="print-buttons">
+            <button id="printBtn"><i class="fas fa-print"></i> Print (A4)</button>
+            <button id="exportDocBtn"><i class="fas fa-file-word"></i> Export .doc</button>
+            <button id="editBtn" class="ghost"><i class="fas fa-edit"></i> Back</button>
+          </div>
+        </div>
+        <div id="letterContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // CONFIG – replace with your actual Apps Script URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxW9wMmgG2gwnIKtBchjN1GrdasILb-77A_4NeH5ApW0mZQpSazUca2BY11vt606UB3EQ/exec";
+    
+    let fullTableData = [];      // all rows from server (original indices)
+    let filteredRows = [];       // rows with non-blank work order (and unpaid? keeping original logic, but we removed status column; we still only show "unpaid"? for consistency we keep status filtering but column hidden)
+    let selectedIndices = new Set(); // stores indices in filteredRows array
+    let allVendors = [];
+
+    const $ = id => document.getElementById(id);
+    const todayISO = () => new Date().toISOString().split('T')[0];
+
+    function showStatus(msg, ok = true) {
+      const el = $('connectionStatus');
+      $('statusMessage').innerText = msg;
+      el.className = `note ${ok ? 'success-note' : 'error-note'}`;
+      el.style.display = 'block';
+      if (ok) setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    function formatDate(d) {
+      if (!d) return '';
+      try {
+        let date = new Date(d);
+        if (isNaN(date)) return d;
+        let dd = String(date.getDate()).padStart(2,'0');
+        let mm = String(date.getMonth()+1).padStart(2,'0');
+        let yyyy = date.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      } catch (e) { return d; }
+    }
+
+    // Load vendors
+    async function loadVendors() {
+      try {
+        let resp = await fetch(scriptURL + '?action=getVendors');
+        let data = await resp.json();
+        if (data.error) throw new Error(data.message);
+        allVendors = data.vendors || [];
+        let sel = $('vendorSelect');
+        sel.innerHTML = '<option value="">-- Select Vendor --</option>' +
+          allVendors.map(v => `<option value="${v}">${v}</option>`).join('');
+        showStatus(`Loaded ${allVendors.length} vendors`);
+      } catch (e) {
+        console.error(e);
+        $('vendorSelect').innerHTML = '<option value="">Error loading</option>';
+        showStatus(e.message, false);
+      }
+    }
+
+    // Load vendor data and filter: (1) unpaid (status[10] unpaid/empty) AND (2) Work Order No (col 15) not blank
+    async function loadVendorData(vendor) {
+      if (!vendor) { clearTable(); return; }
+      $('tableBody').innerHTML = `<tr><td colspan="9" class="empty-state"><div class="loading"></div> Loading...</td></tr>`;
+      try {
+        let resp = await fetch(scriptURL + `?action=getEarnestMoneyData&vendor=${encodeURIComponent(vendor)}`);
+        let result = await resp.json();
+        if (result.error) throw new Error(result.message);
+        fullTableData = result.data || [];
+        
+        // Filter: unpaid (status col 10 == 'unpaid' or missing) AND Work Order No (col 15) present and not blank
+        filteredRows = fullTableData.filter(row => {
+          let status = (row[10] || '').toLowerCase();
+          let unpaid = (status === 'unpaid' || status === '' || status === null);
+          let workOrder = row[15];  // column 15 = Work Order No
+          let hasWorkOrder = workOrder && workOrder.toString().trim() !== '';
+          return unpaid && hasWorkOrder;
+        });
+
+        if (filteredRows.length === 0) {
+          $('tableBody').innerHTML = `<tr><td colspan="9" class="empty-state">No unpaid entries with Work Order</td></tr>`;
+          selectedIndices.clear(); updateTotals(); return;
+        }
+        renderRows(filteredRows);
+        $('rowCount').innerText = `Eligible: ${filteredRows.length}`;
+        showStatus(`Loaded ${filteredRows.length} entries (unpaid + work order present)`);
+      } catch (e) {
+        $('tableBody').innerHTML = `<tr><td colspan="9" class="empty-state">Error</td></tr>`;
+        showStatus(e.message, false);
+      }
+    }
+
+    function renderRows(rows) {
+      let html = '';
+      selectedIndices.clear(); // fresh start
+      rows.forEach((r, idx) => {
+        // idx is the index in filteredRows
+        html += `<tr>
+          <td><div class="checkbox-container"><input type="checkbox" data-idx="${idx}"></div></td>
+          <td>${r[2] || ''}</td><td>${r[3] || ''}</td><td>${r[4] || ''}</td>
+          <td>${formatDate(r[5])}</td><td>${r[6] || ''}</td><td>${r[7] || ''}</td>
+          <td>${r[15] || ''}</td><td>${formatDate(r[16])}</td>
+        </tr>`;
+      });
+      $('tableBody').innerHTML = html;
+      attachCheckboxes();
+      updateTotals();
+    }
+
+    function attachCheckboxes() {
+      document.querySelectorAll('#sheetTable tbody input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', e => {
+          let idx = Number(e.target.dataset.idx);
+          if (e.target.checked) {
+            // enforce single selection: clear all others
+            if (selectedIndices.size > 0) {
+              // uncheck previously checked boxes
+              document.querySelectorAll('#sheetTable tbody input[type="checkbox"]').forEach(c => {
+                if (c !== e.target) c.checked = false;
+              });
+              selectedIndices.clear();
+            }
+            selectedIndices.add(idx);
+          } else {
+            selectedIndices.delete(idx);
+          }
+          updateTotals();
+        });
+      });
+      
+      $('selectAll').onchange = function() {
+        // In single-select mode, selectAll behaves as "select first" or clear
+        // We'll implement: if any checked -> uncheck all; else check the first row (if exists)
+        let cbs = document.querySelectorAll('#sheetTable tbody input[type="checkbox"]');
+        if (this.checked) {
+          // clear any previous selection, then select the first
+          cbs.forEach(cb => cb.checked = false);
+          selectedIndices.clear();
+          if (cbs.length > 0) {
+            cbs[0].checked = true;
+            selectedIndices.add(0);
+          }
+        } else {
+          cbs.forEach(cb => cb.checked = false);
+          selectedIndices.clear();
+        }
+        updateTotals();
+      };
+    }
+
+    function updateTotals() {
+      $('totalSelected').innerText = selectedIndices.size;
+      // manage selectAll state: if only one row selected and total rows > 0? selectAll shouldn't be checked
+      let totalCheck = document.querySelectorAll('#sheetTable tbody input[type="checkbox"]').length;
+      let checkedCount = selectedIndices.size;
+      $('selectAll').checked = (totalCheck > 0 && checkedCount === totalCheck); // but with single-select this will rarely happen; fine.
+    }
+
+    function clearTable() {
+      $('tableBody').innerHTML = `<tr><td colspan="9" class="empty-state">Select vendor</td></tr>`;
+      selectedIndices.clear();
+      $('rowCount').innerText = '';
+      updateTotals();
+    }
+
+    // GENERATE LETTER – using filteredRows and selected single index
+    function generateLetter() {
+      if (selectedIndices.size === 0) {
+        alert('Please select one item');
+        return;
+      }
+      // get the selected row (single)
+      let idx = Array.from(selectedIndices)[0];
+      let row = filteredRows[idx];
+      if (!row) return;
+
+      // Reference values
+      let nitNo = row[3] || '';
+      let nitDate = formatDate(row[5]) || '';
+      let slNo = row[4] || '';
+      let woNo = row[15] || '';
+      let woDate = formatDate(row[16]) || '';
+
+      let firm = $('firmName').value || $('vendorSelect').value;
+      let place = $('place').value;
+      let letterDate = formatDate($('letterDate').value || todayISO());
+      let fallbackSource = $('sourceFund').value || '';
+
+      // Scheme details – only one row in table
+      let activityId = row[6] || '';
+      let schemeName = row[7] || '';
+      let source = (row[14] && row[14].trim() !== '') ? row[14] : fallbackSource;
+      let schemeRows = `<tr><td>${activityId}</td><td>${schemeName}</td><td>${source}</td></tr>`;
+
+      // Reference block
+      const refBlock = `
+        <div class="ref-grid">
+          <div class="ref-item"><span class="ref-label">NIT No.-</span> ${nitNo}</div>
+          <div class="ref-item"><span class="ref-label">NIT Date-</span> ${nitDate}</div>
+          <div class="ref-item"><span class="ref-label">Sl No-</span> ${slNo}</div>
+          <div class="ref-item"><span class="ref-label">Work Order No-</span> ${woNo}</div>
+          <div class="ref-item"><span class="ref-label">WO Date-</span> ${woDate}</div>
+          <div class="ref-item"></div>
+        </div>
+      `;
+
+      const letterHtml = `
+        <div class="letter">
+          <div style="overflow: hidden;">
+            <div style="float: left;">
+              <p>To,<br>The Prodhan<br>Bhagabanpur Gram Panchayat<br>${place}</p>
+            </div>
+            <div style="float: right;">
+              <p>Date: ${letterDate}</p>
+            </div>
+          </div>
+          <div style="clear: both;"></div>
+
+          <p class="subject">Sub: Prayer for bill for the Executed work</p>
+
+          ${refBlock}
+
+          <p>Sir/Madam,</p>
+          <p>With due respect, I would like to state that I have successfully completed the work of the scheme under Bhagabanpur Gram Panchayat as per the work order issued by your office.</p>
+          <p>Therefore, I humbly request you to kindly arrange for the payment of the executed scheme bill after necessary verification and official procedures.</p>
+          <p>For this act of kindness, I shall remain ever grateful.</p>
+
+          <div class="scheme-details">
+            <p><strong>Scheme Details</strong></p>
+            <table>
+              <thead>
+                <tr><th>Activity ID</th><th>Scheme Name</th><th>Source of Fund</th></tr>
+              </thead>
+              <tbody>
+                ${schemeRows}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="signature">
+            <p>Yours faithfully,</p>
+            <p><strong>${firm}</strong></p>
+          </div>
+        </div>
+      `;
+
+      $('letterContainer').innerHTML = letterHtml;
+      $('previewArea').style.display = 'block';
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    // Export .doc
+    function exportAsDoc() {
+      const letterDiv = $('letterContainer').querySelector('.letter');
+      if (!letterDiv) { alert('Generate the letter first.'); return; }
+
+      const styles = document.querySelector('style').innerHTML;
+      const docHtml = `
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            ${styles}
+            .letter { box-shadow: none; margin: 0 auto; padding: 40px; max-width: 1000px; }
+            @page { size: A4 portrait; margin: 1.5cm; }
+          </style>
+        </head>
+        <body style="background: white; margin: 0; padding: 20px;">
+          ${letterDiv.outerHTML}
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([docHtml], { type: 'application/msword' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `payment_request_${$('vendorSelect').value || 'vendor'}.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }
+
+    // Event listeners
+    $('refreshBtn').addEventListener('click', async () => {
+      await loadVendors();
+      if ($('vendorSelect').value) loadVendorData($('vendorSelect').value);
+    });
+    $('vendorSelect').addEventListener('change', e => {
+      $('firmName').value = e.target.value;
+      loadVendorData(e.target.value);
+    });
+    $('generateBtn').addEventListener('click', generateLetter);
+    $('clearBtn').addEventListener('click', () => {
+      selectedIndices.clear();
+      document.querySelectorAll('#sheetTable tbody input[type="checkbox"]').forEach(cb => cb.checked = false);
+      $('selectAll').checked = false;
+      updateTotals();
+    });
+    // "Mark EMD Paid" button removed
+
+    document.addEventListener('click', e => {
+      if (e.target.id === 'printBtn') {
+        window.print();   // uses @page A4 portrait; prints only preview area due to print styles
+      }
+      if (e.target.id === 'editBtn') $('previewArea').style.display = 'none';
+      if (e.target.id === 'exportDocBtn') exportAsDoc();
+    });
+
+    // Init
+    $('letterDate').value = todayISO();
+    loadVendors();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earnest Money Register | Navy Theme | Multipage</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+      color: #1e293b;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    /* Header Section - Navy Blue */
+    .header-section {
+      background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+      padding: 25px 30px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(30deg);
+      pointer-events: none;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    h2::before {
+      content: "💰";
+      font-size: 1.8rem;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .summary {
+      float: right;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-top: -45px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge {
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 13px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .badge.green { 
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white; 
+    }
+    .badge.red { 
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white; 
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      background: #f8fafc;
+      padding: 12px 30px;
+      display: flex;
+      gap: 25px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #1e293b;
+    }
+
+    .stat-card strong {
+      color: #003366;
+      font-weight: 700;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      padding: 20px 30px;
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 350px;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      padding: 10px 15px 10px 40px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 13px;
+      transition: all 0.3s;
+      color: #1e293b;
+    }
+
+    .search-wrapper input:focus {
+      outline: none;
+      border-color: #003366;
+      box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+    }
+
+    .search-wrapper::before {
+      content: "🔍";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #003366;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #003366, #001f3f);
+      border: none;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 13px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 51, 102, 0.3);
+      background: linear-gradient(135deg, #004080, #00264d);
+    }
+
+    /* Table Container */
+    .table-container {
+      overflow-x: auto;
+      background: white;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    /* Navy Blue Column Headers */
+    th {
+      background: linear-gradient(135deg, #003366, #001f3f);
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+      transition: 0.2s;
+    }
+
+    td a {
+      color: #003366;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+      color: #004080;
+    }
+
+    td input {
+      width: 120px;
+      padding: 6px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 12px;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    td input:focus {
+      outline: none;
+      border-color: #003366;
+      box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, #003366, #001f3f);
+      border: none;
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 11px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      transform: scale(0.95);
+      background: linear-gradient(135deg, #004080, #00264d);
+    }
+
+    .action-btn.saving {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .action-btn.saved {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    /* Status Badges */
+    .readonly-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 11px;
+      min-width: 85px;
+    }
+
+    .status-accepted { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+    .status-rejected { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+    .status-disqualify { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+    .status-empty { background: #e2e8f0; color: #64748b; }
+
+    /* Pagination */
+    .pagination-container {
+      padding: 20px 30px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .page-info {
+      font-size: 13px;
+      color: #003366;
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      background: white;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      color: #003366;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: #003366;
+      color: white;
+      border-color: #003366;
+    }
+
+    .page-btn.active {
+      background: linear-gradient(135deg, #003366, #001f3f);
+      color: white;
+      border-color: #003366;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-size-select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      color: #003366;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      width: auto;
+      max-width: 95%;
+      max-height: 85%;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #003366, #001f3f);
+      padding: 15px 20px;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .modal-summary {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-content .badge {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    .modal table {
+      margin: 15px auto;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .modal th, .modal td {
+      border: 1px solid #e2e8f0;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .modal th {
+      background: linear-gradient(135deg, #003366, #001f3f);
+      color: white;
+    }
+
+    .modal input, .modal select {
+      padding: 5px 8px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 11px;
+    }
+
+    .btn-bar {
+      padding: 15px 20px;
+      text-align: right;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .close-btn { 
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    
+    .save-btn { 
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* Enhanced Loading Animation */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 51, 102, 0.2);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .loader {
+      text-align: center;
+      background: white;
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 15px;
+      position: relative;
+    }
+
+    .loader-spinner::before,
+    .loader-spinner::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      animation: pulse 1.2s ease-out infinite;
+    }
+
+    .loader-spinner::before {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #003366, #001f3f);
+      opacity: 0.3;
+      animation-delay: 0s;
+    }
+
+    .loader-spinner::after {
+      width: 80%;
+      height: 80%;
+      background: linear-gradient(135deg, #003366, #001f3f);
+      top: 10%;
+      left: 10%;
+      animation-delay: 0.4s;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1.4);
+        opacity: 0;
+      }
+    }
+
+    .loader-text {
+      color: #003366;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      animation: fadeText 1.5s ease-in-out infinite;
+    }
+
+    @keyframes fadeText {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    #message {
+      margin: 10px 20px;
+      padding: 12px;
+      display: none;
+      border-radius: 12px;
+      font-weight: 500;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    #message.success { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+    #message.error { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
+    #message.loading { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e3a8a; }
+
+    @media (max-width: 768px) {
+      .summary { float: none; margin-top: 15px; text-align: right; }
+      .stats-bar { flex-wrap: wrap; gap: 10px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-wrapper { max-width: 100%; }
+      .pagination-container { flex-direction: column; align-items: center; }
+      th, td { padding: 8px 6px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+<div class="main-container">
+  <div class="header-section">
+    <h2>Earnest Money Payment Entry Module</h2>
+    <div class="subtitle">Tender Status READ ONLY | Multipage View | Navy Theme</div>
+    <div class="summary">
+      <span class="badge green" id="paidCount">💰 PAID: ₹0</span>
+      <span class="badge red" id="unpaidCount">⚠️ UNPAID: ₹0</span>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card"><strong>📊 Total Records:</strong> <span id="totalRecords">0</span></div>
+    <div class="stat-card"><strong>✅ Paid Amount:</strong> ₹<span id="paidAmountStat">0</span></div>
+    <div class="stat-card"><strong>⚠️ Unpaid Amount:</strong> ₹<span id="unpaidAmountStat">0</span></div>
+    <div class="stat-card"><strong>🏢 Vendors:</strong> <span id="vendorCount">0</span></div>
+  </div>
+
+  <div id="message"></div>
+
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" placeholder="Search by NIT, Vendor, SL..." oninput="debouncedFilter()">
+    </div>
+    <button class="btn-primary" id="refreshBtn" onclick="refreshData()">
+      <span>⟳</span> Refresh Data
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>UNIQUE NIT</th>
+          <th>NIT</th>
+          <th>SL</th>
+          <th>NIT DATE</th>
+          <th>VENDOR</th>
+          <th>EARNEST MONEY</th>
+          <th>Payment Status</th>
+          <th>Tender Status <span style="font-size: 10px; font-weight: normal;">(read only)</span></th>
+          <th>Cheque No</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="pagination-container">
+    <div class="page-info">
+      Showing <span id="startRange">0</span> - <span id="endRange">0</span> of <span id="totalFiltered">0</span> records
+    </div>
+    <div class="pagination-controls">
+      <select id="pageSizeSelect" class="page-size-select" onchange="changePageSize()">
+        <option value="10">10 per page</option>
+        <option value="20" selected>20 per page</option>
+        <option value="50">50 per page</option>
+        <option value="100">100 per page</option>
+      </select>
+      <button class="page-btn" id="firstPageBtn" onclick="goToPage(1)">⏮ First</button>
+      <button class="page-btn" id="prevPageBtn" onclick="prevPage()">◀ Prev</button>
+      <span id="pageNumbers" style="display: flex; gap: 5px;"></span>
+      <button class="page-btn" id="nextPageBtn" onclick="nextPage()">Next ▶</button>
+      <button class="page-btn" id="lastPageBtn" onclick="goToPage(totalPages)">Last ⏭</button>
+    </div>
+  </div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Loading data...</div>
+  </div>
+</div>
+
+<div class="modal" id="vendorModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🏢 Vendor: <span id="modalVendorName"></span></h3>
+      <div class="modal-summary">
+        <span class="badge green" id="modalPaid">PAID: ₹0</span>
+        <span class="badge red" id="modalUnpaid">UNPAID: ₹0</span>
+      </div>
+    </div>
+    <div style="padding: 20px; overflow-x: auto;">
+      <table id="modalTable">
+        <thead>
+          <tr>
+            <th>NIT</th>
+            <th>SL</th>
+            <th>NIT DATE</th>
+            <th>EARNEST MONEY</th>
+            <th>Payment</th>
+            <th>Tender Status <span style="font-size: 10px; font-weight: normal;">(view only)</span></th>
+            <th>Cheque No</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="btn-bar">
+      <button class="close-btn" onclick="closeModal()">Close</button>
+      <button class="save-btn" id="modalSaveBtn" onclick="saveModalData()">Save All</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbw_zOggb9P4-veVW8PyofioUlTRb2d5tifegtUgq1iHtEwYe1bJHbGrgZbB8JHTFulJsw/exec";
+  let tableData = [];
+  let filteredData = [];
+  let currentVendor = null;
+  let modalRows = [];
+  
+  // Pagination variables
+  let currentPage = 1;
+  let pageSize = 20;
+  let totalPages = 1;
+  let searchTimeout = null;
+
+  function showLoading(show) {
+    document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+  }
+
+  function formatTimestamp(val){
+    if(!val) return "";
+    const d = new Date(val);
+    if(isNaN(d)) return val;
+    const pad = n => n.toString().padStart(2,'0');
+    return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  function formatNitDate(val){
+    if(!val) return "";
+    if (typeof val === 'string' && val.includes('/')) {
+      const parts = val.split('/');
+      if (parts.length === 3) {
+        if (parts[0] > 12) return val;
+        else return `${parts[1]}/${parts[0]}/${parts[2]}`;
+      }
+    }
+    const d = new Date(val);
+    if(isNaN(d)) return val;
+    return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+  }
+
+  function parseDateForInput(val) {
+    if (!val) return "";
+    if (typeof val === 'string' && val.includes('/')) {
+      const parts = val.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+    const d = new Date(val);
+    if (isNaN(d)) return "";
+    return d.toISOString().split('T')[0];
+  }
+
+  function renderTenderStatus(status) {
+    let statusClass = 'status-empty';
+    let displayText = 'Not Set';
+    
+    if (status === 'ACCEPTED') {
+      statusClass = 'status-accepted';
+      displayText = 'ACCEPTED';
+    } else if (status === 'REJECTED') {
+      statusClass = 'status-rejected';
+      displayText = 'REJECTED';
+    } else if (status === 'DISQUALIFY') {
+      statusClass = 'status-disqualify';
+      displayText = 'DISQUALIFY';
+    } else if (status === '') {
+      displayText = '—';
+    } else {
+      displayText = status;
+    }
+    
+    return `<span class="readonly-status ${statusClass}">${displayText}</span>`;
+  }
+
+  function updateStats() {
+    let paid = 0, unpaid = 0;
+    let vendors = new Set();
+    
+    tableData.forEach(row => {
+      if (row[7] === "PAID") paid += Number(row[6]) || 0;
+      else unpaid += Number(row[6]) || 0;
+      if (row[5]) vendors.add(row[5]);
+    });
+    
+    document.getElementById("paidCount").textContent = `💰 PAID: ₹${paid.toLocaleString()}`;
+    document.getElementById("unpaidCount").textContent = `⚠️ UNPAID: ₹${unpaid.toLocaleString()}`;
+    document.getElementById("totalRecords").textContent = tableData.length;
+    document.getElementById("paidAmountStat").textContent = paid.toLocaleString();
+    document.getElementById("unpaidAmountStat").textContent = unpaid.toLocaleString();
+    document.getElementById("vendorCount").textContent = vendors.size;
+  }
+
+  function applyFilter() {
+    const searchVal = document.getElementById("searchInput").value.toLowerCase();
+    filteredData = tableData.filter(row => {
+      const text = [row[1], row[2], formatNitDate(row[4]), row[5]].join(" ").toLowerCase();
+      return text.includes(searchVal);
+    });
+    currentPage = 1;
+    renderTablePage();
+  }
+
+  function debouncedFilter() {
+    if (searchTimeout) clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => applyFilter(), 300);
+  }
+
+  function renderTablePage() {
+    const tbody = document.querySelector("#dataTable tbody");
+    tbody.innerHTML = "";
+    
+    const startIdx = (currentPage - 1) * pageSize;
+    const endIdx = Math.min(startIdx + pageSize, filteredData.length);
+    const pageData = filteredData.slice(startIdx, endIdx);
+    
+    if (pageData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 40px;">✨ No records found</td></tr>';
+      updatePaginationInfo();
+      return;
+    }
+    
+    pageData.forEach((row) => {
+      const i = tableData.indexOf(row);
+      const tr = document.createElement("tr");
+      const tenderStatusHtml = renderTenderStatus(row[8]);
+      
+      tr.innerHTML = `
+        <td>${formatTimestamp(row[0])}</td>
+        <td>${row[1] || ""}</td>
+        <td>${row[2] || ""}</td>
+        <td>${row[3] || ""}</td>
+        <td>${formatNitDate(row[4])}</td>
+        <td><a href="#" onclick="openModal('${(row[5] || "").replace(/'/g, "\\'")}');return false;">${row[5] || ""}</a></td>
+        <td>₹${(Number(row[6]) || 0).toLocaleString()}</td>
+        <td><select id="payment_${i}" disabled style="background:white; width:85px;">
+          <option value="PAID" ${row[7]==="PAID"?"selected":""}>PAID</option>
+          <option value="UNPAID" ${row[7]==="UNPAID"?"selected":""}>UNPAID</option>
+        </select></td>
+        <td>${tenderStatusHtml}</td>
+        <td><input type="text" id="cheque_${i}" value="${row[9] || ''}" oninput="onChequeChange(${i})" placeholder="Chq No"></td>
+        <td><input type="date" id="date_${i}" value="${parseDateForInput(row[10])}" oninput="toggleButton(${i})"></td>
+        <td><button class="action-btn" id="btn_${i}" onclick="updateRow(${i})">Save</button></td>
+      `;
+      tbody.appendChild(tr);
+      onChequeChange(i);
+      toggleButton(i);
+    });
+    
+    updatePaginationInfo();
+    updateStats();
+  }
+
+  function updatePaginationInfo() {
+    totalPages = Math.ceil(filteredData.length / pageSize);
+    if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+    
+    const start = (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, filteredData.length);
+    
+    document.getElementById('startRange').textContent = filteredData.length ? start : 0;
+    document.getElementById('endRange').textContent = end;
+    document.getElementById('totalFiltered').textContent = filteredData.length;
+    
+    document.getElementById('firstPageBtn').disabled = currentPage === 1;
+    document.getElementById('prevPageBtn').disabled = currentPage === 1;
+    document.getElementById('nextPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+    document.getElementById('lastPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+    
+    renderPageNumbers();
+  }
+
+  function renderPageNumbers() {
+    const container = document.getElementById('pageNumbers');
+    container.innerHTML = '';
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (endPage - startPage < 4) {
+      if (startPage === 1) endPage = Math.min(totalPages, startPage + 4);
+      if (endPage === totalPages) startPage = Math.max(1, endPage - 4);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+      btn.onclick = () => goToPage(i);
+      container.appendChild(btn);
+    }
+  }
+
+  function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTablePage();
+  }
+
+  function nextPage() { if (currentPage < totalPages) goToPage(currentPage + 1); }
+  function prevPage() { if (currentPage > 1) goToPage(currentPage - 1); }
+  function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTablePage(); }
+
+  function onChequeChange(i){
+    const cheque = document.getElementById(`cheque_${i}`).value.trim();
+    const payment = document.getElementById(`payment_${i}`);
+    if(payment) payment.value = cheque ? "PAID" : "UNPAID";
+    toggleButton(i);
+    updateStats();
+  }
+
+  function toggleButton(i){
+    const btn = document.getElementById(`btn_${i}`);
+    if(btn) btn.disabled = false;
+  }
+
+  function showMessage(msg, type){
+    const m = document.getElementById("message");
+    m.textContent = msg;
+    m.className = type;
+    m.style.display = "block";
+    if(type !== "loading") setTimeout(() => m.style.display = "none", 3000);
+  }
+
+  async function updateRow(i){
+    const btn = document.getElementById(`btn_${i}`);
+    const originalText = btn.textContent;
+    
+    btn.textContent = "Saving...";
+    btn.classList.add('saving');
+    btn.disabled = true;
+    
+    const payload = {
+      action: "updateEarnestMoney",
+      rowIndex: i,
+      paymentStatus: document.getElementById(`payment_${i}`).value,
+      tenderStatus: tableData[i][8],
+      chequeNo: document.getElementById(`cheque_${i}`).value,
+      dateVal: document.getElementById(`date_${i}`).value
+    };
+    
+    try {
+      const res = await fetch(scriptURL, { method: "POST", body: JSON.stringify(payload) });
+      const data = await res.json();
+      if(data.success) {
+        tableData[i][7] = payload.paymentStatus;
+        tableData[i][9] = payload.chequeNo;
+        tableData[i][10] = payload.dateVal;
+        showMessage(`Row ${i+1} updated ✅`, "success");
+        btn.textContent = "Saved";
+        btn.classList.remove('saving');
+        btn.classList.add('saved');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('saved');
+          btn.disabled = false;
+        }, 1500);
+        applyFilter();
+      } else {
+        showMessage(`Error: ${data.error}`, "error");
+        btn.textContent = originalText;
+        btn.classList.remove('saving');
+        btn.disabled = false;
+      }
+    } catch (err) {
+      showMessage("Update failed ❌", "error");
+      btn.textContent = originalText;
+      btn.classList.remove('saving');
+      btn.disabled = false;
+    }
+  }
+
+  async function refreshData(){
+    await loadData();
+  }
+
+  async function loadData(){
+    showLoading(true);
+    try {
+      const res = await fetch(scriptURL + "?action=getEarnestMoneyData&t=" + Date.now());
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      tableData = await res.json();
+      if (!Array.isArray(tableData)) throw new Error("Invalid data format");
+      showMessage(`Loaded ${tableData.length} records ✅`, "success");
+      applyFilter();
+    } catch (err) {
+      console.error("Load error:", err);
+      tableData = [];
+      showMessage(`Failed to load data: ${err.message}`, "error");
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  function openModal(vendor){
+    currentVendor = vendor;
+    document.getElementById("modalVendorName").textContent = vendor;
+    const tbody = document.querySelector("#modalTable tbody");
+    tbody.innerHTML = "";
+    modalRows = [];
+    
+    tableData.forEach((row, i) => {
+      if(row[5] !== vendor || row[7] === "PAID") return;
+      modalRows.push(i);
+      const tr = document.createElement("tr");
+      const tenderStatusHtml = renderTenderStatus(row[8]);
+      
+      tr.innerHTML = `
+        <td>${row[2]}</td>
+        <td>${row[3]}</td>
+        <td>${formatNitDate(row[4])}</td>
+        <td>₹${(Number(row[6]) || 0).toLocaleString()}</td>
+        <td><select id="mPayment_${i}" disabled>
+          <option value="PAID" ${row[7]==="PAID"?"selected":""}>PAID</option>
+          <option value="UNPAID" ${row[7]==="UNPAID"?"selected":""}>UNPAID</option>
+        </select></td>
+        <td>${tenderStatusHtml}</td>
+        <td><input type="text" id="mCheque_${i}" value="${row[9]||''}" oninput="onModalChequeChange(${i})"> 
+        <td><input type="date" id="mDate_${i}" value="${parseDateForInput(row[10])}"> 
+      `;
+      tbody.appendChild(tr);
+      onModalChequeChange(i);
+    });
+    updateModalSummary();
+    document.getElementById("vendorModal").style.display = "flex";
+  }
+
+  function closeModal(){
+    document.getElementById("vendorModal").style.display = "none";
+    currentVendor = null;
+  }
+
+  function onModalChequeChange(i){
+    const val = document.getElementById(`mCheque_${i}`).value.trim();
+    const pay = document.getElementById(`mPayment_${i}`);
+    if(pay) pay.value = val ? "PAID" : "UNPAID";
+    updateModalSummary();
+  }
+
+  function updateModalSummary(){
+    let paid=0, unpaid=0;
+    modalRows.forEach(i => {
+      const payment = document.getElementById(`mPayment_${i}`).value;
+      const amt = Number(tableData[i][6]) || 0;
+      if(payment === "PAID") paid += amt;
+      else unpaid += amt;
+    });
+    document.getElementById("modalPaid").textContent = `PAID: ₹${paid.toLocaleString()}`;
+    document.getElementById("modalUnpaid").textContent = `UNPAID: ₹${unpaid.toLocaleString()}`;
+  }
+
+  async function saveModalData(){
+    if(!currentVendor) return;
+    
+    const btn = document.getElementById('modalSaveBtn');
+    const originalText = btn.textContent;
+    btn.textContent = "Saving...";
+    btn.disabled = true;
+    
+    const payload = { action: "batchUpdateEarnestMoney", data: [] };
+    modalRows.forEach(i => {
+      payload.data.push({
+        rowIndex: i,
+        paymentStatus: document.getElementById(`mPayment_${i}`).value,
+        tenderStatus: tableData[i][8],
+        chequeNo: document.getElementById(`mCheque_${i}`).value,
+        dateVal: document.getElementById(`mDate_${i}`).value
+      });
+    });
+    
+    try {
+      const res = await fetch(scriptURL, { method: "POST", body: JSON.stringify(payload) });
+      const data = await res.json();
+      if(data.success){
+        payload.data.forEach(item => {
+          tableData[item.rowIndex][7] = item.paymentStatus;
+          tableData[item.rowIndex][9] = item.chequeNo;
+          tableData[item.rowIndex][10] = item.dateVal;
+        });
+        showMessage("Modal data saved ✅", "success");
+        btn.textContent = "Saved";
+        setTimeout(() => {
+          refreshData();
+          closeModal();
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 1000);
+      } else {
+        showMessage(`Error: ${data.error}`, "error");
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    } catch (err) {
+      console.error(err);
+      showMessage("Modal save failed ❌", "error");
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  refreshData();
+</script>
+</body>
+</html>

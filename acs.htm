@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Comparative Statement - Annexure 8</title>
+  <style>
+    body { font-family: "Segoe UI", sans-serif; margin: 30px; background: #fafafa; color: #333; }
+    h1 { text-align:center; font-size:22px; margin-bottom:20px; }
+    select, button { padding:8px 12px; font-size:15px; margin:5px 5px 20px 0; }
+    select { border-radius:6px; border:1px solid #ccc; min-width:200px; }
+    button { border:none; border-radius:6px; cursor:pointer; background:#1976d2; color:white; }
+    button:hover { background:#1565c0; }
+    #output { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.15); overflow-x:auto; }
+    .error { color: #d32f2f; background: #ffebee; padding: 10px; border-radius: 4px; margin: 10px 0; }
+    .loading { color: #1976d2; font-style: italic; }
+
+    @media print {
+      body, html { margin:0; background:white; }
+      body * { visibility:hidden; }
+      #output, #output * { visibility:visible; }
+      #output { position:absolute; top:0; left:0; width:100%; padding:0; }
+      .annexure { width:277mm; min-height:190mm; margin:0 auto; padding:8mm; box-sizing:border-box; page-break-after:always; display:flex; flex-direction:column; }
+      table { width:100%; border-collapse:collapse; flex:1; }
+      table, th, td { border:1px solid #000; page-break-inside:avoid; }
+      thead { display:table-header-group; }
+      tbody { display:table-row-group; }
+      tbody tr td { vertical-align:middle; padding:6px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>ADVANCED COMPARATIVE STATEMENT FOR WORKS CONTRACT</h1>
+
+  <div>
+    <label for="nitSelect"><b>Select NIT:</b></label>
+    <select id="nitSelect">
+      <option value="">-- Choose NIT --</option>
+    </select>
+    <button onclick="loadNITData()">Show</button>
+    <button onclick="window.print()">Print</button>
+  </div>
+
+  <div id="output"></div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzL64bOqaaDibySwxt7pk6mb3qPcpazl-pGPbuARjNhPqpY7EstmCbwWT1E9mfb_aGP/exec";
+
+    async function loadNITs(){
+      const select = document.getElementById("nitSelect");
+      try{
+        const res = await fetch(`${WEB_APP_URL}?function=getNITs`);
+        const data = await res.json();
+        
+        if (data.error) {
+          showError("Error loading NITs: " + data.error);
+          return;
+        }
+        
+        if (Array.isArray(data)) {
+          data.forEach(nit=>{
+            const opt = document.createElement("option");
+            opt.value = nit;
+            opt.textContent = nit;
+            select.appendChild(opt);
+          });
+        } else {
+          showError("Unexpected response format");
+        }
+      } catch(e) { 
+        showError("Error loading NITs: " + e.message);
+      }
+    }
+
+    async function loadNITData(){
+      const nit = document.getElementById("nitSelect").value;
+      if(!nit){ 
+        alert("Please select a NIT."); 
+        return; 
+      }
+      
+      document.getElementById("output").innerHTML = '<p class="loading">Loading...</p>';
+
+      try{
+        const res = await fetch(`${WEB_APP_URL}?function=getAnnexure8&nit=${encodeURIComponent(nit)}`);
+        const data = await res.json();
+        
+        if (data.error) {
+          showError("Error: " + data.error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          // Check if first item has error property
+          if (data[0].error) {
+            showError("Error: " + data[0].error);
+            return;
+          }
+          
+          let html = "";
+          data.forEach(d=>{
+            if (d.html) {
+              html += `<div class="annexure">${d.html}</div>`;
+            }
+          });
+          document.getElementById("output").innerHTML = html || "<p>No valid data found.</p>";
+        } else {
+          document.getElementById("output").innerHTML = "<p>No records found for this NIT.</p>";
+        }
+      } catch(e) {
+        showError("Error loading data: " + e.message);
+        console.error(e);
+      }
+    }
+    
+    function showError(message) {
+      document.getElementById("output").innerHTML = `<div class="error">${message}</div>`;
+    }
+
+    document.addEventListener("DOMContentLoaded", loadNITs);
+  </script>
+</body>
+</html>

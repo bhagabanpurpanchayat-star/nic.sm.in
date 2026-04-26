@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বিল দরখাস্ত - নাজিম আলী</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SolaimanLipi', 'Arial Unicode MS', 'Likhan', 'Noto Sans Bengali', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            max-width: 750px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .form-body {
+            padding: 20px;
+            background: white;
+        }
+
+        .address-section {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .address-section .to {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .address-section .name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2a5298;
+            margin: 3px 0;
+        }
+
+        .address-section .details {
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .applicant-card {
+            background: #e8f0fe;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-right: 5px solid #2a5298;
+        }
+
+        .applicant-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .selection-section {
+            background: #f1f3f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .selection-item {
+            text-align: center;
+        }
+
+        .selection-label {
+            font-size: 14px;
+            color: #1e3c72;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        select, input[type="date"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #2a5298;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'SolaimanLipi', sans-serif;
+            background: white;
+        }
+
+        .month-preview {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .breakup-section {
+            background: #fff3e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px dashed #ff9800;
+        }
+
+        .breakup-title {
+            color: #1e3c72;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .breakup-items {
+            display: grid;
+            gap: 8px;
+        }
+
+        .breakup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calculation {
+            font-size: 14px;
+            color: #ff9800;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .item-amount {
+            font-weight: 700;
+            color: #2a5298;
+            font-size: 17px;
+            text-align: right;
+        }
+
+        .total-amount {
+            margin-top: 10px;
+            padding: 12px 15px;
+            background: #1e3c72;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .total-calculation {
+            font-size: 14px;
+            color: #ffd700;
+            margin-left: 8px;
+        }
+
+        .total-amount span:last-child {
+            font-size: 20px;
+            color: #ffd700;
+        }
+
+        .amount-words-box {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            border: 2px solid #1e3c72;
+        }
+
+        .amount-words-label {
+            font-size: 13px;
+            color: #1e3c72;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .amount-words {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2a5298;
+            line-height: 1.4;
+            word-spacing: 3px;
+        }
+
+        .declaration {
+            background: #f1f8e9;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #4caf50;
+        }
+
+        .declaration label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: normal;
+            cursor: pointer;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .declaration input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'SolaimanLipi', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2a5298;
+        }
+
+        .btn-secondary {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #f57c00;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .export-btn {
+            flex: 1;
+            padding: 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'SolaimanLipi', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .export-btn:hover {
+            background: #5a6268;
+        }
+
+        .preview-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 2px dashed #1e3c72;
+            display: none;
+        }
+
+        .preview-section.show {
+            display: block;
+        }
+
+        .preview-content {
+            font-family: 'SolaimanLipi', 'Courier New', monospace;
+            line-height: 1.8;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-size: 14px;
+            border: 1px solid #dee2e6;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 0 15px;
+        }
+
+        .signature-left, .signature-right {
+            text-align: center;
+            width: 180px;
+        }
+
+        .signature-line {
+            width: 180px;
+            height: 1px;
+            border-top: 1px dashed #1e3c72;
+            margin: 8px 0;
+        }
+
+        .signature-name {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+        }
+
+        .signature-title {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Print styles - Hide everything except the preview content */
+        @media print {
+            body {
+                background: white;
+                padding: 20px;
+            }
+            
+            .form-container {
+                max-width: 100%;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .form-body {
+                padding: 0;
+            }
+            
+            /* Hide all input sections and buttons */
+            .address-section,
+            .applicant-card,
+            .selection-section,
+            .breakup-section,
+            .amount-words-box,
+            .declaration,
+            .button-group,
+            .export-options {
+                display: none !important;
+            }
+            
+            /* Show only preview section */
+            .preview-section {
+                display: block !important;
+                border: none;
+                padding: 0;
+                margin: 0;
+                background: white;
+            }
+            
+            .preview-content {
+                border: none;
+                padding: 0;
+                font-size: 14px;
+                line-height: 1.8;
+            }
+            
+            .signature-section {
+                margin-top: 50px;
+            }
+            
+            /* Ensure proper page layout */
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-body">
+            <!-- Address Section -->
+            <div class="address-section">
+                <div class="to">বরাবর,</div>
+                <div class="name">প্রধান, ভগবানপুর গ্রাম পঞ্চায়েত</div>
+                <div class="details">আড়বাড়া, চাঁচল, মালদা - ৭৩২১২৩</div>
+            </div>
+
+            <!-- Applicant Details -->
+            <div class="applicant-card">
+                <div class="applicant-details">
+                    <div class="detail-item">
+                        <div class="detail-label">আবেদনকারীর নাম</div>
+                        <div class="detail-value">নাজিম আলী</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">গ্রাম</div>
+                        <div class="detail-value">আড়বাড়া</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ব্লক</div>
+                        <div class="detail-value">চাঁচল</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">জেলা</div>
+                        <div class="detail-value">মালদা</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selection Section - Date and Months -->
+            <div class="selection-section">
+                <div class="selection-grid">
+                    <div class="selection-item">
+                        <div class="selection-label">📅 আবেদনের তারিখ</div>
+                        <input type="date" id="appDate" class="appDate" required>
+                    </div>
+                    <div class="selection-item">
+                        <div class="selection-label">🔢 মাসের সংখ্যা</div>
+                        <select id="monthCount" onchange="updateBillCalculation()">
+                            <option value="1">১ মাস</option>
+                            <option value="2">২ মাস</option>
+                            <option value="3">৩ মাস</option>
+                            <option value="4">৪ মাস</option>
+                            <option value="5">৫ মাস</option>
+                            <option value="6">৬ মাস</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="monthPreview" class="month-preview">
+                    গত ১ মাসের জন্য বিল (ফেব্রুয়ারি ২০২৪)
+                </div>
+            </div>
+
+            <!-- Bill Breakup - Simplified -->
+            <div class="breakup-section">
+                <div class="breakup-title">বিলের বিবরণ</div>
+                <div class="breakup-items">
+                    <div class="breakup-item">
+                        <span class="item-name">
+                            🧹 অফিস কক্ষ পরিষ্কার
+                            <span class="calculation" id="officeCalculation">(৩,০০০ × ১ = ৩,০০০)</span>
+                        </span>
+                        <span class="item-amount" id="officeAmount">₹ ৩,০০০/-</span>
+                    </div>
+                    <div class="breakup-item">
+                        <span class="item-name">
+                            🚽 টয়লেট পরিষ্কার
+                            <span class="calculation" id="toiletCalculation">(১,০০০ × ১ = ১,০০০)</span>
+                        </span>
+                        <span class="item-amount" id="toiletAmount">₹ ১,০০০/-</span>
+                    </div>
+                </div>
+                <div class="total-amount">
+                    <span>
+                        মোট টাকা
+                        <span class="total-calculation" id="totalCalculation">(৪,০০০ × ১ = ৪,০০০)</span>
+                    </span>
+                    <span id="totalAmount">₹ ৪,০০০/-</span>
+                </div>
+            </div>
+
+            <!-- Amount in Words -->
+            <div class="amount-words-box">
+                <div class="amount-words-label">শব্দে টাকার পরিমাণ</div>
+                <div class="amount-words" id="amountInWords">চার হাজার টাকা মাত্র</div>
+            </div>
+
+            <!-- Declaration -->
+            <div class="declaration">
+                <label>
+                    <input type="checkbox" id="declaration" required>
+                    আমি, নাজিম আলী, ঘোষণা করছি যে উল্লেখিত মাস/সমূহে অফিস কক্ষ ও টয়লেট পরিষ্কারের কাজ সঠিকভাবে সম্পন্ন হয়েছে। বিলের টাকা নির্ধারিত হারে যথাযথ।
+                </label>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" onclick="generateBill()">📄 বিল তৈরি করুন</button>
+                <button type="button" class="btn btn-secondary" onclick="printBill()">🖨️ প্রিন্ট</button>
+            </div>
+            
+            <!-- Export Options -->
+            <div class="export-options">
+                <button class="export-btn" onclick="exportAsDoc()">📝 ডক এক্সপোর্ট</button>
+                <button class="export-btn" onclick="exportAsPDF()">📕 পিডিএফ এক্সপোর্ট</button>
+            </div>
+
+            <!-- Preview Section -->
+            <div id="previewSection" class="preview-section">
+                <div id="previewContent" class="preview-content"></div>
+                
+                <!-- Signature Section -->
+                <div class="signature-section">
+                    <div class="signature-left">
+                        <div class="signature-line"></div>
+                        <div class="signature-name">প্রধান</div>
+                        <div class="signature-title">ভগবানপুর গ্রাম পঞ্চায়েত</div>
+                    </div>
+                    <div class="signature-right">
+                        <div class="signature-line"></div>
+                        <div class="signature-name">নাজিম আলী</div>
+                        <div class="signature-title">আবেদনকারী</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set default date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('appDate').value = `${year}-${month}-${day}`;
+            
+            // Initial calculation
+            updateBillCalculation();
+        });
+
+        // Function to get month names in Bengali
+        function getBengaliMonthName(date) {
+            const bengaliMonths = [
+                'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+                'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+            ];
+            return bengaliMonths[date.getMonth()];
+        }
+
+        // Function to get previous months range
+        function getPreviousMonthsRange(monthCount) {
+            const today = new Date();
+            const months = [];
+            
+            for (let i = monthCount; i > 0; i--) {
+                const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                months.push({
+                    name: getBengaliMonthName(month),
+                    year: month.getFullYear()
+                });
+            }
+            
+            return months;
+        }
+
+        // Format months range for display
+        function formatMonthsRange(months) {
+            if (months.length === 1) {
+                return `${months[0].name} ${months[0].year}`;
+            } else {
+                const firstMonth = months[0];
+                const lastMonth = months[months.length - 1];
+                
+                if (firstMonth.year === lastMonth.year) {
+                    return `${firstMonth.name} থেকে ${lastMonth.name} ${lastMonth.year}`;
+                } else {
+                    return `${firstMonth.name} ${firstMonth.year} থেকে ${lastMonth.name} ${lastMonth.year}`;
+                }
+            }
+        }
+
+        // Format Bengali number with commas
+        function formatBengaliNumber(num) {
+            return num.toLocaleString('bn-IN');
+        }
+
+        // Update bill calculation based on month count
+        function updateBillCalculation() {
+            const monthCount = parseInt(document.getElementById('monthCount').value);
+            const perMonthOffice = 3000;
+            const perMonthToilet = 1000;
+            const perMonthTotal = 4000;
+            
+            const totalOffice = perMonthOffice * monthCount;
+            const totalToilet = perMonthToilet * monthCount;
+            const grandTotal = perMonthTotal * monthCount;
+            
+            // Update calculations display
+            document.getElementById('officeCalculation').textContent = 
+                `(৩,০০০ × ${formatBengaliNumber(monthCount)} = ${formatBengaliNumber(totalOffice)})`;
+            document.getElementById('toiletCalculation').textContent = 
+                `(১,০০০ × ${formatBengaliNumber(monthCount)} = ${formatBengaliNumber(totalToilet)})`;
+            document.getElementById('totalCalculation').textContent = 
+                `(৪,০০০ × ${formatBengaliNumber(monthCount)} = ${formatBengaliNumber(grandTotal)})`;
+            
+            // Update amounts
+            document.getElementById('officeAmount').textContent = `₹ ${formatBengaliNumber(totalOffice)}/-`;
+            document.getElementById('toiletAmount').textContent = `₹ ${formatBengaliNumber(totalToilet)}/-`;
+            document.getElementById('totalAmount').textContent = `₹ ${formatBengaliNumber(grandTotal)}/-`;
+            
+            // Update month preview
+            const months = getPreviousMonthsRange(monthCount);
+            const monthsRange = formatMonthsRange(months);
+            document.getElementById('monthPreview').textContent = 
+                `গত ${monthCount} মাসের জন্য বিল (${monthsRange})`;
+            
+            // Update amount in words
+            document.getElementById('amountInWords').textContent = 
+                numberToBengaliWords(grandTotal) + ' টাকা মাত্র';
+        }
+
+        // Convert number to Bengali words
+        function numberToBengaliWords(num) {
+            if (num === 0) return 'শূন্য';
+            
+            const ones = ['', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 
+                         'দশ', 'এগারো', 'বারো', 'তেরো', 'চৌদ্দ', 'পনেরো', 'ষোল', 'সতেরো', 'আঠারো', 'ঊনিশ'];
+            const tens = ['', '', 'বিশ', 'ত্রিশ', 'চল্লিশ', 'পঞ্চাশ', 'ষাট', 'সত্তর', 'আশি', 'নব্বই'];
+            
+            if (num < 20) return ones[num];
+            if (num < 100) {
+                return tens[Math.floor(num / 10)] + (num % 10 ? ' ' + ones[num % 10] : '');
+            }
+            if (num < 1000) {
+                return ones[Math.floor(num / 100)] + ' শত' + (num % 100 ? ' ' + numberToBengaliWords(num % 100) : '');
+            }
+            if (num < 100000) {
+                return numberToBengaliWords(Math.floor(num / 1000)) + ' হাজার' + (num % 1000 ? ' ' + numberToBengaliWords(num % 1000) : '');
+            }
+            
+            return 'অনেক';
+        }
+
+        // Generate bill preview
+        function generateBill() {
+            if (!document.getElementById('declaration').checked) {
+                alert('দয়া করে ঘোষণাটি স্বীকার করুন');
+                return;
+            }
+
+            const appDate = document.getElementById('appDate').value;
+            const monthCount = parseInt(document.getElementById('monthCount').value);
+            const totalOffice = 3000 * monthCount;
+            const totalToilet = 1000 * monthCount;
+            const grandTotal = 4000 * monthCount;
+            
+            if (!appDate) {
+                alert('দয়া করে তারিখ নির্বাচন করুন');
+                return;
+            }
+
+            const formattedDate = new Date(appDate).toLocaleDateString('bn-IN', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const months = getPreviousMonthsRange(monthCount);
+            const monthsRange = formatMonthsRange(months);
+            const amountInWords = numberToBengaliWords(grandTotal);
+
+            let monthText = '';
+            if (monthCount === 1) {
+                monthText = `${months[0].name} ${months[0].year} মাসে`;
+            } else {
+                monthText = `${monthsRange} মাসে`;
+            }
+
+            const preview = `
+মাননীয়া,
+প্রধান, ভগবানপুর গ্রাম পঞ্চায়েত
+অরবরা, চাঁচল, মালদা
+
+তারিখ: ${formattedDate}
+
+বিষয়: ${monthText} অফিস কক্ষ ও টয়লেট পরিষ্কারের বিল
+
+মহাশয়া,
+
+আমি, নাজিম আলী, গ্রাম - অরবরা, চাঁচল, মালদা-র বাসিন্দা। 
+${monthText} অফিস কক্ষ ও টয়লেট পরিষ্কারের কাজ সম্পন্ন করেছি।
+
+বিলের বিবরণ:
+══════════════════════════════════
+মোট মাস: ${monthCount} মাস
+══════════════════════════════════
+১। অফিস কক্ষ পরিষ্কার    = ৩,০০০ × ${monthCount} = ${totalOffice.toLocaleString('bn-IN')}/-
+২। টয়লেট পরিষ্কার        = ১,০০০ × ${monthCount} = ${totalToilet.toLocaleString('bn-IN')}/-
+══════════════════════════════════
+   মোট টাকা              = ৪,০০০ × ${monthCount} = ${grandTotal.toLocaleString('bn-IN')}/-
+══════════════════════════════════
+
+শব্দে: ${amountInWords} টাকা মাত্র
+
+অতএব, উক্ত টাকা প্রদান করার জন্য অনুরোধ করছি।
+
+ভবদীয়,
+            `;
+
+            document.getElementById('previewContent').textContent = preview;
+            document.getElementById('previewSection').classList.add('show');
+        }
+
+        // Print bill - Only prints the generated letter
+        function printBill() {
+            if (!document.getElementById('declaration').checked) {
+                alert('দয়া করে ঘোষণাটি স্বীকার করুন');
+                return;
+            }
+
+            const appDate = document.getElementById('appDate').value;
+            const monthCount = parseInt(document.getElementById('monthCount').value);
+            const totalOffice = 3000 * monthCount;
+            const totalToilet = 1000 * monthCount;
+            const grandTotal = 4000 * monthCount;
+            
+            if (!appDate) {
+                alert('দয়া করে তারিখ নির্বাচন করুন');
+                return;
+            }
+
+            const formattedDate = new Date(appDate).toLocaleDateString('bn-IN', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const months = getPreviousMonthsRange(monthCount);
+            const monthsRange = formatMonthsRange(months);
+            const amountInWords = numberToBengaliWords(grandTotal);
+
+            let monthText = '';
+            if (monthCount === 1) {
+                monthText = `${months[0].name} ${months[0].year} মাসে`;
+            } else {
+                monthText = `${monthsRange} মাসে`;
+            }
+
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="bn">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>বিল দরখাস্ত - নাজিম আলী</title>
+                    <style>
+                        body {
+                            font-family: 'SolaimanLipi', 'Arial Unicode MS', 'Noto Sans Bengali', sans-serif;
+                            padding: 40px;
+                            max-width: 700px;
+                            margin: 0 auto;
+                            line-height: 2;
+                        }
+                        .signature-section {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-top: 60px;
+                            padding: 0 20px;
+                        }
+                        .signature-left, .signature-right {
+                            text-align: center;
+                            width: 200px;
+                        }
+                        .signature-line {
+                            width: 200px;
+                            border-top: 1px dashed #000;
+                            margin: 10px 0;
+                        }
+                        .preview-content {
+                            white-space: pre-wrap;
+                            font-size: 16px;
+                        }
+                        @page {
+                            size: A4;
+                            margin: 2.5cm;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="preview-content">
+মাননীয়া,
+প্রধান, ভগবানপুর গ্রাম পঞ্চায়েত
+অরবরা, চাঁচল, মালদা
+
+তারিখ: ${formattedDate}
+
+বিষয়: ${monthText} অফিস কক্ষ ও টয়লেট পরিষ্কারের বিল
+
+মহাশয়া,
+
+আমি, নাজিম আলী, গ্রাম - অরবরা, চাঁচল, মালদা-র বাসিন্দা। 
+${monthText} অফিস কক্ষ ও টয়লেট পরিষ্কারের কাজ সম্পন্ন করেছি।
+
+বিলের বিবরণ:
+══════════════════════════════════
+মোট মাস: ${monthCount} মাস
+══════════════════════════════════
+১। অফিস কক্ষ পরিষ্কার    = ৩,০০০ × ${monthCount} = ${totalOffice.toLocaleString('bn-IN')}/-
+২। টয়লেট পরিষ্কার        = ১,০০০ × ${monthCount} = ${totalToilet.toLocaleString('bn-IN')}/-
+══════════════════════════════════
+   মোট টাকা              = ৪,০০০ × ${monthCount} = ${grandTotal.toLocaleString('bn-IN')}/-
+══════════════════════════════════
+
+শব্দে: ${amountInWords} টাকা মাত্র
+
+অতএব, উক্ত টাকা প্রদান করার জন্য অনুরোধ করছি।
+
+ভবদীয়,
+                    </div>
+                    
+                    <div class="signature-section">
+                        <div class="signature-left">
+                            <div class="signature-line"></div>
+                            <div>প্রধান</div>
+                            <div style="font-size: 14px;">ভগবানপুর গ্রাম পঞ্চায়েত</div>
+                        </div>
+                        <div class="signature-right">
+                            <div class="signature-line"></div>
+                            <div>নাজিম আলী</div>
+                            <div style="font-size: 14px;">আবেদনকারী</div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                printWindow.print();
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
+            };
+        }
+
+        // Export as DOC
+        function exportAsDoc() {
+            if (!document.getElementById('declaration').checked) {
+                alert('দয়া করে ঘোষণাটি স্বীকার করুন');
+                return;
+            }
+
+            const appDate = document.getElementById('appDate').value;
+            const monthCount = parseInt(document.getElementById('monthCount').value);
+            const totalOffice = 3000 * monthCount;
+            const totalToilet = 1000 * monthCount;
+            const grandTotal = 4000 * monthCount;
+            
+            const formattedDate = new Date(appDate).toLocaleDateString('bn-IN', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            
+            const months = getPreviousMonthsRange(monthCount);
+            const monthsRange = formatMonthsRange(months);
+            const amountInWords = numberToBengaliWords(grandTotal);
+
+            let monthText = '';
+            if (monthCount === 1) {
+                monthText = `${months[0].name} ${months[0].year} মাসে`;
+            } else {
+                monthText = `${monthsRange} মাসে`;
+            }
+            
+            const content = `
+মাননীয়া,
+প্রধান, ভগবানপুর গ্রাম পঞ্চায়েত
+অরবরা, চাঁচল, মালদা
+
+তারিখ: ${formattedDate}
+
+বিষয়: ${monthText} অফিস কক্ষ ও টয়লেট পরিষ্কারের বিল
+
+মহাশয়া,
+
+আমি, নাজিম আলী, গ্রাম - অরবরা, চাঁচল, মালদা-র বাসিন্দা। 
+${monthText} অফিস কক্ষ ও টয়লেট পরিষ্কারের কাজ সম্পন্ন করেছি।
+
+বিলের বিবরণ:
+══════════════════════════════════
+মোট মাস: ${monthCount} মাস
+══════════════════════════════════
+১। অফিস কক্ষ পরিষ্কার    = ৩,০০০ × ${monthCount} = ${totalOffice.toLocaleString('bn-IN')}/-
+২। টয়লেট পরিষ্কার        = ১,০০০ × ${monthCount} = ${totalToilet.toLocaleString('bn-IN')}/-
+══════════════════════════════════
+   মোট টাকা              = ৪,০০০ × ${monthCount} = ${grandTotal.toLocaleString('bn-IN')}/-
+══════════════════════════════════
+
+শব্দে: ${amountInWords} টাকা মাত্র
+
+অতএব, উক্ত টাকা প্রদান করার জন্য অনুরোধ করছি।
+
+ভবদীয়,
+
+
+(নাজিম আলী)
+অরবরা, চাঁচল, মালদা
+            `;
+
+            const blob = new Blob([content], { type: 'application/msword' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Bill_Najim_Ali_${monthCount}_months.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Export as PDF (using print)
+        function exportAsPDF() {
+            printBill();
+        }
+    </script>
+</body>
+</html>

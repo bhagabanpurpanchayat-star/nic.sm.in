@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Prepare NIT · Live Data</title>
+  <style>
+    :root {
+      --sidebar:#213645;
+      --card-bg: rgba(31, 31, 31, 0.35);
+      --muted:#cfd8dc;
+      --accent:#0ca678;
+      --accent-2:#0b63d6;
+      --neon-blue: #00d9ff;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: linear-gradient(135deg, #0b0b0b, #151515, #1c1c1c);
+      color: var(--muted);
+      min-height: 100vh;
+    }
+    header { 
+      height:56px; 
+      background: linear-gradient(90deg,var(--sidebar),#13232f); 
+      display:flex; 
+      align-items:center; 
+      padding:0 18px; 
+      color:#fff; 
+      box-shadow:0 2px 6px rgba(0,0,0,0.6); 
+      font-size:18px; 
+      font-weight:bold; 
+    }
+    main { 
+      padding:18px; 
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .card { 
+      background: var(--card-bg); 
+      padding:16px; 
+      border-radius:14px; 
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 12px var(--neon-blue), 0 0 24px rgba(0,217,255,0.3); 
+      backdrop-filter: blur(15px); 
+      -webkit-backdrop-filter: blur(15px); 
+      border:1px solid var(--neon-blue); 
+      transition: all 0.3s ease-in-out; 
+    }
+
+    .page-title { 
+      font-size:28px; 
+      font-weight:700; 
+      margin-bottom:12px; 
+      color:#fff; 
+      text-align:center; 
+      animation: pulseTitle 2s infinite ease-in-out; 
+    }
+    @keyframes pulseTitle { 
+      0%, 100% { transform: scale(1); } 
+      50% { transform: scale(1.1); } 
+    }
+
+    .form-grid { 
+      display:grid; 
+      grid-template-columns:repeat(auto-fit, minmax(100px, 1fr)); 
+      gap:8px; 
+      margin-bottom:12px; 
+    }
+    .field { 
+      display: flex;
+      flex-direction: column;
+    }
+    label { 
+      display:block; 
+      font-size:12px; 
+      margin-bottom:4px; 
+      color:var(--muted); 
+      text-align:center; 
+    }
+    input[type=text], input[type=date], input[type=datetime-local], select { 
+      width:100%; 
+      padding:4px 6px; 
+      border-radius:4px; 
+      border:1px solid var(--neon-blue); 
+      background:rgba(255,255,255,0.05); 
+      color:#fff; 
+      font-size:13px; 
+      height:26px; 
+      text-align:center; 
+      backdrop-filter: blur(8px); 
+      transition: all 0.3s ease-in-out; 
+      box-shadow: 0 0 5px rgba(0,217,255,0.3); 
+    }
+    select option {
+      background: #1c1c1c;
+      color: #fff;
+    }
+    input[type=text]:focus, input[type=date]:focus, input[type=datetime-local]:focus, select:focus { 
+      box-shadow: 0 0 10px var(--neon-blue); 
+      border-color: var(--neon-blue); 
+      outline: none;
+    }
+
+    #schemeCount { 
+      float: right; 
+      background-color: rgba(0,217,255,0.15); 
+      color:white; 
+      padding:5px 12px; 
+      border-radius:16px; 
+      font-weight:bold; 
+      font-size:13px; 
+      margin-bottom:6px; 
+      border:1px solid var(--neon-blue); 
+      box-shadow:0 0 8px var(--neon-blue); 
+    }
+
+    .schemes, .sheet-table-container { 
+      margin-top:8px; 
+      border-radius:8px; 
+      overflow:auto; 
+      border:1px solid var(--neon-blue); 
+      max-height:280px; 
+      background: rgba(255,255,255,0.05); 
+      backdrop-filter: blur(12px); 
+      box-shadow: 0 0 8px var(--neon-blue), 0 6px 20px rgba(0,0,0,0.5); 
+    }
+    table { 
+      width:100%; 
+      border-collapse:collapse; 
+      font-size:12px; 
+      color:#fff; 
+      table-layout:fixed; 
+    }
+    thead th { 
+      background: rgba(43,74,99,0.55); 
+      padding:6px 4px; 
+      text-align:center; 
+      word-wrap:break-word; 
+      white-space:normal; 
+      position:sticky; 
+      top:0; 
+      z-index:2; 
+      backdrop-filter: blur(8px); 
+      border-bottom:1px solid var(--neon-blue); 
+      box-shadow:0 0 8px rgba(0,217,255,0.3); 
+    }
+    tbody tr { 
+      transition: all 0.2s ease; 
+    }
+    tbody tr:hover { 
+      background: rgba(0,217,255,0.08); 
+      cursor:pointer; 
+      box-shadow: inset 0 0 6px var(--neon-blue); 
+    }
+    tbody tr.selected { 
+      background: rgba(0,217,255,0.15); 
+      box-shadow: inset 0 0 8px var(--neon-blue); 
+    }
+    tbody td { 
+      padding:4px 3px; 
+      border-top:1px solid rgba(255,255,255,0.05); 
+      vertical-align:middle; 
+      text-align:center; 
+      word-wrap:break-word; 
+      white-space:normal; 
+    }
+    .table-input { 
+      width:100%; 
+      padding:2px 3px; 
+      border-radius:3px; 
+      border:1px solid var(--neon-blue); 
+      background:rgba(255,255,255,0.06); 
+      color:#fff; 
+      font-size:12px; 
+      height:22px; 
+      text-align:center; 
+      backdrop-filter: blur(6px); 
+      box-shadow: 0 0 5px rgba(0,217,255,0.3); 
+    }
+
+    .btn { 
+      padding:6px 12px; 
+      border-radius:4px; 
+      border:1px solid var(--neon-blue); 
+      cursor:pointer; 
+      font-weight:600; 
+      font-size:13px; 
+      transition:0.3s ease-in-out; 
+      box-shadow:0 0 8px rgba(0,217,255,0.4); 
+    }
+    .btn.primary { 
+      background:#0ca678; 
+      color:#fff; 
+    }
+    .btn.primary:hover { 
+      background:#09996b; 
+      box-shadow:0 0 12px var(--neon-blue); 
+    }
+    .btn.danger { 
+      background:#e53935; 
+      color:white; 
+    }
+    .btn.danger:hover { 
+      background:#c62828; 
+      box-shadow:0 0 12px var(--neon-blue); 
+    }
+    .btn.secondary {
+      background: transparent;
+      color: var(--neon-blue);
+      border: 2px solid var(--neon-blue);
+    }
+    .btn.secondary:hover {
+      background: var(--neon-blue);
+      color: #000;
+      box-shadow: 0 0 20px var(--neon-blue);
+    }
+
+    #searchBox { 
+      width:100%; 
+      padding:6px; 
+      border-radius:4px; 
+      margin-bottom:10px; 
+      border:1px solid var(--neon-blue); 
+      background:rgba(255,255,255,0.06); 
+      color:#fff; 
+      backdrop-filter: blur(8px); 
+      box-shadow:0 0 6px rgba(0,217,255,0.3); 
+    }
+    #searchBox:focus { 
+      box-shadow:0 0 10px var(--neon-blue); 
+      outline: none;
+    }
+
+    #insertBtn { 
+      margin-top:8px; 
+      padding:8px; 
+      border-radius:4px; 
+      border:1px solid var(--neon-blue); 
+      cursor:not-allowed; 
+      background:#888; 
+      color:#fff; 
+      font-weight:600; 
+      box-shadow:0 3px 12px rgba(0,0,0,0.4),0 0 8px var(--neon-blue); 
+    }
+    #insertBtn.active { 
+      cursor:pointer; 
+      background:#0ca678; 
+      box-shadow:0 0 12px var(--neon-blue); 
+    }
+
+    @keyframes rowHighlight { 
+      0% { background-color: rgba(0,255,0,0.4); } 
+      100% { background-color: transparent; } 
+    }
+    .highlight { 
+      animation: rowHighlight 1s ease-out; 
+    }
+
+    .pulse { 
+      animation: pulseBtn 1s infinite; 
+    }
+    @keyframes pulseBtn { 
+      0% { transform: scale(1); box-shadow:0 0 8px var(--neon-blue); } 
+      50% { transform: scale(1.05); box-shadow:0 0 16px var(--neon-blue); } 
+      100% { transform: scale(1); box-shadow:0 0 8px var(--neon-blue); } 
+    }
+
+    .save-status { 
+      margin-left:12px; 
+      font-weight:700; 
+      color: var(--neon-blue); 
+      vertical-align: middle; 
+    }
+    
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+    /* Two-page navigation */
+    .page-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 20px;
+    }
+    .page-badge {
+      background: rgba(0,217,255,0.1);
+      border: 1px solid var(--neon-blue);
+      padding: 6px 24px;
+      border-radius: 40px;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 0 10px var(--neon-blue);
+    }
+    .page-badge.active {
+      background: var(--neon-blue);
+      color: black;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    /* page visibility */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Tender type selector */
+    .tender-type-selector {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+    .tender-type-selector label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(0,217,255,0.1);
+      border: 1px solid var(--neon-blue);
+    }
+    .tender-type-selector input[type="radio"] {
+      accent-color: var(--neon-blue);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Schedule table style */
+    .schedule-table-container {
+      margin: 20px 0;
+      border: 1px solid var(--neon-blue);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 20px var(--neon-blue);
+    }
+    .schedule-input-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(0,0,0,0.2);
+    }
+    .schedule-input-table th {
+      background: #0e4b60;
+      color: white;
+      padding: 8px 4px;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 2px solid var(--neon-blue);
+    }
+    .schedule-input-table td {
+      padding: 6px 3px;
+      border-bottom: 1px solid #1b5f77;
+      text-align: center;
+    }
+    .schedule-input-table input {
+      width: 100%;
+      background: #1e3a47;
+      border: 1px solid var(--neon-blue);
+      border-radius: 4px;
+      padding: 4px 3px;
+      color: white;
+      font-size: 12px;
+      text-align: center;
+    }
+    .schedule-input-table input:focus {
+      outline: 2px solid var(--neon-blue);
+    }
+    .schedule-input-table input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .auto-filled {
+      border-color: #4caf50 !important;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.5) !important;
+      background: rgba(76, 175, 80, 0.1) !important;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--neon-blue);
+      font-size: 14px;
+    }
+    .error-message {
+      color: #ff6b6b;
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #ff6b6b;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    /* Compact legend */
+    .compact-legend {
+      background: rgba(0,0,0,0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      border: 1px dashed var(--neon-blue);
+      display: inline-block;
+    }
+    .compact-legend span.green {
+      color: #4caf50;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="page-title">Prepare NIT</div>
+
+  <!-- page indicator -->
+  <div class="page-indicator">
+    <span class="page-badge active" id="badgePage1">❶ Select works</span>
+    <span class="page-badge" id="badgePage2">❷ Tender schedule</span>
+  </div>
+
+  <!-- PAGE 1 – SELECT WORK -->
+  <div id="page1" class="page active">
+    <div class="card">
+      <form id="page1Form">
+        <div class="form-grid">
+          <div class="field"><label>Financial Year</label><input type="text" name="fyear" id="fyear"/></div>
+          <div class="field memo"><label>Memo No</label><input type="text" name="memo" id="memo"/></div>
+          <div class="field memodate"><label>Memo Date</label><input type="date" name="memodate" id="memodate"/></div>
+          <div class="field nit"><label>NIT No</label><input type="text" name="nit" id="nit"/></div>
+          <div class="field date"><label>NIT Date</label><input type="date" name="date" id="date"/></div>
+          <div class="field"><label>Time Allowed</label><input type="text" name="timeAllowed" id="timeAllowed" placeholder="e.g., 30 days"/></div>
+        </div>
+
+        <h3>Select Work from Action Plan</h3>
+        <input type="text" id="searchBox" placeholder="Search by Activity ID, Work Name, or Both..." />
+        <div class="sheet-table-container">
+          <table class="sheet-table">
+            <thead>
+              <tr>
+                <th style="width:80px;">Activity ID</th>
+                <th style="width:300px;">Name of the work</th>
+                <th style="width:160px;">Site details</th>
+                <th style="width:140px;">Source of Fund</th>
+                <th style="width:120px;">Tendered Amount</th>
+              </tr>
+            </thead>
+            <tbody id="sheetData"></tbody>
+          </table>
+        </div>
+        <button id="insertBtn" type="button">Insert</button>
+
+        <div id="schemeCount" class="clearfix">Scheme Count: 0</div>
+
+        <div class="schemes">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:80px;">Activity ID</th>
+                <th style="width:320px;">Name of the work</th>
+                <th style="width:160px;">Site details</th>
+                <th style="width:140px;">Source of Fund</th>
+                <th style="width:120px;">Tendered Amount</th>
+                <th style="width:120px;">Tender Form Price</th>
+                <th style="width:120px;">Earnest Money</th>
+                <th style="width:80px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="schemesBody"></tbody>
+          </table>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn primary" id="goToPage2">Next → Schedule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PAGE 2 – TENDER SCHEDULE TABLE -->
+  <div id="page2" class="page">
+    <div class="card">
+      <h3 style="color:var(--neon-blue); margin-bottom:8px;">📅 Tender schedule</h3>
+      
+      <!-- Tender Type Selection - RESTORED -->
+      <div class="tender-type-selector">
+        <label>
+          <input type="radio" name="tenderType" value="online" checked> Online Tender (e-Tender) - Full Schedule
+        </label>
+        <label>
+          <input type="radio" name="tenderType" value="offline"> Offline Tender - Limited Schedule
+        </label>
+      </div>
+
+      <!-- Compact legend (minimal) -->
+      <div class="compact-legend">
+        <span class="green">🟢 Auto-filled</span>
+      </div>
+
+      <!-- hidden fields to carry page1 data -->
+      <input type="hidden" id="hidden_fyear">
+      <input type="hidden" id="hidden_memo">
+      <input type="hidden" id="hidden_memodate">
+      <input type="hidden" id="hidden_nit">
+      <input type="hidden" id="hidden_date">
+      <input type="hidden" id="hidden_timeAllowed">
+      <input type="hidden" name="tenderScheduleJson" id="tenderScheduleJson" value="">
+      <input type="hidden" name="tenderTypeValue" id="tenderTypeValue" value="online">
+
+      <!-- schedule table -->
+      <div class="schedule-table-container">
+        <table class="schedule-input-table" id="scheduleInputTable">
+          <thead>
+            <tr>
+              <th style="width:40%;">Details</th>
+              <th style="width:20%;">Date</th>
+              <th style="width:20%;">Start time</th>
+              <th style="width:20%;">End time</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleTableBody"></tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: space-between; margin-top:20px;">
+        <button type="button" class="btn secondary" id="backToPage1">← Back to works</button>
+        <div style="display: flex; gap:8px;">
+          <button type="button" class="btn primary" id="previewScheduleBtn">Preview & store schedule</button>
+          <button type="button" class="btn primary" id="finalSaveBtn">Save & Update (final)</button>
+        </div>
+      </div>
+      <span id="saveStatus" class="save-status"></span>
+      <div id="previewNotice" style="margin-top:16px; font-size:13px; color:#aaf0ff;"></div>
+    </div>
+  </div>
+</main>
+
+<audio id="successSound" preload="auto" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+
+<script>
+// ---------- YOUR LIVE WEB APP URL ----------
+const API_URL = "https://script.google.com/macros/s/AKfycbyM5AtLe5sksevohnXz1zrEGCh0nSVJT-bWgtsq-HPPBjTNLeFDFpDZcFDtT95WJBnP/exec";
+
+const sheetDataBody = document.getElementById("sheetData");
+const schemesBody = document.getElementById("schemesBody");
+const insertBtn = document.getElementById("insertBtn");
+const searchBox = document.getElementById("searchBox");
+const schemeCount = document.getElementById("schemeCount");
+const successSound = document.getElementById("successSound");
+const saveStatus = document.getElementById("saveStatus");
+const tenderScheduleJson = document.getElementById("tenderScheduleJson");
+const scheduleTableBody = document.getElementById("scheduleTableBody");
+const previewNotice = document.getElementById("previewNotice");
+const tenderTypeRadios = document.querySelectorAll('input[name="tenderType"]');
+const tenderTypeValue = document.getElementById('tenderTypeValue');
+
+// page navigation
+const page1 = document.getElementById('page1');
+const page2 = document.getElementById('page2');
+const badge1 = document.getElementById('badgePage1');
+const badge2 = document.getElementById('badgePage2');
+const goToPage2 = document.getElementById('goToPage2');
+const backToPage1 = document.getElementById('backToPage1');
+
+// hidden fields on page2
+const hidden_fyear = document.getElementById('hidden_fyear');
+const hidden_memo = document.getElementById('hidden_memo');
+const hidden_memodate = document.getElementById('hidden_memodate');
+const hidden_nit = document.getElementById('hidden_nit');
+const hidden_date = document.getElementById('hidden_date');
+const hidden_timeAllowed = document.getElementById('hidden_timeAllowed');
+
+// page1 fields
+const fyear = document.getElementById('fyear');
+const memo = document.getElementById('memo');
+const memodate = document.getElementById('memodate');
+const nit = document.getElementById('nit');
+const date = document.getElementById('date');
+const timeAllowed = document.getElementById('timeAllowed');
+
+// ---------- schedule rows definitions ----------
+const fullScheduleRows = [
+  { desc: "Date of issue of Notice Inviting e-Tender" },
+  { desc: "Date of Publish of Notice Inviting Tender" },
+  { desc: "Period and time for download of Bidding Documents From" },
+  { desc: "Period and time for download of Bidding Documents Up To" },
+  { desc: "Time of submission Bids from" },
+  { desc: "Time of submission Bids Up To" },
+  { desc: "Time and Date for opening Technical Bids" },
+  { desc: "Time and Date of opening Financial Bids" },
+  { desc: "Time and Date for Financial Evaluation" },
+  { desc: "Contract Date for Award of Contract" }
+];
+
+const offlineScheduleRows = [
+  { desc: "Date of issue of Notice Inviting e-Tender" },
+  { desc: "Time of submission Bids Up To" },
+  { desc: "Time and Date for opening Technical Bids" }
+];
+
+// Current schedule rows based on selection
+let currentScheduleRows = fullScheduleRows;
+
+// Update schedule table based on tender type
+function updateScheduleTable() {
+  const isOnline = document.querySelector('input[name="tenderType"]:checked').value === 'online';
+  currentScheduleRows = isOnline ? fullScheduleRows : offlineScheduleRows;
+  tenderTypeValue.value = isOnline ? 'online' : 'offline';
+  
+  let html = '';
+  currentScheduleRows.forEach((row, idx) => {
+    html += `<tr>
+      <td>${row.desc}</td>
+      <td><input type="date" class="schedule-date" data-index="${idx}" style="width:100%;" ${idx === 0 ? 'id="issueDateInput"' : ''}></td>
+      <td><input type="time" class="schedule-start" data-index="${idx}" style="width:100%;" value=""></td>
+      <td><input type="time" class="schedule-end" data-index="${idx}" style="width:100%;" value=""></td>
+    </tr>`;
+  });
+  scheduleTableBody.innerHTML = html;
+  
+  // Set up auto-fill logic
+  setupAutoFill();
+  
+  // Set initial values
+  initializeValues();
+}
+
+// Add event listeners to radio buttons
+tenderTypeRadios.forEach(radio => {
+  radio.addEventListener('change', updateScheduleTable);
+});
+
+// Set up auto-fill event listeners
+function setupAutoFill() {
+  // When publish date changes (index 1)
+  const publishDateInput = document.querySelector('.schedule-date[data-index="1"]');
+  const publishStartInput = document.querySelector('.schedule-start[data-index="1"]');
+  
+  if (publishDateInput) {
+    // Update dependent fields when publish date changes
+    const updateFromPublish = () => {
+      const publishDate = publishDateInput.value;
+      const publishStart = publishStartInput?.value || '';
+      
+      // Update Period and time for download of Bidding Documents From (index 2)
+      const downloadFromDate = document.querySelector('.schedule-date[data-index="2"]');
+      const downloadFromStart = document.querySelector('.schedule-start[data-index="2"]');
+      
+      if (downloadFromDate && publishDate) {
+        downloadFromDate.value = publishDate;
+        downloadFromDate.classList.add('auto-filled');
+      }
+      if (downloadFromStart && publishStart) {
+        downloadFromStart.value = publishStart;
+        downloadFromStart.classList.add('auto-filled');
+      }
+      
+      // Update Time of submission Bids from (index 4)
+      const submissionFromDate = document.querySelector('.schedule-date[data-index="4"]');
+      const submissionFromStart = document.querySelector('.schedule-start[data-index="4"]');
+      
+      if (submissionFromDate && publishDate) {
+        submissionFromDate.value = publishDate;
+        submissionFromDate.classList.add('auto-filled');
+      }
+      if (submissionFromStart && publishStart) {
+        submissionFromStart.value = publishStart;
+        submissionFromStart.classList.add('auto-filled');
+      }
+    };
+    
+    publishDateInput.addEventListener('change', updateFromPublish);
+    if (publishStartInput) {
+      publishStartInput.addEventListener('change', updateFromPublish);
+    }
+  }
+  
+  // When download up to date changes (index 3)
+  const downloadUpToDate = document.querySelector('.schedule-date[data-index="3"]');
+  const downloadUpToStart = document.querySelector('.schedule-start[data-index="3"]');
+  
+  if (downloadUpToDate) {
+    const updateFromDownloadUpTo = () => {
+      const downloadDate = downloadUpToDate.value;
+      const downloadStart = downloadUpToStart?.value || '';
+      
+      // Update Time of submission Bids Up To (index 5)
+      const submissionUpToDate = document.querySelector('.schedule-date[data-index="5"]');
+      const submissionUpToStart = document.querySelector('.schedule-start[data-index="5"]');
+      
+      if (submissionUpToDate && downloadDate) {
+        submissionUpToDate.value = downloadDate;
+        submissionUpToDate.classList.add('auto-filled');
+      }
+      if (submissionUpToStart && downloadStart) {
+        submissionUpToStart.value = downloadStart;
+        submissionUpToStart.classList.add('auto-filled');
+      }
+    };
+    
+    downloadUpToDate.addEventListener('change', updateFromDownloadUpTo);
+    if (downloadUpToStart) {
+      downloadUpToStart.addEventListener('change', updateFromDownloadUpTo);
+    }
+  }
+  
+  // Set default end times to 17:30 for all end time fields
+  document.querySelectorAll('.schedule-end').forEach((input) => {
+    if (!input.value) {
+      input.value = '17:30';
+      input.classList.add('auto-filled');
+    }
+  });
+}
+
+// Initialize values from page1
+function initializeValues() {
+  if (hidden_date.value) {
+    // Set Date of issue (index 0) from NIT Date
+    const issueDateInput = document.querySelector('.schedule-date[data-index="0"]');
+    if (issueDateInput) {
+      issueDateInput.value = hidden_date.value;
+      issueDateInput.classList.add('auto-filled');
+    }
+  }
+}
+
+// Build schedule table initially
+updateScheduleTable();
+
+// Preview button
+document.getElementById('previewScheduleBtn').addEventListener('click', ()=>{
+  const isOnline = document.querySelector('input[name="tenderType"]:checked').value === 'online';
+  const scheduleData = {
+    tenderType: isOnline ? 'online' : 'offline',
+    rows: {}
+  };
+  
+  let anyFilled = false;
+  for(let i=0; i<currentScheduleRows.length; i++) {
+    const dateInp = document.querySelector(`.schedule-date[data-index="${i}"]`);
+    const startInp = document.querySelector(`.schedule-start[data-index="${i}"]`);
+    const endInp = document.querySelector(`.schedule-end[data-index="${i}"]`);
+    const date = dateInp?.value || '';
+    const start = startInp?.value || '';
+    const end = endInp?.value || '';
+    
+    if(date || start || end) anyFilled = true;
+    
+    scheduleData.rows[i] = { 
+      desc: currentScheduleRows[i].desc, 
+      date, 
+      start, 
+      end
+    };
+  }
+  
+  if(!anyFilled) {
+    if(!confirm('All fields empty. Store empty schedule?')) return;
+  }
+  
+  tenderScheduleJson.value = JSON.stringify(scheduleData);
+  previewNotice.innerText = '✅ Schedule stored. You can now save.';
+  setTimeout(()=> previewNotice.innerText = '', 2500);
+});
+
+// Page navigation
+goToPage2.addEventListener('click', ()=>{
+  hidden_fyear.value = fyear.value;
+  hidden_memo.value = memo.value;
+  hidden_memodate.value = memodate.value;
+  hidden_nit.value = nit.value;
+  hidden_date.value = date.value;
+  hidden_timeAllowed.value = timeAllowed.value;
+  
+  // Update schedule table with new NIT date
+  updateScheduleTable();
+  
+  page1.classList.remove('active');
+  page2.classList.add('active');
+  badge1.classList.remove('active');
+  badge2.classList.add('active');
+});
+
+backToPage1.addEventListener('click', ()=>{
+  page2.classList.remove('active');
+  page1.classList.add('active');
+  badge2.classList.remove('active');
+  badge1.classList.add('active');
+});
+
+// ---------- FETCH LIVE DATA FROM YOUR WEB APP ----------
+const selectedActIds = new Set();
+const sheetDataMap = new Map();
+let sheetData = [];
+
+async function fetchAndLoad() {
+  try {
+    sheetDataBody.innerHTML = '<tr><td colspan="5" class="loading">Loading data from server...</td></tr>';
+    
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
+    sheetData = await res.json();
+    
+    sheetDataBody.innerHTML = '';
+    
+    sheetDataMap.clear();
+    sheetData.forEach(r => { 
+      const key = String(r.actId ?? r.Activity_ID ?? r.id ?? "").trim(); 
+      if(key) sheetDataMap.set(key, r); 
+    });
+    
+    insertBtn.disabled = true;
+    loadData(sheetData);
+  } catch(e) { 
+    console.error('Fetch error:', e);
+    sheetDataBody.innerHTML = `<tr><td colspan="5" class="error-message">❌ Failed to load data: ${e.message}</td></tr>`;
+  }
+}
+
+function loadData(data){
+  sheetDataBody.innerHTML = "";
+  if (!data || data.length === 0) {
+    sheetDataBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No data available</td></tr>';
+    return;
+  }
+  
+  data.forEach(row=>{
+    const actId = String(row.actId ?? row.Activity_ID ?? row.id ?? "").trim();
+    const work = String(row.work ?? row.Name_of_the_work ?? row.Work_Name ?? "").trim();
+    const site = String(row.site ?? row.Site_details ?? row.Site ?? "").trim();
+    const fund = String(row.fund ?? row.Source_of_Fund ?? row.Fund ?? "").trim();
+    const tendered = String(row.tendered ?? row.Tendered_Amount ?? row.Amount ?? "").trim();
+    
+    const tr = document.createElement("tr");
+    tr.dataset.actid = actId;
+    tr.innerHTML = `
+      <td>${escapeHtml(actId)}</td>
+      <td>${escapeHtml(work)}</td>
+      <td>${escapeHtml(site)}</td>
+      <td>${escapeHtml(fund)}</td>
+      <td>${escapeHtml(tendered)}</td>
+    `;
+    tr.addEventListener("click", ()=>toggleRowSelection(actId, tr));
+    tr.addEventListener("dblclick", ()=>{
+      insertRowsByActIds([actId]); 
+      selectedActIds.delete(actId); 
+      tr.classList.remove("selected"); 
+      updateInsertBtn();
+    });
+    sheetDataBody.appendChild(tr);
+  });
+}
+
+function escapeHtml(text){ 
+  return String(text || '')
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;"); 
+}
+
+function escapeAttr(s){ 
+  return String(s || '')
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;"); 
+}
+
+function toggleRowSelection(actId, tr){ 
+  if(!actId) return; 
+  if(selectedActIds.has(actId)){ 
+    selectedActIds.delete(actId); 
+    tr.classList.remove("selected"); 
+  } else { 
+    selectedActIds.add(actId); 
+    tr.classList.add("selected"); 
+  } 
+  updateInsertBtn(); 
+}
+
+function updateInsertBtn(){ 
+  const has = selectedActIds.size > 0; 
+  insertBtn.disabled = !has; 
+  insertBtn.classList.toggle("active", has); 
+}
+
+insertBtn.addEventListener("click", ()=>{
+  const ids = Array.from(selectedActIds);
+  if(ids.length === 0) return;
+  insertRowsByActIds(ids);
+  document.querySelectorAll('.sheet-table tbody tr').forEach(tr => { 
+    const id = tr.dataset.actid; 
+    if(selectedActIds.has(id)) tr.classList.remove('selected'); 
+  });
+  selectedActIds.clear();
+  updateInsertBtn();
+});
+
+function insertRowsByActIds(actIds){
+  if(!Array.isArray(actIds) || actIds.length === 0) return;
+  const duplicateNames = [];
+  let insertedAny = false;
+
+  actIds.forEach(actId => {
+    const row = sheetDataMap.get(actId);
+    if(!row) return;
+    
+    const workName = String(row.work ?? row.Name_of_the_work ?? row.Work_Name ?? "").trim();
+    const site = String(row.site ?? row.Site_details ?? row.Site ?? "").trim();
+    const fund = String(row.fund ?? row.Source_of_Fund ?? row.Fund ?? "").trim();
+    const tendered = String(row.tendered ?? row.Tendered_Amount ?? row.Amount ?? "").trim();
+    
+    let isDuplicate = false;
+    for(const existingTr of schemesBody.querySelectorAll("tr")){
+      const existingAct = existingTr.querySelector("input[name='actid[]']")?.value ?? "";
+      const existingWork = existingTr.querySelector("input[name='work[]']")?.value ?? "";
+      if(existingAct === actId || existingWork === workName){ 
+        isDuplicate = true; 
+        break; 
+      }
+    }
+    if(isDuplicate){ 
+      duplicateNames.push(workName || actId); 
+      return; 
+    }
+
+    const newTr = document.createElement("tr");
+    newTr.classList.add("highlight");
+    newTr.innerHTML = `
+      <td><input class="table-input" name="actid[]" value="${escapeAttr(actId)}" readonly/></td>
+      <td><input class="table-input" name="work[]" value="${escapeAttr(workName)}" readonly/></td>
+      <td><input class="table-input" name="site[]" value="${escapeAttr(site)}" readonly/></td>
+      <td><input class="table-input" name="fund[]" value="${escapeAttr(fund)}" readonly/></td>
+      <td><input class="table-input tendered" name="tendered[]" value="${escapeAttr(tendered)}"/></td>
+      <td><input class="table-input formprice" name="formprice[]"/></td>
+      <td><input class="table-input earnest" name="earnest[]"/></td>
+      <td><button type="button" class="btn danger" onclick="this.closest('tr').remove(); updateSchemeCount();">Exclude</button></td>
+    `;
+    schemesBody.appendChild(newTr);
+    setTimeout(() => newTr.classList.remove('highlight'), 1000);
+    insertedAny = true;
+
+    const tenderedInput = newTr.querySelector(".tendered");
+    const formInput = newTr.querySelector(".formprice");
+    const earnestInput = newTr.querySelector(".earnest");
+
+    function recalc(){
+      const val = parseFloat(tenderedInput.value.replace(/,/g, "")) || 0;
+      earnestInput.value = Math.ceil((val * 0.02) / 10) * 10;
+      if(val <= 200000) formInput.value = 250;
+      else if(val <= 500000) formInput.value = 500;
+      else formInput.value = 750;
+    }
+    tenderedInput.addEventListener("input", recalc);
+    recalc();
+  });
+
+  if(insertedAny){ 
+    try{ 
+      successSound.currentTime = 0; 
+      const p = successSound.play(); 
+      if(p && p.then) p.catch(()=>{}); 
+    } catch(err){} 
+  }
+  if(duplicateNames.length > 0){ 
+    const uniq = Array.from(new Set(duplicateNames)); 
+    alert("⚠️ Already added, skipped:\n\n" + uniq.join("\n")); 
+  }
+  updateSchemeCount();
+}
+
+function updateSchemeCount(){ 
+  schemeCount.textContent = `Scheme Count: ${schemesBody.querySelectorAll("tr").length}`; 
+}
+
+searchBox.addEventListener("input", ()=>{
+  const query = searchBox.value.toLowerCase().trim();
+  if(!query){ 
+    loadData(sheetData); 
+    return; 
+  }
+  const filtered = sheetData.filter(row => {
+    const actId = String(row.actId ?? row.Activity_ID ?? row.id ?? "").toLowerCase();
+    const work = String(row.work ?? row.Name_of_the_work ?? row.Work_Name ?? "").toLowerCase();
+    const combined = `${actId} ${work}`;
+    return actId.includes(query) || work.includes(query) || combined.includes(query);
+  });
+  loadData(filtered);
+});
+
+// Load live data when page starts
+window.addEventListener("load", fetchAndLoad);
+
+// ---------- FINAL SAVE WITH DUPLICATE CHECKING ----------
+document.getElementById('finalSaveBtn').addEventListener('click', async function() {
+  const schemeRows = schemesBody.querySelectorAll("tr");
+  if(schemeRows.length === 0){ 
+    alert("No schemes selected."); 
+    return; 
+  }
+
+  if(!tenderScheduleJson.value) {
+    alert('Please click "Preview & store schedule" first.');
+    return;
+  }
+
+  const actids = [], works = [], sites = [], funds = [], 
+        tendered = [], formprices = [], earnests = [];
+  
+  schemeRows.forEach(tr => {
+    actids.push(tr.querySelector("input[name='actid[]']")?.value || '');
+    works.push(tr.querySelector("input[name='work[]']")?.value || '');
+    sites.push(tr.querySelector("input[name='site[]']")?.value || '');
+    funds.push(tr.querySelector("input[name='fund[]']")?.value || '');
+    tendered.push(tr.querySelector("input[name='tendered[]']")?.value || '');
+    formprices.push(tr.querySelector("input[name='formprice[]']")?.value || '');
+    earnests.push(tr.querySelector("input[name='earnest[]']")?.value || '');
+  });
+
+  const btn = this;
+  btn.disabled = true; 
+  btn.classList.add("pulse"); 
+  saveStatus.textContent = `0/${actids.length}`;
+
+  try {
+    // ----- DUPLICATE CHECK (CLIENT SIDE) -----
+    // First, fetch existing records
+    const existingRes = await fetch(API_URL + "?check=1");
+    const existing = await existingRes.json();
+    
+    // Create sets for quick lookup
+    const existingActIds = new Set();
+    const existingWorks = new Set();
+    
+    existing.forEach(item => {
+      if (item.actId) existingActIds.add(String(item.actId).trim());
+      if (item.work) existingWorks.add(String(item.work).trim().toLowerCase());
+    });
+    
+    // Check for duplicates
+    const foundDuplicates = [];
+    const seenActIds = new Set();
+    const seenWorks = new Set();
+    
+    for(let i = 0; i < actids.length; i++) {
+      const currentActId = String(actids[i] || "").trim();
+      const currentWork = String(works[i] || "").trim();
+      const currentWorkLower = currentWork.toLowerCase();
+      
+      // Check against database
+      if ((currentActId && existingActIds.has(currentActId)) || 
+          (currentWork && existingWorks.has(currentWorkLower))) {
+        foundDuplicates.push(`• ${currentActId} - ${currentWork}`);
+      }
+      
+      // Check within current selection
+      if (currentActId && seenActIds.has(currentActId)) {
+        foundDuplicates.push(`• ${currentActId} - ${currentWork} (duplicate in current selection)`);
+      }
+      if (currentWork && seenWorks.has(currentWorkLower)) {
+        foundDuplicates.push(`• ${currentWork} (duplicate in current selection)`);
+      }
+      
+      if (currentActId) seenActIds.add(currentActId);
+      if (currentWork) seenWorks.add(currentWorkLower);
+    }
+    
+    // If duplicates found, show message and stop
+    if (foundDuplicates.length > 0) {
+      const uniqueDups = [...new Set(foundDuplicates)];
+      alert("❌ DUPLICATE ENTRIES FOUND!\n\nThe following works cannot be saved:\n\n" + 
+            uniqueDups.join("\n") + 
+            "\n\nPlease remove these entries and try again.");
+      
+      btn.disabled = false;
+      btn.classList.remove("pulse");
+      saveStatus.textContent = "";
+      return;
+    }
+    // ----- END DUPLICATE CHECK -----
+
+    // Proceed with saving one by one
+    for(let i = 0; i < actids.length; i++){
+      const params = new URLSearchParams();
+      params.append("fyear", hidden_fyear.value);
+      params.append("memo", hidden_memo.value);
+      params.append("memodate", hidden_memodate.value);
+      params.append("nit", hidden_nit.value);
+      params.append("date", hidden_date.value);
+      params.append("timeAllowed", hidden_timeAllowed.value);
+      params.append("tenderScheduleJson", tenderScheduleJson.value);
+      params.append("tenderType", tenderTypeValue.value);
+      params.append("actid[]", actids[i]);
+      params.append("work[]", works[i]);
+      params.append("site[]", sites[i]);
+      params.append("fund[]", funds[i]);
+      params.append("tendered[]", tendered[i]);
+      params.append("formprice[]", formprices[i]);
+      params.append("earnest[]", earnests[i]);
+
+      const resp = await fetch(API_URL, { 
+        method: "POST", 
+        body: params.toString(), 
+        headers: {"Content-Type": "application/x-www-form-urlencoded"} 
+      });
+      const json = await resp.json();
+      
+      // Handle server response
+      if(json.result === "error") {
+        alert("Error saving row " + (i+1) + ": " + (json.message || "Unknown error"));
+        btn.disabled = false;
+        btn.classList.remove("pulse");
+        saveStatus.textContent = "";
+        return;
+      }
+      
+      if(json.result === "duplicate") {
+        alert(json.message);
+        btn.disabled = false;
+        btn.classList.remove("pulse");
+        saveStatus.textContent = "";
+        return;
+      }
+      
+      if(!json || json.result !== "success") { 
+        alert("Failed row " + (i+1)); 
+        btn.disabled = false; 
+        btn.classList.remove("pulse"); 
+        saveStatus.textContent = ""; 
+        return; 
+      }
+      saveStatus.textContent = `${i+1}/${actids.length}`;
+    }
+    
+    btn.textContent = "Saved ✅";
+    setTimeout(() => { 
+      btn.disabled = false; 
+      btn.classList.remove("pulse"); 
+      btn.innerHTML = "Save & Update (final)"; 
+      saveStatus.textContent = ""; 
+    }, 1200);
+    alert(`✅ Successfully saved ${actids.length} scheme(s).`);
+    
+  } catch(err){
+    alert("❌ Error: " + err.message);
+    btn.disabled = false; 
+    btn.classList.remove("pulse"); 
+    btn.innerHTML = "Save & Update (final)"; 
+    saveStatus.textContent = "";
+  }
+});
+</script>
+</body>
+</html>

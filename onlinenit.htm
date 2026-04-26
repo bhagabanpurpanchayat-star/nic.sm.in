@@ -1,0 +1,851 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NIT Template Management System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #1a73e8;
+      --primary-dark: #155ab6;
+      --secondary-color: #5f6368;
+      --success-color: #34a853;
+      --danger-color: #ea4335;
+      --light-gray: #f8f9fa;
+      --border-color: #dadce0;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #202124;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header h1 {
+      color: var(--primary-color);
+      font-size: 28px;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .header p {
+      color: var(--secondary-color);
+      font-size: 16px;
+    }
+
+    .controls-panel {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--secondary-color);
+      font-size: 14px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      font-size: 15px;
+      background-color: white;
+      transition: border-color 0.2s;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background-color: #2e9440;
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background-color: #d33426;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background-color: white;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background-color: rgba(26, 115, 232, 0.05);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .preview-container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow);
+    }
+
+    .preview-container h3 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+      overflow-x: auto;
+      font-size: 14px;
+    }
+
+    /* A4 Print Styling */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+      }
+      
+      @page {
+        size: A4;
+        margin: 0.5in;
+      }
+    }
+
+    .a4-preview {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 20mm;
+      background: white;
+      box-shadow: var(--shadow);
+      border: 1px solid #ddd;
+      overflow-y: auto;
+      max-height: 80vh;
+      font-size: 14px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--secondary-color);
+    }
+
+    .loading i {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--secondary-color);
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      color: #ddd;
+    }
+
+    .empty-state h3 {
+      margin-bottom: 10px;
+      color: var(--secondary-color);
+    }
+
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: var(--success-color);
+      color: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .notification.error {
+      background: var(--danger-color);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      color: var(--secondary-color);
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .controls-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .form-group {
+        min-width: 100%;
+      }
+      
+      .btn-group {
+        justify-content: center;
+      }
+      
+      .a4-preview {
+        width: 100%;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>NIT Template Management System</h1>
+      <p>Panchayat e-Tender - Preview, Export & Print</p>
+    </div>
+
+    <div class="controls-panel">
+      <div class="form-group">
+        <label for="nitSelect"><i class="fas fa-file-contract"></i> Select NIT</label>
+        <select id="nitSelect">
+          <option value="">-- Loading NITs --</option>
+        </select>
+      </div>
+      
+      <div class="btn-group">
+        <button class="btn btn-primary" id="previewBtn">
+          <i class="fas fa-eye"></i> Preview
+        </button>
+        <button class="btn btn-success" id="exportPdfBtn" disabled>
+          <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+        <button class="btn btn-outline" id="exportDocBtn" disabled>
+          <i class="fas fa-file-word"></i> Export DOC
+        </button>
+        <button class="btn btn-primary" id="printBtn" disabled>
+          <i class="fas fa-print"></i> Print
+        </button>
+      </div>
+    </div>
+
+    <div class="preview-container">
+      <h3>
+        <span>Document Preview</span>
+        <span id="nit-title" style="font-size: 16px; color: var(--secondary-color);"></span>
+      </h3>
+      
+      <div id="preview-area" class="a4-preview">
+        <div id="form-container">
+          <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <h3>No NIT Selected</h3>
+            <p>Select a NIT from the dropdown and click "Preview" to view the document</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>© 2023 Panchayat e-Tender System | NIT Template Management</p>
+    </div>
+  </div>
+
+  <!-- Notification element -->
+  <div id="notification" class="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notification-text">Operation completed successfully</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    // Global variables
+    const baseUrl = "https://script.google.com/macros/s/AKfycbzR0-hXFBU4TwlS3apJHGk_krSIcVqYreftzWe280zi4rNY_XqXJeCt8DVlEqBbmoVt/exec";
+    const nitSelect = document.getElementById("nitSelect");
+    const previewBtn = document.getElementById("previewBtn");
+    const printBtn = document.getElementById("printBtn");
+    const exportPdfBtn = document.getElementById("exportPdfBtn");
+    const exportDocBtn = document.getElementById("exportDocBtn");
+    const container = document.getElementById("form-container");
+    const previewArea = document.getElementById("preview-area");
+    const nitTitle = document.getElementById("nit-title");
+    const notification = document.getElementById("notification");
+    const notificationText = document.getElementById("notification-text");
+    
+    let currentNITData = null;
+    let currentNITName = "";
+
+    // NEW: Function to extract data from the template
+    function extractDataFromTemplate(templateHtml) {
+      // Create a temporary div to parse the HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = templateHtml;
+      
+      // Extract values from the placeholders
+      const memoNo = tempDiv.querySelector('.memo-value .placeholder')?.textContent || '';
+      const memoDate = tempDiv.querySelector('.memo-right .date-value .placeholder')?.textContent || '';
+      const nitNo = tempDiv.querySelector('.memo-nits-container:nth-child(2) .memo-value .placeholder')?.textContent || '';
+      const nitDate = tempDiv.querySelector('.memo-nits-container:nth-child(2) .date-value .placeholder')?.textContent || '';
+      
+      // Extract EMD table data
+      const emdTableData = [];
+      const emdRows = tempDiv.querySelectorAll('.emd-table tbody tr');
+      emdRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 9) {
+          emdTableData.push({
+            slNo: cells[0]?.textContent || '',
+            nameOfWork: cells[1]?.textContent || '',
+            siteDetails: cells[2]?.textContent || '',
+            sourceFund: cells[3]?.textContent || '',
+            tenderedAmount: cells[4]?.textContent || '',
+            earnestMoney: cells[5]?.textContent || '',
+            costOfTenderDocument: cells[6]?.textContent || '',
+            requiredCredential: cells[7]?.textContent || '',
+            workCompletionPeriod: cells[8]?.textContent || ''
+          });
+        }
+      });
+      
+      // Extract other placeholder values
+      const dateSaleTender = tempDiv.querySelector('[class*="DATE_SALE_TENDER"]')?.textContent || 
+                            (templateHtml.match(/{{DATE_SALE_TENDER}}/) ? '' : '');
+      const lastDateDrop = tempDiv.querySelector('[class*="LAST_DATE_DROP"]')?.textContent || 
+                          (templateHtml.match(/{{LAST_DATE_DROP}}/) ? '' : '');
+      const dateOpening = tempDiv.querySelector('[class*="DATE_OPENING"]')?.textContent || 
+                         (templateHtml.match(/{{DATE_OPENING}}/) ? '' : '');
+      
+      return {
+        memoNo,
+        memoDate,
+        nitNo,
+        nitDate,
+        dateSaleTender,
+        lastDateDrop,
+        dateOpening,
+        emdTableData
+      };
+    }
+
+    // Load NITs on page load
+    document.addEventListener('DOMContentLoaded', loadNITs);
+    
+    async function loadNITs() {
+      try {
+        const res = await fetch(baseUrl + "?function=getNITs");
+        const nits = await res.json();
+        
+        nitSelect.innerHTML = "<option value=''>-- Select NIT --</option>";
+        nits.forEach(nit => {
+          const opt = document.createElement("option");
+          opt.value = nit;
+          opt.textContent = nit;
+          nitSelect.appendChild(opt);
+        });
+        
+        showNotification("NITs loaded successfully", "success");
+      } catch (err) {
+        console.error("Error loading NITs:", err);
+        nitSelect.innerHTML = "<option value=''>-- Error loading NITs --</option>";
+        showNotification("Error loading NITs", "error");
+      }
+    }
+
+    // Preview selected NIT - MODIFIED for template
+    previewBtn.addEventListener("click", async () => {
+      const nit = nitSelect.value;
+      if (!nit) { 
+        showNotification("Please select a NIT", "error");
+        return; 
+      }
+
+      container.innerHTML = `
+        <div class="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Loading NIT data...</p>
+        </div>
+      `;
+      
+      disableButtons(true);
+      currentNITName = nit;
+      nitTitle.textContent = nit;
+
+      try {
+        const res = await fetch(baseUrl + "?function=getNITData&nit=" + encodeURIComponent(nit));
+        const data = await res.json();
+
+        if (!data || !data.html) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-exclamation-triangle"></i>
+              <h3>No Data Found</h3>
+              <p>No data found for the selected NIT.</p>
+            </div>
+          `;
+          disableButtons(false);
+          return;
+        }
+
+        currentNITData = data;
+        
+        // Your template already has the correct formatting, just display it
+        container.innerHTML = data.html;
+        
+        disableButtons(false);
+        showNotification("NIT preview loaded successfully", "success");
+        
+        // Scroll to preview
+        previewArea.scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-circle"></i>
+            <h3>Error Loading Preview</h3>
+            <p>There was an error loading the NIT preview.</p>
+          </div>
+        `;
+        disableButtons(false);
+        showNotification("Error loading preview", "error");
+      }
+    });
+
+    // Print functionality
+    printBtn.addEventListener("click", () => {
+      if (!container.innerHTML.trim() || !currentNITData) { 
+        showNotification("No NIT to print", "error");
+        return; 
+      }
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Print NIT - ${currentNITName}</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 0.5in;
+            }
+            body {
+              font-family: "Times New Roman", Times, serif;
+              line-height: 1.5;
+              color: #000;
+              padding: 20px;
+              font-size: 14px;
+            }
+            * {
+              box-sizing: border-box;
+              margin: 0;
+              padding: 0;
+            }
+            .header-box {
+              width: 100%;
+              text-align: center;
+              padding: 10px 0 5px 0;
+            }
+            .title-main {
+              font-size: 22px;
+              font-weight: bold;
+              color: #1f4e79;
+              text-decoration: underline;
+            }
+            .notice-title {
+              margin-top: 10px;
+              font-size: 26px;
+              font-weight: bold;
+              color: #1f4e79;
+            }
+            .memo-nits-container {
+              display: flex;
+              justify-content: space-between;
+              width: 100%;
+              margin-bottom: 10px;
+            }
+            .memo-line {
+              display: flex;
+              justify-content: space-between;
+              width: 100%;
+              margin-bottom: 5px;
+            }
+            .memo-left, .memo-right {
+              display: flex;
+              align-items: center;
+            }
+            .memo-label, .date-label {
+              font-weight: bold;
+              margin-right: 5px;
+              white-space: nowrap;
+            }
+            .emd-table, .dates-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+              font-size: 12px;
+            }
+            .emd-table th, .emd-table td, 
+            .dates-table th, .dates-table td {
+              border: 1px solid #000;
+              padding: 6px;
+              text-align: center;
+            }
+            .emd-table th, .dates-table th {
+              background-color: #f0f0f0;
+              font-weight: bold;
+            }
+            .signature-block {
+              text-align: right;
+              margin-bottom: 40px;
+            }
+            .copy-section {
+              margin-top: 60px;
+              padding-top: 20px;
+              border-top: 1px solid #000;
+            }
+            .footer {
+              margin-top: 40px;
+              text-align: center;
+              font-size: 12px;
+              color: #666;
+            }
+          </style>
+        </head>
+        <body>
+          ${container.innerHTML}
+        </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+      printWindow.focus();
+      
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    });
+
+    // Export to PDF
+    exportPdfBtn.addEventListener("click", async () => {
+      if (!container.innerHTML.trim() || !currentNITData) { 
+        showNotification("No NIT to export", "error");
+        return; 
+      }
+
+      try {
+        showNotification("Generating PDF...", "success");
+        
+        // Create a temporary div with the content for PDF generation
+        const tempDiv = document.createElement('div');
+        tempDiv.style.width = '210mm';
+        tempDiv.style.padding = '20mm';
+        tempDiv.style.fontFamily = '"Times New Roman", Times, serif';
+        tempDiv.style.fontSize = '14px';
+        tempDiv.innerHTML = container.innerHTML;
+        
+        document.body.appendChild(tempDiv);
+        
+        // Use html2canvas to capture the content
+        const canvas = await html2canvas(tempDiv, {
+          scale: 2,
+          useCORS: true,
+          logging: false
+        });
+        
+        document.body.removeChild(tempDiv);
+        
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+        
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        
+        pdf.save(`NIT_${currentNITName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
+        showNotification("PDF exported successfully", "success");
+      } catch (err) {
+        console.error("PDF export error:", err);
+        showNotification("Error exporting PDF", "error");
+      }
+    });
+
+    // Export to DOC (using HTML format)
+    exportDocBtn.addEventListener("click", () => {
+      if (!container.innerHTML.trim() || !currentNITData) { 
+        showNotification("No NIT to export", "error");
+        return; 
+      }
+
+      try {
+        const docContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>NIT - ${currentNITName}</title>
+            <style>
+              body {
+                font-family: "Times New Roman", Times, serif;
+                line-height: 1.5;
+                color: #000;
+                margin: 0.5in;
+                font-size: 14px;
+              }
+              * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+              }
+              .header-box {
+                width: 100%;
+                text-align: center;
+                padding: 10px 0 5px 0;
+              }
+              .title-main {
+                font-size: 22px;
+                font-weight: bold;
+                color: #1f4e79;
+                text-decoration: underline;
+              }
+              .notice-title {
+                margin-top: 10px;
+                font-size: 26px;
+                font-weight: bold;
+                color: #1f4e79;
+              }
+              .memo-nits-container {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                margin-bottom: 10px;
+              }
+              .memo-line {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                margin-bottom: 5px;
+              }
+              .memo-left, .memo-right {
+                display: flex;
+                align-items: center;
+              }
+              .memo-label, .date-label {
+                font-weight: bold;
+                margin-right: 5px;
+                white-space: nowrap;
+              }
+              .emd-table, .dates-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 12px;
+              }
+              .emd-table th, .emd-table td, 
+              .dates-table th, .dates-table td {
+                border: 1px solid #000;
+                padding: 6px;
+                text-align: center;
+              }
+              .emd-table th, .dates-table th {
+                background-color: #f0f0f0;
+                font-weight: bold;
+              }
+              .signature-block {
+                text-align: right;
+                margin-bottom: 40px;
+              }
+              .copy-section {
+                margin-top: 60px;
+                padding-top: 20px;
+                border-top: 1px solid #000;
+              }
+              .footer {
+                margin-top: 40px;
+                text-align: center;
+                font-size: 12px;
+                color: #666;
+              }
+            </style>
+          </head>
+          <body>
+            ${container.innerHTML}
+          </body>
+          </html>
+        `;
+        
+        const blob = new Blob([docContent], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `NIT_${currentNITName.replace(/\s+/g, '_')}_${new Date().getTime()}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification("Document exported successfully", "success");
+      } catch (err) {
+        console.error("DOC export error:", err);
+        showNotification("Error exporting document", "error");
+      }
+    });
+
+    // Helper function to disable/enable buttons
+    function disableButtons(disabled) {
+      previewBtn.disabled = disabled;
+      printBtn.disabled = disabled || !currentNITData;
+      exportPdfBtn.disabled = disabled || !currentNITData;
+      exportDocBtn.disabled = disabled || !currentNITData;
+    }
+
+    // Notification function
+    function showNotification(message, type = "success") {
+      notificationText.textContent = message;
+      notification.className = "notification";
+      
+      if (type === "error") {
+        notification.classList.add("error");
+        notification.querySelector("i").className = "fas fa-exclamation-circle";
+      } else {
+        notification.querySelector("i").className = "fas fa-check-circle";
+      }
+      
+      notification.classList.add("show");
+      
+      setTimeout(() => {
+        notification.classList.remove("show");
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
+

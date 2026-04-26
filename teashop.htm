@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tea shop · bill with export · ₹700–5000</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        body {
+            background: #e5e7eb;
+            display: flex;
+            justify-content: center;
+            padding: 25px 15px;
+            margin: 0;
+        }
+        .card {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-radius: 18px;
+            padding: 25px 20px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: #1e293b;
+            border-bottom: 3px double #b45309;
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 18px;
+            background: #fef9c3;
+            padding: 18px 20px;
+            border-radius: 28px;
+            margin-bottom: 25px;
+            border: 2px solid #b45309;
+            justify-content: space-evenly;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 100px;
+        }
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #422006;
+            margin-bottom: 3px;
+        }
+        .input-group input, .input-group select {
+            background: white;
+            border: 2px solid #b45309;
+            border-radius: 40px;
+            padding: 8px 14px;
+            font-weight: bold;
+            font-size: 1rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px #fde68a;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #b45309;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 8px 22px;
+            border-radius: 40px;
+            cursor: pointer;
+            border: 2px solid #7b341e;
+            letter-spacing: 0.8px;
+            transition: 0.15s;
+            box-shadow: 0 4px 0 #7b341e;
+        }
+        .btn:hover {
+            background: #9a4408;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #7b341e;
+        }
+        .btn.print {
+            background: #1e3a8a;
+            border-color: #172554;
+            box-shadow: 0 4px 0 #172554;
+        }
+        .btn.export {
+            background: #065f46;
+            border-color: #064e3b;
+            box-shadow: 0 4px 0 #064e3b;
+        }
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .export-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 2px solid #b45309;
+            border-radius: 12px;
+            margin-top: 5px;
+            min-width: 160px;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .export-options.show {
+            display: block;
+        }
+        .export-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #422006;
+            transition: 0.1s;
+            border-bottom: 1px solid #fde68a;
+        }
+        .export-option:last-child {
+            border-bottom: none;
+        }
+        .export-option:hover {
+            background: #fef3c7;
+        }
+        .bill-paper {
+            background: #fffaf0;
+            border: 3px solid #422006;
+            padding: 20px 18px 15px 18px;
+            border-radius: 30px 30px 15px 15px;
+            box-shadow: inset 0 0 0 2px #fde68a, 0 10px 15px -5px #3f2e1e;
+            font-size: 0.95rem;
+        }
+        .to-address {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            border-left: 8px solid #b45309;
+            padding-left: 16px;
+            background: #fef3c7;
+            border-radius: 0 40px 40px 0;
+        }
+        .to-address p {
+            margin: 3px 0;
+        }
+        .date-right {
+            text-align: right;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0px 0 8px;
+        }
+        .salutation {
+            font-size: 1rem;
+            margin: 6px 0 2px;
+            font-style: italic;
+        }
+        .request-note {
+            margin: 2px 0 10px; 
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0 12px;
+            border: 3px solid #422006;
+            font-size: 0.75rem;
+        }
+        .bill-table th {
+            background: #b45309;
+            color: white;
+            padding: 6px 2px;
+            border: 2px solid #2c1a0f;
+            text-align: center;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        .bill-table td {
+            border: 2px solid #422006;
+            padding: 4px 2px;
+            text-align: center;
+            background: #ffffffd9;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+        .bill-table tfoot td {
+            background: #fde68a;
+            font-weight: 800;
+            font-size: 0.85rem;
+            border: 3px solid #422006;
+        }
+        .amount-words {
+            font-size: 1rem;
+            text-align: right;
+            margin-top: 10px;
+            border-top: 3px double #b45309;
+            padding-top: 8px;
+            font-weight: 600;
+        }
+        .signature {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 1rem;
+            align-items: end;
+        }
+        .signature div:last-child {
+            border-top: 2px dashed #422006;
+            min-width: 160px;
+            text-align: center;
+            padding-top: 4px;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        .error-message {
+            color: #b91c1c;
+            font-weight: bold;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 30px;
+            text-align: center;
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .card {
+                box-shadow: none;
+                padding: 0;
+                background: white;
+                max-width: 100%;
+            }
+            h1, .controls, .btn, .button-group, .input-group {
+                display: none !important;
+            }
+            .bill-paper {
+                border: none;
+                box-shadow: none;
+                background: white;
+                padding: 0.15in 0.2in;
+                margin: 0 auto;
+                width: 100%;
+                page-break-inside: avoid;
+                font-size: 0.85rem;
+            }
+            .bill-table th {
+                background: #b45309 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .bill-table tfoot td {
+                background: #fde68a !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .to-address {
+                background: #fef3c7 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .bill-table {
+                font-size: 0.7rem !important;
+            }
+            .bill-table td, .bill-table th {
+                padding: 3px 1px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>☕ TEA & BISCUIT BILL · ₹700 TO ₹5000</h1>
+    <div class="controls">
+        <div class="input-group">
+            <label>📅 MONTH</label>
+            <select id="monthSelect">
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>📆 YEAR</label>
+            <input type="number" id="yearInput" value="2026" min="2000" max="2100" step="1">
+        </div>
+        <div class="input-group">
+            <label>🍪 BISCUIT RATE (₹)</label>
+            <input type="number" id="biscuitRate" value="5" min="1" step="1">
+        </div>
+        <div class="input-group">
+            <label>🍵 TEA RATE (₹)</label>
+            <input type="number" id="teaRate" value="5" min="1" step="1">
+        </div>
+        <div class="input-group">
+            <label>💰 TOTAL AMOUNT (₹)</label>
+            <input type="number" id="totalAmount" value="2000" min="700" max="5000" step="1">
+        </div>
+        <div class="button-group">
+            <button class="btn" id="genBtn">⚡ GENERATE BILL</button>
+            <button class="btn print" id="printBtn">🖨️ PRINT</button>
+            <div class="export-dropdown">
+                <button class="btn export" id="exportBtn">📄 EXPORT ▼</button>
+                <div class="export-options" id="exportOptions">
+                    <div class="export-option" data-format="pdf">📕 Export as PDF</div>
+                    <div class="export-option" data-format="doc">📘 Export as Word</div>
+                    <div class="export-option" data-format="txt">📃 Export as Text</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill container -->
+    <div id="billContainer" class="bill-paper">
+        <!-- dynamic bill will be injected here -->
+    </div>
+</div>
+
+<!-- Include jsPDF and html2canvas for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+(function() {
+    const monthSel = document.getElementById('monthSelect');
+    const yearInp = document.getElementById('yearInput');
+    const biscuitRateInp = document.getElementById('biscuitRate');
+    const teaRateInp = document.getElementById('teaRate');
+    const totalAmountInp = document.getElementById('totalAmount');
+    const genBtn = document.getElementById('genBtn');
+    const printBtn = document.getElementById('printBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const exportOptions = document.getElementById('exportOptions');
+    const billContainer = document.getElementById('billContainer');
+
+    monthSel.value = "0"; // January default
+
+    // Toggle export dropdown
+    exportBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportOptions.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+        exportOptions.classList.remove('show');
+    });
+
+    exportOptions.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // ---------- number to words (Indian style) ----------
+    function numberToWordsIndian(num) {
+        if (num === 0) return "Zero";
+        const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+        const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+        const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+        
+        function convertBelowThousand(n) {
+            if (n === 0) return "";
+            let str = "";
+            if (n >= 100) {
+                str += ones[Math.floor(n / 100)] + " Hundred ";
+                n %= 100;
+            }
+            if (n >= 20) {
+                str += tens[Math.floor(n / 10)] + " ";
+                n %= 10;
+            } else if (n >= 10) {
+                str += teens[n - 10] + " ";
+                n = 0;
+            }
+            if (n > 0) {
+                str += ones[n] + " ";
+            }
+            return str.trim();
+        }
+
+        let words = "";
+        if (num >= 1000) {
+            const thousands = Math.floor(num / 1000);
+            words += convertBelowThousand(thousands) + " Thousand ";
+            num %= 1000;
+        }
+        if (num > 0) {
+            words += convertBelowThousand(num);
+        }
+        return words.trim() + " only";
+    }
+
+    // ---------- get allowed dates (all working days: Mon-Fri + 4th Saturday) ----------
+    function getAllowedDates(monthIndex, year) {
+        const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+        const saturdays = [];
+        for (let d = 1; d <= lastDay; d++) {
+            const dow = new Date(year, monthIndex, d).getDay();
+            if (dow === 6) saturdays.push(d);
+        }
+        let fourthSat = null;
+        if (saturdays.length >= 4) fourthSat = saturdays[3];
+
+        const allowed = [];
+        for (let d = 1; d <= lastDay; d++) {
+            const dow = new Date(year, monthIndex, d).getDay();
+            if (dow === 0) continue;
+            if (dow === 6) {
+                if (fourthSat !== null && d === fourthSat) allowed.push(d);
+            } else {
+                allowed.push(d);
+            }
+        }
+        return allowed.sort((a,b) => a-b);
+    }
+
+    // ---------- generate all valid (b,t) pairs with 7≤b≤25, 7≤t≤25, |b-t|≤1 ----------
+    function getAllowedPairs(rB, rT) {
+        const pairs = [];
+        for (let b = 7; b <= 25; b++) {
+            for (let t = 7; t <= 25; t++) {
+                if (Math.abs(b - t) <= 1) {
+                    pairs.push({ b, t, cost: b * rB + t * rT });
+                }
+            }
+        }
+        return pairs;
+    }
+
+    // ---------- local search to achieve exact total ----------
+    function findSolution(N, targetTotal, pairs, maxAttempts = 6000) {
+        let current = [];
+        for (let i = 0; i < N; i++) {
+            const idx = Math.floor(Math.random() * pairs.length);
+            current.push({ ...pairs[idx] });
+        }
+        let currentTotal = current.reduce((sum, p) => sum + p.cost, 0);
+        let diff = targetTotal - currentTotal;
+
+        if (diff === 0) return current;
+
+        for (let restart = 0; restart < 5; restart++) {
+            for (let iter = 0; iter < maxAttempts; iter++) {
+                const dayIdx = Math.floor(Math.random() * N);
+                const oldPair = current[dayIdx];
+                let bestPair = null;
+                let bestDiff = Math.abs(diff);
+                const shuffled = [...pairs];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                for (const newPair of shuffled) {
+                    if (newPair.b === oldPair.b && newPair.t === oldPair.t) continue;
+                    const newDiff = targetTotal - (currentTotal - oldPair.cost + newPair.cost);
+                    if (newDiff === 0) {
+                        current[dayIdx] = { ...newPair };
+                        return current;
+                    }
+                    if (Math.abs(newDiff) < bestDiff) {
+                        bestDiff = Math.abs(newDiff);
+                        bestPair = newPair;
+                    }
+                }
+                if (bestPair) {
+                    currentTotal = currentTotal - oldPair.cost + bestPair.cost;
+                    diff = targetTotal - currentTotal;
+                    current[dayIdx] = { ...bestPair };
+                    if (diff === 0) return current;
+                }
+            }
+            current = [];
+            for (let i = 0; i < N; i++) {
+                const idx = Math.floor(Math.random() * pairs.length);
+                current.push({ ...pairs[idx] });
+            }
+            currentTotal = current.reduce((sum, p) => sum + p.cost, 0);
+            diff = targetTotal - currentTotal;
+            if (diff === 0) return current;
+        }
+        return null;
+    }
+
+    // ---------- get current bill HTML content (without outer controls) ----------
+    function generateBillHTML() {
+        const monthIndex = parseInt(monthSel.value);
+        const year = parseInt(yearInp.value) || 2026;
+        const rBiscuit = parseFloat(biscuitRateInp.value) || 5;
+        const rTea = parseFloat(teaRateInp.value) || 5;
+        const total = parseFloat(totalAmountInp.value) || 0;
+
+        if (total < 700 || total > 5000) {
+            return `<div class="error-message">❌ Total amount must be between ₹700 and ₹5000.</div>`;
+        }
+
+        const allowedDates = getAllowedDates(monthIndex, year);
+        if (allowedDates.length === 0) {
+            return `<div class="error-message">❌ No working days in this month.</div>`;
+        }
+
+        const pairs = getAllowedPairs(rBiscuit, rTea);
+        const minCost = Math.min(...pairs.map(p => p.cost));
+        const maxCost = Math.max(...pairs.map(p => p.cost));
+        const N = allowedDates.length;
+        if (total < N * minCost || total > N * maxCost) {
+            return `<div class="error-message">❌ Total must be between ₹${N*minCost} and ₹${N*maxCost} for this month.</div>`;
+        }
+
+        const rows = findSolution(N, total, pairs);
+        if (!rows) {
+            return `<div class="error-message">❌ Could not find a combination. Try slightly different amount or rates.</div>`;
+        }
+
+        const yearShort = year.toString().slice(-2);
+        const today = new Date();
+        const formattedToday = `${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getDate().toString().padStart(2,'0')}/${today.getFullYear()}`;
+
+        let tableRows = '';
+        rows.forEach((row, idx) => {
+            const dateStr = `${allowedDates[idx]}/${monthIndex+1}/${yearShort}`;
+            tableRows += `<tr>
+                <td>${dateStr}</td>
+                <td>${row.b}</td><td>${rBiscuit}</td>
+                <td>${row.t}</td><td>${rTea}</td>
+                <td>₹${row.cost}</td>
+            </tr>`;
+        });
+
+        const totalWords = numberToWordsIndian(total);
+
+        return `
+            <div class="to-address">
+                <p><strong>To,</strong><br>The Prodhan<br>Bhagabanpur Gram Panchayat<br>Vill+P.O-Arbara, Chanchal, Malda</p>
+            </div>
+            <div class="date-right">Dated- ${formattedToday}</div>
+            <div class="salutation">Madam,</div>
+            <div class="request-note">Most respectfully I state that I supplied Tea & Biscuit at your GP office in your verbal order for the period below. Kindly pass my bill.</div>
+            
+            <table class="bill-table">
+                <thead>
+                    <tr><th rowspan="2">Date</th><th colspan="4">Description of Bill</th><th rowspan="2">Total (₹)</th></tr>
+                    <tr><th>Biscuit (Nos)</th><th>Rate</th><th>Tea (Cup)</th><th>Rate</th></tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="5" style="text-align:right; font-weight:800;">TOTAL:</td><td>₹${total}</td></tr>
+                </tfoot>
+            </table>
+
+            <div class="amount-words">Rupees ${totalWords}</div>
+
+            <div class="signature">
+                <div>Yours Sincerely</div>
+                <div>Signature</div>
+            </div>
+        `;
+    }
+
+    // ---------- render bill in container ----------
+    function renderBill() {
+        const billHTML = generateBillHTML();
+        billContainer.innerHTML = billHTML;
+    }
+
+    // ---------- export functions ----------
+    async function exportAsPDF() {
+        const billHTML = generateBillHTML();
+        if (billHTML.includes('error-message')) {
+            alert('Please fix the error before exporting.');
+            return;
+        }
+
+        // Create a wrapper with styles for PDF
+        const printWrapper = document.createElement('div');
+        printWrapper.style.width = '800px';
+        printWrapper.style.padding = '20px';
+        printWrapper.style.background = 'white';
+        printWrapper.style.fontFamily = 'Courier New, Courier, monospace';
+        printWrapper.innerHTML = billHTML;
+
+        // Apply print styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .bill-table { width: 100%; border-collapse: collapse; border: 3px solid #422006; font-size: 12px; }
+            .bill-table th { background: #b45309; color: white; padding: 6px 2px; border: 2px solid #2c1a0f; }
+            .bill-table td { border: 2px solid #422006; padding: 4px 2px; background: #ffffffd9; }
+            .bill-table tfoot td { background: #fde68a; font-weight: 800; }
+            .to-address { background: #fef3c7; padding: 10px; border-left: 8px solid #b45309; }
+            .amount-words { text-align: right; border-top: 3px double #b45309; padding-top: 8px; }
+            .signature { display: flex; justify-content: space-between; margin-top: 20px; }
+            .signature div:last-child { border-top: 2px dashed #422006; min-width: 160px; text-align: center; }
+        `;
+        printWrapper.appendChild(style);
+
+        document.body.appendChild(printWrapper);
+
+        try {
+            const canvas = await html2canvas(printWrapper, {
+                scale: 2,
+                backgroundColor: '#ffffff'
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'px',
+                format: [canvas.width * 0.75, canvas.height * 0.75]
+            });
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width * 0.75, canvas.height * 0.75);
+            pdf.save(`tea_bill_${new Date().getTime()}.pdf`);
+        } catch (error) {
+            console.error('PDF export error:', error);
+            alert('Error generating PDF. Please try again.');
+        }
+
+        document.body.removeChild(printWrapper);
+    }
+
+    function exportAsWord() {
+        const billHTML = generateBillHTML();
+        if (billHTML.includes('error-message')) {
+            alert('Please fix the error before exporting.');
+            return;
+        }
+
+        const fullHTML = `
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Tea Shop Bill</title>
+                <style>
+                    body { font-family: 'Courier New', Courier, monospace; padding: 30px; max-width: 800px; margin: 0 auto; }
+                    .bill-table { width: 100%; border-collapse: collapse; border: 3px solid #422006; font-size: 12px; }
+                    .bill-table th { background: #b45309; color: white; padding: 6px 2px; border: 2px solid #2c1a0f; }
+                    .bill-table td { border: 2px solid #422006; padding: 4px 2px; background: #ffffff; }
+                    .bill-table tfoot td { background: #fde68a; font-weight: 800; }
+                    .to-address { background: #fef3c7; padding: 10px; border-left: 8px solid #b45309; margin-bottom: 15px; }
+                    .date-right { text-align: right; font-weight: 600; margin: 10px 0; }
+                    .salutation { font-size: 16px; margin: 10px 0; font-style: italic; }
+                    .amount-words { text-align: right; border-top: 3px double #b45309; padding-top: 8px; font-weight: 600; }
+                    .signature { display: flex; justify-content: space-between; margin-top: 30px; }
+                    .signature div:last-child { border-top: 2px dashed #422006; min-width: 160px; text-align: center; padding-top: 4px; }
+                </style>
+            </head>
+            <body>
+                ${billHTML}
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob([fullHTML], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tea_bill_${new Date().getTime()}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function exportAsText() {
+        const billHTML = generateBillHTML();
+        if (billHTML.includes('error-message')) {
+            alert('Please fix the error before exporting.');
+            return;
+        }
+
+        // Parse HTML to extract text content
+        const temp = document.createElement('div');
+        temp.innerHTML = billHTML;
+        
+        // Extract text in a structured way
+        let textContent = '';
+        
+        // Get address
+        const address = temp.querySelector('.to-address');
+        if (address) textContent += address.textContent + '\n\n';
+        
+        // Get date
+        const date = temp.querySelector('.date-right');
+        if (date) textContent += date.textContent + '\n\n';
+        
+        // Get salutation and note
+        const salutation = temp.querySelector('.salutation');
+        const note = temp.querySelector('.request-note');
+        if (salutation) textContent += salutation.textContent + '\n';
+        if (note) textContent += note.textContent + '\n\n';
+        
+        // Get table data
+        const table = temp.querySelector('.bill-table');
+        if (table) {
+            const rows = table.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('th, td');
+                const rowText = Array.from(cells).map(cell => cell.textContent.trim()).join('\t');
+                textContent += rowText + '\n';
+            });
+        }
+        
+        // Get amount in words
+        const words = temp.querySelector('.amount-words');
+        if (words) textContent += '\n' + words.textContent + '\n\n';
+        
+        // Get signature
+        const signature = temp.querySelector('.signature');
+        if (signature) {
+            const sigParts = signature.querySelectorAll('div');
+            textContent += sigParts[0]?.textContent + '\n\n\n';
+            textContent += sigParts[1]?.textContent;
+        }
+
+        const blob = new Blob([textContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tea_bill_${new Date().getTime()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Export option handlers
+    document.querySelectorAll('.export-option').forEach(option => {
+        option.addEventListener('click', async (e) => {
+            const format = e.target.dataset.format;
+            exportOptions.classList.remove('show');
+            
+            switch(format) {
+                case 'pdf':
+                    await exportAsPDF();
+                    break;
+                case 'doc':
+                    exportAsWord();
+                    break;
+                case 'txt':
+                    exportAsText();
+                    break;
+            }
+        });
+    });
+
+    // Initial render
+    renderBill();
+
+    genBtn.addEventListener('click', renderBill);
+    printBtn.addEventListener('click', () => window.print());
+})();
+</script>
+</body>
+</html>

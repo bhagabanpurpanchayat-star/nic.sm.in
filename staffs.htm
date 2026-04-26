@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Member Details – View Only</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .glass-container {
+      width: 100%;
+      max-width: 1600px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s ease-in-out;
+    }
+    .refresh-btn:hover { background: rgba(0,123,255,0.2); }
+    .progress-wrapper {
+      flex-grow: 1;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .progress-bar {
+      flex-grow: 1;
+      height: 14px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        #ff5722 0%,
+        #ff9800 20%,
+        #ffeb3b 40%,
+        #ffffff 60%,
+        #ffeb3b 80%,
+        #ff9800 100%
+      );
+      background-size: 200% 100%;
+      animation: spark 0.5s linear infinite;
+    }
+    @keyframes spark {
+      from { background-position: 200% 0; }
+      to   { background-position: 0 0; }
+    }
+    .progress-text {
+      min-width: 50px;
+      font-size: 14px;
+      color: #333;
+      font-weight: 600;
+    }
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1200px;
+    }
+    th, td {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 14px 10px;
+      text-align: center;
+      vertical-align: middle;
+      color: #333;
+      font-size: 14px;
+    }
+    thead th {
+      background: #2c3e50;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.7); }
+  </style>
+</head>
+<body>
+
+<div class="glass-container">
+  <h2>Gram Panchayat Staffs</h2>
+
+  <div class="toolbar">
+    <div class="progress-wrapper">
+      <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+      <div class="progress-text">0%</div>
+    </div>
+    <button type="button" class="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+  </div>
+
+  <div class="table-container">
+    <table id="memberTable">
+      <thead>
+        <tr>
+          <th>SL No</th>
+          <th>SANSAD</th>
+          <th>Member Name</th>
+          <th>Guardian</th>
+          <th>Gender</th>
+          <th>PRI Rank</th>
+          <th>Local Address</th>
+          <th>Contact No</th>
+          <th>Photo</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const endpoint = "https://script.google.com/macros/s/AKfycbxoe-GnEQtyWpe6P6V85DgyG4XNjb9YhnQ7G_n23WBPgDJycRdUer9xXBvcB_lwAzuxgg/exec";
+
+  let progressInterval;
+  const allowedPRI = [
+    "Executive Assistant",
+    "Secretary",
+    "TA (NS In Charge)",
+    "Sahayak",
+    "GPK",
+    "GRS",
+    "VLE",
+    "Tax Collector",
+     "Casual",
+    "JS",
+    "HMO",
+    "DEO",
+    "TAX COLLECTOR"
+  ];
+
+  function startProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    let percent = 0;
+    wrapper.style.display = "flex";
+    fill.style.width = "0%";
+    text.textContent = "0%";
+
+    progressInterval = setInterval(() => {
+      percent += 2;
+      if (percent > 100) percent = 100;
+      fill.style.width = percent + "%";
+      text.textContent = percent + "%";
+      if (percent === 100) clearInterval(progressInterval);
+    }, 80);
+  }
+
+  function endProgress() {
+    const wrapper = document.querySelector(".progress-wrapper");
+    const fill = document.querySelector(".progress-bar-fill");
+    const text = document.querySelector(".progress-text");
+    clearInterval(progressInterval);
+    fill.style.width = "100%";
+    text.textContent = "100%";
+    setTimeout(() => { wrapper.style.display = "none"; }, 600);
+  }
+
+  async function refreshData() {
+    startProgress();
+    const res = await fetch(endpoint);
+    const records = await res.json();
+
+    const tbody = document.querySelector("#memberTable tbody");
+    tbody.innerHTML = "";
+
+    const filtered = records.filter(r => allowedPRI.includes(r["PRI RANK"]));
+
+    filtered.forEach((data, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${data["SANSAD"]||""}</td>
+        <td>${data["Member Name"]||""}</td>
+        <td>${data["Gurdian"]||""}</td>
+        <td>${data["GENDER"]||""}</td>
+        <td>${data["PRI RANK"]||""}</td>
+        <td>${data["Local Address"]||""}</td>
+        <td>${data["Contact No"]||""}</td>
+        <td>${data["Photo"] ? `<a href="${data["Photo"]}" target="_blank">View</a>` : ""}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    endProgress();
+  }
+
+  // Auto load on page open
+  window.addEventListener("load", () => refreshData());
+</script>
+</body>
+</html>
+
+
+

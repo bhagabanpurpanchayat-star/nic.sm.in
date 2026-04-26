@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GP Management Portal</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      margin: 0; 
+      font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; 
+      background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
+      overflow: hidden;
+    }
+    
+    @keyframes gradientFlow { 
+      0%{background-position:0% 50%;}
+      50%{background-position:100% 50%;}
+      100%{background-position:0% 50%;}
+    }
+    
+    :root {
+      --sidebar-bg: linear-gradient(270deg, #34495e, #2c3e50, #1d3557);
+      --sidebar-hover: linear-gradient(270deg, #5a6e7f, #3c5a70, #2c3e50);
+    }
+    
+    /* Sidebar - Compact, sharp text */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--sidebar-bg);
+      background-size: 300% 300%;
+      animation: gradientFlow 15s ease infinite;
+      color: #fff;
+      padding: 12px 0 16px 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.4);
+      z-index: 1000;
+      scrollbar-width: thin;
+      scrollbar-color: #888 #333;
+      font-size: 13px;
+    }
+    
+    .sidebar::-webkit-scrollbar { width: 5px; }
+    .sidebar::-webkit-scrollbar-track { background: #333; }
+    .sidebar::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+    
+    /* Raised 3D Button Effect - Compact size, sharp text */
+    .sidebar a {
+      display: block;
+      padding: 8px 14px;
+      margin: 3px 10px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(0,0,0,0.3));
+      border-radius: 8px;
+      color: #ecf0f1;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      box-shadow: 0 3px 4px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.15);
+      transition: all 0.2s ease;
+      position: relative;
+      top: 0;
+      font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    }
+    
+    .sidebar a:hover {
+      background: var(--sidebar-hover);
+      background-size: 200% 200%;
+      animation: gradientFlow 8s ease infinite;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+    }
+    
+    .sidebar a:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.1);
+    }
+    
+    /* Submenu styling - Compact */
+    .submenu {
+      margin-left: 16px;
+      border-left: 2px solid rgba(255,255,255,0.2);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-in-out;
+      opacity: 0;
+    }
+    
+    .submenu a {
+      font-size: 11.5px;
+      padding: 6px 12px;
+      margin: 2px 8px 2px 18px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(0,0,0,0.25));
+      border-radius: 6px;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255,255,255,0.08);
+      letter-spacing: 0.1px;
+    }
+    
+    .submenu a:hover {
+      transform: translateX(4px) translateY(-1px);
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.12);
+    }
+    
+    .submenu a:active {
+      transform: translateX(4px) translateY(1px);
+    }
+    
+    .submenu.open { 
+      max-height: 2000px;
+      opacity: 1; 
+    }
+    
+    /* Main content area - Matching background */
+    .content {
+      margin-left: 260px;
+      padding: 0;
+      height: 100vh;
+      background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
+      overflow: hidden;
+    }
+    
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: linear-gradient(145deg, #EFF2F7 0%, #E8EDF4 100%);
+      display: block;
+    }
+    
+    /* Theme dropdown in sidebar footer - Compact */
+    .sidebar-footer {
+      padding: 14px 12px;
+      margin-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .theme-label {
+      color: #ecf0f1;
+      font-size: 11px;
+      margin-bottom: 6px;
+      display: block;
+      text-align: center;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    
+    .theme-options {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .theme-option {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.5);
+      transition: 0.2s;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+    }
+    
+    .theme-option:hover {
+      transform: scale(1.08);
+      border-color: #fff;
+      box-shadow: 0 0 6px rgba(255,255,255,0.5);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 230px; }
+      .content { margin-left: 230px; }
+      .sidebar a { font-size: 11.5px; padding: 7px 12px; }
+      .submenu a { font-size: 10.5px; padding: 5px 10px; }
+    }
+    
+    @media (max-width: 600px) {
+      .sidebar { width: 200px; }
+      .content { margin-left: 200px; }
+      .sidebar a { font-size: 11px; padding: 6px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar - Compact menu with raised buttons -->
+  <div class="sidebar">
+    <div>
+      <a onclick="loadPage('home')">🏠 Home</a>
+      
+      <!-- Basic Profile -->
+      <a onclick="toggleSubmenu('submenu-profile')">👤 Basic Profile ▾</a>
+      <div class="submenu" id="submenu-profile">
+        <a onclick="loadPage('allmember')">👥 PRI Profile</a>
+        <a onclick="loadPage('pollingstation')">🗳️ PS Profile</a>
+        <a onclick="loadPage('sansad')">🏛️ Sansad Profile</a>
+        <a onclick="loadPage('mouja')">🌍 Mouja Profile</a>
+        <a onclick="loadPage('village')">🏡 Village Profile</a>
+        <a onclick="loadPage('para')">🏘️ Para Profile</a>
+        <a onclick="loadPage('club')">🎯 Club Profile</a>
+        <a onclick="loadPage('masjid')">🕌 Masjid Profile</a>
+        <a onclick="loadPage('mandir')">🛕 Mandir Profile</a>
+        <a onclick="loadPage('tower')">📡 Tower Profile</a>
+        <a onclick="loadPage('pond')">🌊 Pond Profile</a>
+        <a onclick="loadPage('pschool')">📚 Primary Profile</a>
+        <a onclick="loadPage('hschool')">🏫 H.School Profile</a>
+      </div>
+      
+      <!-- Action Plan -->
+      <a onclick="loadPage('plan')">🗂 Action Plan Entry</a>
+      
+      <!-- Tender Management -->
+      <a onclick="toggleSubmenu('submenu-tender')">📑 Tender Management ▾</a>
+      <div class="submenu" id="submenu-tender">
+        <a onclick="loadPage('vendorentry')">🧑‍🤝‍🧑 Vendor Entry</a>
+        <a onclick="loadPage('nit')">📝 Prepare NIT</a>
+        <a onclick="loadPage('prnit')">🖨️ Print NIT</a>
+        <a onclick="loadPage('onlinenit')">💻 Print e-NIT</a>
+        <a onclick="loadPage('sale')">💰 Sale of Tender Form</a>
+        <a onclick="loadPage('prform')">🖨️ Print Tender Form</a>
+        <a onclick="loadPage('bidacceptreject')">📊 Vendor's Bid Entry</a>
+        <a onclick="loadPage('acceptance')">✔ EMD Payment Entry</a>
+        <a onclick="loadPage('workorder')">📜 Issue Work Order</a>
+        <a onclick="loadPage('prworkorder')">🧾 Print Work Order</a>
+        <a onclick="loadPage('aggrement')">📜 Print Agreement</a>
+        <a onclick="loadPage('application')">🧑‍🤝‍🧑 Prayer(EMD/SMD/Bill)</a>
+        <a onclick="loadPage('bill')">📊 Bill Payment & Deduction</a>
+        <a onclick="loadPage('security')">🔒 Security Money Return</a>
+        <a onclick="loadPage('nitsummary')">⭕ NIT SUMMARY</a>  
+      </div>
+      
+      <!-- Various Register -->
+      <a onclick="toggleSubmenu('submenu-register')">📚 Various Register ▾</a>
+      <div class="submenu" id="submenu-register">
+        <a onclick="loadPage('tfregister')">📘 Tender Form Register</a>
+        <a onclick="loadPage('emd')">💸 Earnest Money Register</a>
+        <a onclick="loadPage('screening')">🧾 Screening Register</a>
+        <a onclick="loadPage('cs')">📈 Comparative Statement</a>
+        <a onclick="loadPage('acs')">🗂️ ADV Comparative Statement</a>
+        <a onclick="loadPage('letteracceptance')">✅ Letter of Acceptance</a>
+        <a onclick="loadPage('variousreport')">📌 Various Report</a>
+      </div>
+    </div>
+    
+    <!-- Theme selector in sidebar footer - Compact -->
+    <div class="sidebar-footer">
+      <span class="theme-label">🎨 Theme</span>
+      <div class="theme-options">
+        <div class="theme-option" style="background:#1d3557;" onclick="setTheme('default')" title="Default Blue"></div>
+        <div class="theme-option" style="background:#2d6a4f;" onclick="setTheme('green')" title="Green"></div>
+        <div class="theme-option" style="background:#1e1e2f;" onclick="setTheme('dark')" title="Dark"></div>
+        <div class="theme-option" style="background:#5a626e;" onclick="setTheme('grey')" title="Grey"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area - Matching background gradient -->
+  <div class="content">
+    <iframe id="frameContent" src="home.htm"></iframe>
+  </div>
+
+  <script>
+    // Simple functions for menu and theme
+    function loadPage(page) {
+      document.getElementById("frameContent").src = page + ".htm";
+    }
+    
+    function toggleSubmenu(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("open");
+    }
+    
+    function setTheme(theme) {
+      if(theme === "default"){
+        document.documentElement.style.setProperty("--sidebar-bg", "linear-gradient(270deg,#34495e,#2c3e50,#1d3557)");
+        document.documentElement.style.setProperty("--sidebar-hover", "linear-gradient(270deg,#5a6e7f,#3c5a70,#2c3e50)");
+      }
+      if(theme === "green"){
+        document.documentElement.style.setProperty("--sidebar-bg", "linear-gradient(270deg,#2d6a4f,#1b4332,#081c15)");
+        document.documentElement.style.setProperty("--sidebar-hover", "linear-gradient(270deg,#40916c,#2d6a4f,#1b4332)");
+      }
+      if(theme === "dark"){
+        document.documentElement.style.setProperty("--sidebar-bg", "linear-gradient(270deg,#2a2a2a,#1a1a1a,#0a0a0a)");
+        document.documentElement.style.setProperty("--sidebar-hover", "linear-gradient(270deg,#444,#222,#111)");
+      }
+      if(theme === "grey"){
+        document.documentElement.style.setProperty("--sidebar-bg", "linear-gradient(270deg,#6c757d,#495057,#343a40)");
+        document.documentElement.style.setProperty("--sidebar-hover", "linear-gradient(270deg,#868e96,#6c757d,#495057)");
+      }
+    }
+    
+    // Expose functions globally
+    window.loadPage = loadPage;
+    window.toggleSubmenu = toggleSubmenu;
+    window.setTheme = setTheme;
+  </script>
+</body>
+</html>

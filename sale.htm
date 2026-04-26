@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sale of Tender Form - Vendor Assignment</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #2b2b2b; color: #eee; margin: 0; padding: 20px; }
+    h2 { color: #fff; display: inline-block; }
+    .toolbar { margin-bottom: 15px; display: flex; gap: 10px; justify-content: space-between; align-items: center; }
+    .toolbar input { padding: 6px; border-radius: 4px; border: 1px solid #555; width: 360px; font-size: 13px; }
+    .toolbar button { padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .toolbar button:hover { background: #218838; }
+    .spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: #333; }
+    th, td { border: 1px solid #555; padding: 6px; text-align: center; vertical-align: top; }
+    thead { background: #003366; color: #fff; position: sticky; top: 0; z-index: 2; }
+
+    /* Vendor Styling */
+    .vendor-list { max-height: 120px; overflow-y: auto; text-align: left; padding-right: 6px; }
+    .vendor-tag { display: block; background: green; color: #fff; font-weight: bold; border-radius: 4px; padding: 2px 6px; margin: 2px 0; font-size: 11px; text-align: left; }
+    .vendor-count { font-size: 11px; font-weight: bold; color: #ffd700; margin-bottom: 4px; display: block; }
+
+    /* Conditional formatting for work names in MODAL */
+    .work-name-highlight { 
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #000;
+      font-weight: bold;
+      padding: 3px 6px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: 2px solid #ff8c00;
+      font-size: 11px; /* Smaller font */
+    }
+    
+    .work-name-warning { 
+      background: linear-gradient(135deg, #ff6b6b, #ff4757);
+      color: #fff;
+      font-weight: bold;
+      padding: 3px 6px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: 2px solid #ff4757;
+      font-size: 11px; /* Smaller font */
+    }
+
+    /* Narrow Vendor column */
+    #dataTable th:nth-child(14),
+    #dataTable td:nth-child(14) {
+      width: 220px;
+      max-width: 220px;
+    }
+
+    #message { margin: 10px 0; padding: 8px; display: none; border-radius: 4px; font-size: 13px; text-align: center; }
+    #message.success { background: #28a745; color: #fff; }
+    #message.error { background: #dc3545; color: #fff; }
+    #message.loading { background: #007bff; color: #fff; }
+
+    button.action-btn { padding: 6px 14px; border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-save { background: green; }
+    .btn-update { background: orange; }
+    .btn-bulk { background: #6f42c1; }
+    .btn-export { background: #17a2b8; }
+
+    /* Extraction Progress Popup */
+    #progressPopup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+      background:rgba(0,0,0,0.3); z-index:9999; align-items:center; justify-content:center; }
+    #progressPopup div { background:#28a745; color:#fff; padding:20px 30px; border-radius:12px; 
+      box-shadow:0 2px 10px rgba(0,0,0,0.25); font-size:15px; font-weight:500; text-align:center; animation:popIn 0.3s ease; }
+    @keyframes popIn { from {transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
+    .blink { animation: blinkAnim 1s infinite; }
+    @keyframes blinkAnim { 50%{opacity:0.4;} }
+
+    /* Stamp top-right */
+    .stamp { position: absolute; top: 20px; right: 20px; background: #444; padding: 10px 14px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: bold; }
+
+    /* Bulk Vendor Assignment Modal - WIDER */
+    #bulkVendorModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; }
+    #bulkVendorModal .modal-box { background:#fff; color:#000; padding:18px; border-radius:10px; width:1100px; max-width:95%; max-height: 90vh; overflow-y: auto; }
+    #bulkVendorModal h3 { margin-top:0; color:#003366; text-align:center; }
+    .bulk-form-container { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-weight: bold; color: #003366; }
+    .form-group select { padding: 8px; border: 1px solid #888; border-radius: 4px; font-size: 13px; }
+    .form-group .hint { font-size: 11px; color: #666; }
+    
+    /* Two-column layout */
+    .two-column-layout {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .column-header {
+      font-weight: bold;
+      color: #003366;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    /* Vendor Assignment Table */
+    .vendor-assignment-table { width: 100%; border-collapse: collapse; }
+    .vendor-assignment-table th { background: #003366; color: white; padding: 8px; text-align: left; font-size: 12px; }
+    .vendor-assignment-table td { padding: 6px; border: 1px solid #ddd; font-size: 12px; }
+    .vendor-assignment-table input { width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 11px; }
+    .vendor-assignment-table tr:nth-child(even) { background: #f9f9f9; }
+    .vendor-assignment-table tr:hover { background: #f0f0f0; }
+    
+    /* Vendor Section */
+    .vendor-section { 
+      border: 1px solid #ddd; 
+      border-radius: 5px; 
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .vendor-section-header { 
+      background: #f8f9fa; 
+      padding: 10px; 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .vendor-section-header h4 { margin: 0; color: #003366; font-size: 14px; }
+    .vendor-section-content { 
+      padding: 10px; 
+      flex: 1;
+      overflow-y: auto;
+      max-height: 350px;
+    }
+    .vendor-section.collapsed .vendor-section-content { display: none; }
+    
+    /* Work Names Section */
+    .work-section { 
+      border: 1px solid #ddd; 
+      border-radius: 5px; 
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .work-section-header { 
+      background: #f8f9fa; 
+      padding: 10px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .work-section-header h4 { margin: 0; color: #003366; font-size: 14px; }
+    .work-section-content { 
+      padding: 10px; 
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .modal-footer { margin-top:14px; text-align:right; display:flex; justify-content:flex-end; gap:10px; }
+    .btn-cancel { background:#999; color:#fff; }
+    .btn-save-modal { background:#28a745; color:#fff; position:relative; min-width:90px; }
+    .btn-add-vendor { background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+    /* Confirmation modal */
+    #confirmModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:11000; align-items:center; justify-content:center; }
+    #confirmModal .confirm-box { background:#fff; color:#000; padding:20px; border-radius:10px; width:400px; text-align:center; }
+    #confirmModal h4 { margin-top:0; color:#003366; }
+    #confirmModal .buttons { margin-top:18px; display:flex; justify-content:space-around; }
+    #confirmModal .buttons button { padding:6px 14px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; }
+    #confirmYes { background:#28a745; color:#fff; }
+    #confirmNo { background:#dc3545; color:#fff; }
+
+    /* NIT Info Display */
+    .nit-info { background: #e9ecef; padding: 8px; border-radius: 4px; margin-top: 5px; font-size: 12px; color: #495057; }
+    .nit-info strong { color: #003366; }
+    
+    /* Scrollable work list - SMALLER FONTS */
+    .work-list-container {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      background: #fff;
+      font-size: 11px; /* Smaller font for work names */
+      max-height: 300px; /* Fixed height for scroll */
+    }
+    
+    .work-list { margin: 0; padding-left: 15px; }
+    .work-list li { 
+      margin: 3px 0; 
+      padding: 4px 6px;
+      border-radius: 3px;
+      font-size: 11px; /* Smaller font for work names */
+    }
+    
+    /* Custom scrollbar for work list */
+    .work-list-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .work-list-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    .work-list-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+    
+    .work-list-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Vendor count badges - SMALLER */
+    .vendor-count-badge {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      border-radius: 10px;
+      padding: 1px 6px;
+      font-size: 9px; /* Smaller font */
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    .vendor-count-high {
+      background: #ffc107;
+      color: #000;
+    }
+    .vendor-count-very-high {
+      background: #dc3545;
+      color: white;
+    }
+    
+    /* Assignment stats */
+    .assignment-stats {
+      background: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+      margin-top: 8px;
+      padding-top: 8px;
+      font-size: 11px; /* Smaller font */
+    }
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    
+    /* Vendor details in work names - SMALLER */
+    .vendor-details {
+      font-size: 10px; /* Smaller font */
+      color: #666;
+      margin-left: 10px;
+      margin-top: 3px;
+    }
+    
+    /* Frozen header section */
+    .frozen-header {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 10px;
+    }
+    
+    /* Vendor Selection Modal (two-list UI) */
+    #vendorModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; }
+    #vendorModal .modal-box { background:#fff; color:#000; padding:18px; border-radius:10px; width:640px; max-width:95%; }
+    #vendorModal h3 { margin-top:0; color:#003366; text-align:center; }
+    .vendor-container { display:flex; gap:18px; align-items:center; justify-content:center; margin-top:10px; }
+    .vendor-column { flex:1; text-align:center; }
+    .vendor-column h4 { margin:6px 0; color:#003366; }
+    select.two-list { width:100%; height:260px; padding:6px; font-size:13px; border:1px solid #888; border-radius:6px; }
+    .move-buttons { display:flex; flex-direction:column; gap:10px; }
+    .move-buttons button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+    .btn-add { background:#007bff; color:#fff; }
+    .btn-remove { background:#dc3545; color:#fff; }
+    .modal-footer { margin-top:14px; text-align:right; display:flex; justify-content:flex-end; gap:10px; }
+    .modal-footer button { padding:6px 12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; }
+    .btn-cancel { background:#999; color:#fff; }
+    .btn-save-modal { background:#28a745; color:#fff; position:relative; min-width:90px; }
+  </style>
+</head>
+<body>
+  <h2>Sale of Tender Form</h2>
+  <div class="stamp" id="stampBox">Loading counts...</div>
+
+  <div id="message"></div>
+  <div id="progressPopup"><div><span id="progressMessage">Processing...</span></div></div>
+
+  <div class="toolbar">
+    <input id="searchInput" type="text" placeholder="🔍 Search..." oninput="filterTable()" />
+    <div style="display:flex; gap:8px;">
+      <button id="refreshBtn" onclick="refreshData()">⟳ Refresh</button>
+      <button id="clearSearchBtn" onclick="clearSearch()">✖ Clear</button>
+      <button id="exportBtn" class="btn-export action-btn" onclick="exportToExcel()">Export to Excel</button>
+      <button id="bulkAssignBtn" class="btn-bulk action-btn" onclick="openBulkVendorModal()">Bulk Vendor Assignment</button>
+    </div>
+  </div>
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Financial Year</th>
+        <th>UNIQUE NIT</th>
+        <th>NIT No</th>
+        <th>Date</th>
+        <th>Sl No.</th>
+        <th>Activity ID</th>
+        <th>Name of the work</th>
+        <th>Site details</th>
+        <th>Source of Fund</th>
+        <th>Tendered Amount (In Rs.)</th>
+        <th>Tender Form Price</th>
+        <th>Earnest Money</th>
+        <th>Vendors</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Vendor Selection Modal (two-list UI) -->
+  <div id="vendorModal">
+    <div class="modal-box">
+      <h3>Select Vendors</h3>
+      <div class="vendor-container">
+        <div class="vendor-column">
+          <h4>All Vendors</h4>
+          <select id="allVendors" class="two-list" multiple></select>
+        </div>
+
+        <div class="move-buttons">
+          <button id="btnMoveRight" class="btn-add" title="Add selected →">➡</button>
+          <button id="btnMoveLeft" class="btn-remove" title="Remove selected ←">⬅</button>
+        </div>
+
+        <div class="vendor-column">
+          <h4>Selected Vendor</h4>
+          <select id="selectedVendors" class="two-list" multiple></select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button onclick="closeVendorModal()" class="btn-cancel">Cancel</button>
+        <button id="saveVendorModalBtn" class="btn-save-modal">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Vendor Assignment Modal -->
+  <div id="bulkVendorModal">
+    <div class="modal-box">
+      <h3>Bulk Vendor Assignment</h3>
+      
+      <!-- Frozen Header Section -->
+      <div class="frozen-header">
+        <div class="form-group">
+          <label for="nitNoDropdown">Select NIT No</label>
+          <select id="nitNoDropdown">
+            <option value="">-- Select NIT No --</option>
+            <!-- NIT options will be populated dynamically -->
+          </select>
+          <div class="hint">Select the NIT No to assign vendors</div>
+        </div>
+
+        <div id="nitInfoContainer" class="nit-info" style="display: none;">
+          <!-- NIT information will be displayed here (without UNIQUE NIT) -->
+        </div>
+      </div>
+      
+      <!-- Two Column Layout -->
+      <div class="two-column-layout">
+        <!-- Left Column - Vendor Assignment -->
+        <div class="column">
+          <div class="column-header">Vendor Assignment</div>
+          <div class="vendor-section" id="vendorSection">
+            <div class="vendor-section-header" onclick="toggleVendorSection()">
+              <h4>Vendors</h4>
+              <span id="vendorSectionToggle">▼</span>
+            </div>
+            <div class="vendor-section-content">
+              <table class="vendor-assignment-table">
+                <thead>
+                  <tr>
+                    <th width="60%">Vendor</th>
+                    <th width="40%">SL Numbers</th>
+                  </tr>
+                </thead>
+                <tbody id="vendorAssignmentBody">
+                  <!-- Vendor rows will be populated dynamically -->
+                </tbody>
+              </table>
+              <div class="hint" style="margin-top: 10px;">Enter SL numbers for each vendor (comma-separated, e.g., 1,2,3)</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Column - Work Names -->
+        <div class="column">
+          <div class="column-header">Work Names with Vendor Assignments</div>
+          <div class="work-section">
+            <div class="work-section-header">
+              <h4>Work Details</h4>
+            </div>
+            <div class="work-section-content">
+              <div id="workNamesContainer" class="work-list-container">
+                <!-- Work names will be populated dynamically -->
+                <div style="text-align: center; padding: 20px; color: #666;">
+                  Select a NIT No and enter vendor assignments to see work details
+                </div>
+              </div>
+              
+              <!-- Assignment Stats -->
+              <div id="assignmentStats" class="assignment-stats" style="display: none;">
+                <div class="stat-item">
+                  <strong>Total Vendors Assigned:</strong>
+                  <strong id="totalVendors">0</strong>
+                </div>
+                <div class="stat-item">
+                  <strong>Total Assignments:</strong>
+                  <strong id="totalAssignments">0</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button onclick="closeBulkVendorModal()" class="btn-cancel">Cancel</button>
+        <button id="saveBulkVendorBtn" class="btn-save-modal">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation modal -->
+  <div id="confirmModal">
+    <div class="confirm-box">
+      <h4>Confirm Save</h4>
+      <p id="confirmMessage">Are you sure you want to assign vendors to these SL numbers?</p>
+      <div class="buttons">
+        <button id="confirmYes">Yes</button>
+        <button id="confirmNo">No</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // KEEP current scriptURL as requested
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzlNPknY-dsU5wjAQNuxQlN71yM-3VlaRRspR8BUCS3ZwkhDIAnD4qt8QovHWNkLhs8/exec";
+
+    let tableData = [];      // full table rows from server
+    let filteredData = [];   // currently displayed (filtered) data
+    let vendorOptions = [];  // list of all vendors from server
+    let uniqueNITs = [];     // list of unique NIT numbers
+
+    // modal state
+    let modalRowIndex = null;
+    let modalTdVendor = null;
+    let modalActionBtn = null;
+
+    // chosen vendors (from modal) - used during confirmation
+    let modalChosenVendors = [];
+    let selectedNITNo = "";
+
+    function valueToString(v) { if(v===null||v===undefined) return ""; if(typeof v==="string") return v; if(typeof v==="number") return String(v); try{ return String(v); }catch{return "";} }
+
+    // --- Data loading / refresh ---
+    async function refreshData() {
+      const btn = document.getElementById("refreshBtn");
+      const oldHTML = btn.innerHTML;
+      btn.innerHTML = `<span class="spinner"></span> Refreshing...`;
+      btn.disabled = true;
+      showMessage("Refreshing data...", "loading");
+      try { await loadData(); showMessage("Data refreshed ✅", "success"); }
+      catch(err){ showMessage("Refresh failed: "+err.message,"error"); }
+      finally{ btn.innerHTML = oldHTML; btn.disabled=false; }
+    }
+
+    async function loadData() {
+      // fetch vendors and tender data in parallel
+      const [vRes, tRes] = await Promise.all([fetch(scriptURL + "?action=getVendors"), fetch(scriptURL + "?action=getTenderData")]);
+      vendorOptions = await vRes.json();
+      tableData = await tRes.json();
+      filteredData = [...tableData]; // Initialize filteredData with all data
+      renderTable(filteredData);
+      updateStamp(filteredData);
+      populateNITDropdown();
+    }
+
+    // --- Helpers ---
+    function formatTimestamp(raw){ if(!raw) return ""; let d=new Date(raw); if(!isNaN(d)) return d.toLocaleString("en-US",{hour12:false}); return raw; }
+    function formatDate(raw){ if(!raw) return ""; let d=new Date(raw); if(!isNaN(d)) return d.toLocaleDateString("en-GB"); return raw; }
+
+    function showPopup(msg, blink=false){ const el=document.getElementById("progressMessage"); el.innerText=msg; if(blink) el.classList.add("blink"); else el.classList.remove("blink"); document.getElementById("progressPopup").style.display="flex"; }
+    function hidePopup(){ document.getElementById("progressPopup").style.display="none"; }
+
+    function showMessage(text,type){ const msg=document.getElementById("message"); msg.textContent=text; msg.className=type; msg.style.display="block"; setTimeout(()=>{msg.style.display="none";},2200); }
+
+    // --- Table rendering ---
+    function renderTable(data){
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach((filteredRow, filteredIndex) => {
+        const tr = document.createElement("tr");
+
+        const timeStamp = formatTimestamp(filteredRow[0]);
+        const finYear = valueToString(filteredRow[1]);
+        const nitNo = valueToString(filteredRow[4]);
+        const nitDate = formatDate(filteredRow[5]);
+        const slNo = valueToString(filteredRow[6]);
+        const uniqueNIT = valueToString(filteredRow[7]);
+        const activityId = valueToString(filteredRow[8]);
+        const workName = valueToString(filteredRow[9]);
+        const siteDetails = valueToString(filteredRow[10]);
+        const fund = valueToString(filteredRow[11]);
+        const tenderAmt = valueToString(filteredRow[12]);
+        const formPrice = valueToString(filteredRow[13]);
+        const earnest = valueToString(filteredRow[14]);
+        const vendorsArr = valueToString(filteredRow[15]).split(",").map(s => s.trim()).filter(s => s);
+
+        // basic cells
+        [timeStamp, finYear, uniqueNIT, nitNo, nitDate, slNo, activityId, workName, siteDetails, fund, tenderAmt, formPrice, earnest].forEach(val => {
+          const td = document.createElement("td");
+          td.textContent = val;
+          tr.appendChild(td);
+        });
+
+        // vendor column
+        const tdVendor = document.createElement("td");
+        tdVendor.style.cursor = "pointer";
+        if (vendorsArr.length > 0) {
+          const container = document.createElement("div");
+          container.className = "vendor-list";
+
+          const count = document.createElement("span");
+          count.className = "vendor-count";
+          count.textContent = `Vendors: ${vendorsArr.length}`;
+          container.appendChild(count);
+
+          vendorsArr.forEach(v => {
+            const span = document.createElement("span");
+            span.className = "vendor-tag";
+            span.textContent = v;
+            container.appendChild(span);
+          });
+
+          tdVendor.appendChild(container);
+        } else {
+          // show hint and clickable area to open modal
+          const hint = document.createElement("div");
+          hint.style.color = "#ffd700";
+          hint.style.fontWeight = "700";
+          hint.textContent = "Click to add vendors";
+          tdVendor.appendChild(hint);
+        }
+        tr.appendChild(tdVendor);
+
+        // action column
+        const tdAction = document.createElement("td");
+        const btnAction = document.createElement("button");
+        btnAction.classList.add("action-btn");
+        if (vendorsArr.length === 0) {
+          btnAction.textContent = "Save";
+          btnAction.classList.add("btn-save");
+        } else {
+          btnAction.textContent = "Update";
+          btnAction.classList.add("btn-update");
+        }
+
+        // Store the original row index from tableData
+        const originalRowIndex = tableData.findIndex(row => 
+          valueToString(row[7]) === uniqueNIT && 
+          valueToString(row[6]) === slNo
+        );
+
+        // clicking either vendor cell or action button opens modal
+        tdVendor.onclick = () => openVendorModal(originalRowIndex, tdVendor, btnAction, vendorsArr);
+        btnAction.onclick = () => openVendorModal(originalRowIndex, tdVendor, btnAction, vendorsArr);
+
+        tdAction.appendChild(btnAction);
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- Excel Export Function ---
+    function exportToExcel() {
+      showPopup("Preparing Excel export...", true);
+      
+      try {
+        // Use filteredData instead of tableData for export
+        const dataToExport = filteredData.length > 0 ? filteredData : tableData;
+        
+        // Create a workbook
+        const wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Sale of Tender Form Data",
+          Subject: "Vendor Assignment Data",
+          Author: "Tender Management System",
+          CreatedDate: new Date()
+        };
+
+        // Prepare data for export
+        const exportData = dataToExport.map(row => {
+          const timeStamp = formatTimestamp(row[0]);
+          const finYear = valueToString(row[1]);
+          const uniqueNIT = valueToString(row[7]);
+          const nitNo = valueToString(row[4]);
+          const nitDate = formatDate(row[5]);
+          const slNo = valueToString(row[6]);
+          const activityId = valueToString(row[8]);
+          const workName = valueToString(row[9]);
+          const siteDetails = valueToString(row[10]);
+          const fund = valueToString(row[11]);
+          const tenderAmt = valueToString(row[12]);
+          const formPrice = valueToString(row[13]);
+          const earnest = valueToString(row[14]);
+          const vendors = valueToString(row[15]);
+
+          return {
+            "Timestamp": timeStamp,
+            "Financial Year": finYear,
+            "UNIQUE NIT": uniqueNIT,
+            "NIT No": nitNo,
+            "Date": nitDate,
+            "Sl No": slNo,
+            "Activity ID": activityId,
+            "Name of the work": workName,
+            "Site details": siteDetails,
+            "Source of Fund": fund,
+            "Tendered Amount (In Rs.)": tenderAmt,
+            "Tender Form Price": formPrice,
+            "Earnest Money": earnest,
+            "Vendors": vendors
+          };
+        });
+
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        
+        // Get the range of the worksheet
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        
+        // Apply dotted border style to all cells using cell styles
+        for(let R = range.s.r; R <= range.e.r; ++R) {
+          for(let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = {c:C, r:R};
+            const cell_ref = XLSX.utils.encode_cell(cell_address);
+            
+            if(!ws[cell_ref]) continue;
+            
+            // Initialize style object if it doesn't exist
+            if(!ws[cell_ref].s) ws[cell_ref].s = {};
+            
+            // Apply border style - using 'dashed' as 'dotted' might not be supported
+            ws[cell_ref].s.border = {
+              top: { style: 'dashed', color: { rgb: '000000' } },
+              left: { style: 'dashed', color: { rgb: '000000' } },
+              bottom: { style: 'dashed', color: { rgb: '000000' } },
+              right: { style: 'dashed', color: { rgb: '000000' } }
+            };
+            
+            // Apply basic styling
+            ws[cell_ref].s.font = { name: 'Arial', sz: 10 };
+            ws[cell_ref].s.alignment = { vertical: 'center', horizontal: 'left' };
+          }
+        }
+
+        // Style header row with solid borders for better visibility
+        if(range.s.r === 0) {
+          for(let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = {c:C, r:0};
+            const cell_ref = XLSX.utils.encode_cell(cell_address);
+            
+            if(!ws[cell_ref]) continue;
+            
+            if(!ws[cell_ref].s) ws[cell_ref].s = {};
+            ws[cell_ref].s.font = { name: 'Arial', sz: 11, bold: true, color: { rgb: 'FFFFFF' } };
+            ws[cell_ref].s.fill = { fgColor: { rgb: '003366' } };
+            ws[cell_ref].s.border = {
+              top: { style: 'thin', color: { rgb: '000000' } },
+              left: { style: 'thin', color: { rgb: '000000' } },
+              bottom: { style: 'thin', color: { rgb: '000000' } },
+              right: { style: 'thin', color: { rgb: '000000' } }
+            };
+            ws[cell_ref].s.alignment = { vertical: 'center', horizontal: 'center' };
+          }
+        }
+
+        // Alternative approach: Set border for the entire range
+        ws['!cols'] = [];
+        for(let i = 0; i <= range.e.c; i++) {
+          ws['!cols'].push({ width: 15 });
+        }
+
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Tender Data");
+
+        // Generate file and download
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([wbout], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        
+        // Create filename with timestamp and row count
+        const rowCount = dataToExport.length;
+        const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, '');
+        a.download = `Tender_Data_${timestamp}_${rowCount}_Rows.xlsx`;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        hidePopup();
+        showMessage(`Excel export completed! ${rowCount} rows exported ✅`, "success");
+      } catch (error) {
+        console.error("Export error:", error);
+        hidePopup();
+        showMessage("Export failed: " + error.message, "error");
+      }
+    }
+
+    // --- Individual Vendor Modal (two-list) logic ---
+    function openVendorModal(rowIndex, tdVendor, actionBtn, currentVendors) {
+      modalRowIndex = rowIndex;
+      modalTdVendor = tdVendor;
+      modalActionBtn = actionBtn;
+
+      // clear selects
+      const allBox = document.getElementById("allVendors");
+      const selBox = document.getElementById("selectedVendors");
+      allBox.innerHTML = "";
+      selBox.innerHTML = "";
+
+      // prepare selected set
+      const selSet = new Set((currentVendors || []).map(s => s.trim()));
+
+      // populate boxes
+      vendorOptions.forEach(v => {
+        const option = document.createElement("option");
+        option.value = v;
+        option.textContent = v;
+        if (selSet.has(v)) selBox.appendChild(option);
+        else allBox.appendChild(option);
+      });
+
+      // reset modal button label
+      const saveBtn = document.getElementById("saveVendorModalBtn");
+      saveBtn.innerHTML = "Save";
+      saveBtn.disabled = false;
+
+      // show modal
+      document.getElementById("vendorModal").style.display = "flex";
+    }
+
+    function closeVendorModal() {
+      document.getElementById("vendorModal").style.display = "none";
+      modalRowIndex = null; modalTdVendor = null; modalActionBtn = null; modalChosenVendors = [];
+    }
+
+    // move selected from left -> right
+    document.getElementById("btnMoveRight").onclick = () => {
+      const allBox = document.getElementById("allVendors");
+      const selBox = document.getElementById("selectedVendors");
+
+      Array.from(allBox.selectedOptions).forEach(opt => {
+        selBox.appendChild(opt);
+      });
+    };
+
+    // move selected from right -> left
+    document.getElementById("btnMoveLeft").onclick = () => {
+      const allBox = document.getElementById("allVendors");
+      const selBox = document.getElementById("selectedVendors");
+
+      Array.from(selBox.selectedOptions).forEach(opt => {
+        allBox.appendChild(opt);
+      });
+    };
+
+    // Save from modal (show confirm modal first)
+    document.getElementById("saveVendorModalBtn").onclick = () => {
+      const selBox = document.getElementById("selectedVendors");
+      modalChosenVendors = Array.from(selBox.options).map(o => o.value).map(s => s.trim()).filter(s => s);
+
+      if (modalChosenVendors.length < 3) {
+        alert("⚠ Please select at least 3 vendors.");
+        return;
+      }
+
+      // show confirmation modal
+      document.getElementById("confirmModal").style.display = "flex";
+      document.getElementById("confirmMessage").innerHTML = 
+        `Are you sure you want to assign <strong>${modalChosenVendors.length} vendors</strong> to this row?<br><br>
+        <strong>Vendors:</strong> ${modalChosenVendors.join(', ')}`;
+    };
+
+    // --- Save vendors to server (POST to Google Apps Script) ---
+    async function saveVendors(rowIndex, vendors, btn, tdVendor) {
+      try {
+        showPopup("Saving...", true);
+        const formData = new FormData();
+        formData.append("action", "updateVendors");
+        formData.append("rowIndex", rowIndex);
+        formData.append("vendors", vendors.join(", "));
+
+        console.log("Saving row:", rowIndex, "Vendors:", vendors);
+
+        const res = await fetch(scriptURL, { method: "POST", body: formData });
+        const result = await res.json();
+
+        console.log("Save response:", result);
+
+        if (result && result.success) {
+          // Update internal tableData so UI stays consistent
+          if (tableData[rowIndex]) tableData[rowIndex][15] = vendors.join(", ");
+
+          // update the tdVendor to show saved tags (if tdVendor provided)
+          if (tdVendor) {
+            tdVendor.innerHTML = "";
+            const container = document.createElement("div");
+            container.className = "vendor-list";
+
+            const count = document.createElement("span");
+            count.className = "vendor-count";
+            count.textContent = `Vendors: ${vendors.length}`;
+            container.appendChild(count);
+
+            vendors.forEach(v => {
+              const span = document.createElement("span");
+              span.className = "vendor-tag";
+              span.textContent = v;
+              container.appendChild(span);
+            });
+            tdVendor.appendChild(container);
+          }
+
+          updateStamp(filteredData);
+          showPopup("Done ✅");
+          setTimeout(() => hidePopup(), 1200);
+          showMessage("Vendors saved & extracted ✅", "success");
+          return true;
+        } else {
+          console.error("Save failed:", result);
+          showMessage("Save failed: " + (result.error || "Unknown error"), "error");
+          return false;
+        }
+      } catch (err) {
+        console.error("Save error:", err);
+        showMessage("Error: " + err.message, "error");
+        return false;
+      }
+    }
+
+    // --- Populate NIT dropdown ---
+    function populateNITDropdown() {
+      const dropdown = document.getElementById("nitNoDropdown");
+      dropdown.innerHTML = '<option value="">-- Select NIT No --</option>';
+      
+      // Get unique NIT numbers
+      const nitSet = new Set();
+      tableData.forEach(row => {
+        const nitNo = valueToString(row[4]).trim();
+        if (nitNo) nitSet.add(nitNo);
+      });
+      
+      uniqueNITs = Array.from(nitSet).sort();
+      
+      uniqueNITs.forEach(nit => {
+        const option = document.createElement("option");
+        option.value = nit;
+        option.textContent = nit;
+        dropdown.appendChild(option);
+      });
+    }
+
+    // --- Bulk Vendor Assignment Modal ---
+    function openBulkVendorModal() {
+      document.getElementById("bulkVendorModal").style.display = "flex";
+      document.getElementById("nitNoDropdown").value = "";
+      document.getElementById("nitInfoContainer").style.display = "none";
+      selectedNITNo = "";
+      
+      // Populate vendor assignment table with just a few vendors initially
+      populateVendorAssignmentTable(5); // Show only 5 vendors initially
+      
+      // Reset work names section
+      document.getElementById("workNamesContainer").innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #666;">
+          Select a NIT No and enter vendor assignments to see work details
+        </div>
+      `;
+      document.getElementById("assignmentStats").style.display = "none";
+      
+      const saveBtn = document.getElementById("saveBulkVendorBtn");
+      saveBtn.innerHTML = "Save";
+      saveBtn.disabled = false;
+    }
+
+    function closeBulkVendorModal() {
+      document.getElementById("bulkVendorModal").style.display = "none";
+    }
+
+    // Toggle vendor section collapse/expand
+    function toggleVendorSection() {
+      const section = document.getElementById("vendorSection");
+      const toggle = document.getElementById("vendorSectionToggle");
+      
+      section.classList.toggle('collapsed');
+      toggle.textContent = section.classList.contains('collapsed') ? '►' : '▼';
+    }
+
+    // Populate vendor assignment table with limited vendors
+    function populateVendorAssignmentTable(limit = null) {
+      const tbody = document.getElementById("vendorAssignmentBody");
+      tbody.innerHTML = "";
+      
+      // Determine how many vendors to show
+      const vendorsToShow = limit ? vendorOptions.slice(0, limit) : vendorOptions;
+      
+      // Create rows for vendors
+      vendorsToShow.forEach(vendor => {
+        const tr = document.createElement("tr");
+        
+        // Vendor name cell
+        const tdVendor = document.createElement("td");
+        tdVendor.textContent = vendor;
+        tr.appendChild(tdVendor);
+        
+        // SL numbers input cell
+        const tdSl = document.createElement("td");
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "e.g., 1,2,3";
+        input.dataset.vendor = vendor;
+        input.addEventListener('input', updateWorkNameFormatting);
+        tdSl.appendChild(input);
+        tr.appendChild(tdSl);
+        
+        tbody.appendChild(tr);
+      });
+      
+      // Add "Add More Vendors" button if we're limiting the display
+      if (limit && vendorOptions.length > limit) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 2;
+        td.style.textAlign = "center";
+        td.style.padding = "10px";
+        
+        const addButton = document.createElement("button");
+        addButton.type = "button";
+        addButton.className = "btn-add-vendor";
+        addButton.textContent = `Show All ${vendorOptions.length} Vendors`;
+        addButton.onclick = () => populateVendorAssignmentTable(); // Show all vendors
+        
+        td.appendChild(addButton);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Update work name formatting with conditional styling
+    function updateWorkNameFormatting() {
+      if (!selectedNITNo) return;
+      
+      const vendorAssignments = getVendorAssignments();
+      const nitRows = tableData.filter(row => valueToString(row[4]).trim() === selectedNITNo);
+      
+      // Calculate vendor counts per work name
+      const workVendorCounts = {};
+      const workVendorDetails = {};
+      const workSLDetails = {};
+      
+      // Initialize counts
+      nitRows.forEach(row => {
+        const workName = valueToString(row[9]);
+        workVendorCounts[workName] = 0;
+        workVendorDetails[workName] = new Set();
+        workSLDetails[workName] = new Set();
+      });
+      
+      // Count vendors from current assignments
+      Object.keys(vendorAssignments).forEach(vendor => {
+        const slNumbers = vendorAssignments[vendor];
+        
+        slNumbers.forEach(slNo => {
+          const row = nitRows.find(row => valueToString(row[6]).trim() === slNo);
+          if (row) {
+            const workName = valueToString(row[9]);
+            workVendorCounts[workName]++;
+            workVendorDetails[workName].add(vendor);
+            workSLDetails[workName].add(slNo);
+          }
+        });
+      });
+      
+      // Update the work names display
+      const workNamesContainer = document.getElementById("workNamesContainer");
+      const assignmentStats = document.getElementById("assignmentStats");
+      
+      if (Object.keys(vendorAssignments).length > 0) {
+        // Format work names with conditional formatting
+        const workListHTML = Object.keys(workVendorCounts).length > 0 
+          ? `<ul class="work-list">${Object.keys(workVendorCounts).map(workName => {
+              const vendorCount = workVendorCounts[workName];
+              const vendors = Array.from(workVendorDetails[workName]);
+              const slNumbers = Array.from(workSLDetails[workName]);
+              
+              let workClass = '';
+              if (vendorCount >= 5) workClass = 'work-name-warning';
+              else if (vendorCount >= 3) workClass = 'work-name-highlight';
+              
+              let badgeClass = '';
+              if (vendorCount >= 5) badgeClass = 'vendor-count-very-high';
+              else if (vendorCount >= 3) badgeClass = 'vendor-count-high';
+              
+              let vendorDetails = '';
+              if (vendorCount >= 3) {
+                vendorDetails = `<div class="vendor-details">
+                  <strong>Vendors:</strong> ${vendors.join(', ')}<br>
+                  <strong>SL Numbers:</strong> ${slNumbers.join(', ')}
+                </div>`;
+              }
+              
+              return `<li class="${workClass}">${workName} <span class="vendor-count-badge ${badgeClass}">${vendorCount} vendors</span>${vendorDetails}</li>`;
+            }).join('')}</ul>` 
+          : "No work names available";
+        
+        // Calculate totals
+        const totalVendors = Object.keys(vendorAssignments).length;
+        const totalAssignments = Object.values(vendorAssignments).reduce((sum, slNos) => sum + slNos.length, 0);
+        
+        workNamesContainer.innerHTML = workListHTML;
+        
+        // Update assignment stats
+        document.getElementById("totalVendors").textContent = totalVendors;
+        document.getElementById("totalAssignments").textContent = totalAssignments;
+        assignmentStats.style.display = 'block';
+      } else {
+        workNamesContainer.innerHTML = `
+          <div style="text-align: center; padding: 20px; color: #666;">
+            Enter SL numbers for vendors to see work assignments
+          </div>
+        `;
+        assignmentStats.style.display = 'none';
+      }
+    }
+
+    // NIT No selection change handler
+    document.getElementById("nitNoDropdown").addEventListener('change', function() {
+      selectedNITNo = this.value;
+      const infoContainer = document.getElementById("nitInfoContainer");
+      const workNamesContainer = document.getElementById("workNamesContainer");
+      const assignmentStats = document.getElementById("assignmentStats");
+      
+      if (selectedNITNo) {
+        // Find all rows with this NIT No to display info
+        const nitRows = tableData.filter(row => valueToString(row[4]).trim() === selectedNITNo);
+        const workNames = [...new Set(nitRows.map(row => valueToString(row[9])))].filter(name => name);
+        const slNumbers = nitRows.map(row => valueToString(row[6])).filter(sl => sl);
+        
+        // Update NIT info (without UNIQUE NIT)
+        infoContainer.innerHTML = `
+          <div><strong>Total Schemes:</strong> ${nitRows.length}</div>
+          <div><strong>Available SL Numbers:</strong> ${slNumbers.join(', ')}</div>
+        `;
+        infoContainer.style.display = 'block';
+        
+        // Update work names section
+        if (workNames.length > 0) {
+          const workListHTML = `<ul class="work-list">${workNames.map(work => `<li>${work}</li>`).join('')}</ul>`;
+          workNamesContainer.innerHTML = workListHTML;
+        } else {
+          workNamesContainer.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: #666;">
+              No work names available for this NIT
+            </div>
+          `;
+        }
+        
+        assignmentStats.style.display = 'none';
+      } else {
+        infoContainer.style.display = 'none';
+        workNamesContainer.innerHTML = `
+          <div style="text-align: center; padding: 20px; color: #666;">
+            Select a NIT No and enter vendor assignments to see work details
+          </div>
+        `;
+        assignmentStats.style.display = 'none';
+      }
+    });
+
+    // Get vendor assignments from the table
+    function getVendorAssignments() {
+      const assignments = {};
+      const inputs = document.querySelectorAll('#vendorAssignmentBody input');
+      
+      inputs.forEach(input => {
+        const vendor = input.dataset.vendor;
+        const slNumbers = input.value.trim();
+        
+        if (slNumbers && vendor) {
+          assignments[vendor] = slNumbers.split(',').map(s => s.trim()).filter(s => s);
+        }
+      });
+      
+      return assignments;
+    }
+
+    // Save from bulk modal (show confirm modal first)
+    document.getElementById("saveBulkVendorBtn").onclick = () => {
+      if (!selectedNITNo) {
+        alert("⚠ Please select a NIT No first.");
+        return;
+      }
+      
+      const vendorAssignments = getVendorAssignments();
+      const vendorsWithAssignments = Object.keys(vendorAssignments);
+      
+      if (vendorsWithAssignments.length === 0) {
+        alert("⚠ Please enter SL numbers for at least one vendor.");
+        return;
+      }
+      
+      // Find all rows with this NIT No
+      const nitRows = tableData.filter(row => valueToString(row[4]).trim() === selectedNITNo);
+      
+      if (nitRows.length === 0) {
+        alert("⚠ No rows found with the selected NIT No.");
+        return;
+      }
+      
+      // Prepare data for saving
+      const rowsToUpdate = [];
+      const invalidSlNumbers = [];
+      
+      // For each vendor, find the rows with matching SL numbers
+      vendorsWithAssignments.forEach(vendor => {
+        const slNumbers = vendorAssignments[vendor];
+        
+        slNumbers.forEach(slNo => {
+          // Find the row with this NIT No and SL No
+          const rowIndex = tableData.findIndex(row => 
+            valueToString(row[4]).trim() === selectedNITNo && 
+            valueToString(row[6]).trim() === slNo
+          );
+          
+          if (rowIndex !== -1) {
+            rowsToUpdate.push({
+              rowIndex: rowIndex,
+              slNo: slNo,
+              vendor: vendor
+            });
+          } else {
+            invalidSlNumbers.push(slNo);
+          }
+        });
+      });
+      
+      if (invalidSlNumbers.length > 0) {
+        alert(`⚠ The following SL numbers were not found for NIT ${selectedNITNo}: ${invalidSlNumbers.join(', ')}`);
+      }
+      
+      if (rowsToUpdate.length === 0) {
+        alert("⚠ No valid rows found for the specified NIT No and SL numbers.");
+        return;
+      }
+      
+      // Group by row index to combine vendors
+      const groupedUpdates = {};
+      rowsToUpdate.forEach(update => {
+        if (!groupedUpdates[update.rowIndex]) {
+          groupedUpdates[update.rowIndex] = [];
+        }
+        groupedUpdates[update.rowIndex].push(update.vendor);
+      });
+      
+      // Convert to array format and ensure unique vendors per row
+      const finalUpdates = Object.keys(groupedUpdates).map(rowIndex => ({
+        rowIndex: parseInt(rowIndex),
+        vendors: [...new Set(groupedUpdates[rowIndex])] // Remove duplicates
+      }));
+      
+      console.log("Preparing to update rows:", finalUpdates);
+      
+      // Show confirmation with details
+      document.getElementById("confirmModal").style.display = "flex";
+      document.getElementById("confirmMessage").innerHTML = 
+        `Are you sure you want to assign vendors to <strong>${finalUpdates.length} rows</strong>?<br><br>
+        <strong>NIT No:</strong> ${selectedNITNo}<br>
+        <strong>Total assignments:</strong> ${rowsToUpdate.length}<br>
+        <strong>Vendors with assignments:</strong> ${vendorsWithAssignments.join(', ')}`;
+      
+      // Store data for confirmation
+      modalRowIndex = finalUpdates;
+    };
+
+    // --- Bulk Save vendors to server (POST to Google Apps Script) ---
+    async function bulkSaveVendors(updates) {
+      try {
+        showPopup("Saving bulk vendor assignments...", true);
+        
+        // Process each row to update sequentially to avoid race conditions
+        for (const update of updates) {
+          const formData = new FormData();
+          formData.append("action", "updateVendors");
+          formData.append("rowIndex", update.rowIndex);
+          formData.append("vendors", update.vendors.join(", "));
+
+          const res = await fetch(scriptURL, { 
+            method: "POST", 
+            body: formData 
+          });
+          
+          const result = await res.json();
+
+          if (!result || !result.success) {
+            console.error("Failed to save vendors for row", update.rowIndex, result);
+            showMessage(`Failed to save vendors for row ${update.rowIndex}`, "error");
+            return false;
+          }
+          
+          // Update internal tableData so UI stays consistent
+          if (tableData[update.rowIndex]) {
+            // Get existing vendors and merge with new ones
+            const existingVendors = valueToString(tableData[update.rowIndex][15])
+              .split(",")
+              .map(v => v.trim())
+              .filter(v => v);
+            
+            // Combine existing and new vendors, remove duplicates
+            const allVendors = [...new Set([...existingVendors, ...update.vendors])];
+            tableData[update.rowIndex][15] = allVendors.join(", ");
+          }
+          
+          // Small delay to prevent overwhelming the server
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        updateStamp(filteredData);
+        showPopup("Done ✅");
+        setTimeout(() => hidePopup(), 1200);
+        showMessage(`Vendors assigned to ${updates.length} rows ✅`, "success");
+        
+        // Refresh the table to show all changes
+        renderTable(filteredData);
+        return true;
+      } catch (err) {
+        console.error("Bulk save error:", err);
+        showMessage("Error: " + err.message, "error");
+        return false;
+      }
+    }
+
+    // --- Search & utilities ---
+    function updateStamp(data) {
+      const nitNos = data.map(r => valueToString(r[4])).filter(v => v);
+      const totalSchemes = nitNos.length;
+      const uniqueNITs = new Set(nitNos).size;
+      document.getElementById("stampBox").textContent = `Total NITs: ${uniqueNITs} | Total Schemes: ${totalSchemes}`;
+    }
+
+    function filterTable() {
+      const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+      if (!q) { 
+        filteredData = [...tableData]; 
+        renderTable(filteredData); 
+        updateStamp(filteredData); 
+        return; 
+      }
+      
+      filteredData = tableData.filter(row => {
+        const nitNo = valueToString(row[4]).toLowerCase(),
+          date = formatDate(row[5]).toLowerCase(),
+          slNo = valueToString(row[6]).toLowerCase(),
+          activityId = valueToString(row[8]).toLowerCase(),
+          workName = valueToString(row[9]).toLowerCase(),
+          siteDetails = valueToString(row[10]).toLowerCase(),
+          fund = valueToString(row[11]).toLowerCase(),
+          uniqueNIT = valueToString(row[7]).toLowerCase();
+        return (uniqueNIT.includes(q) || nitNo.includes(q) || date.includes(q) ||
+          activityId.includes(q) || workName.includes(q) ||
+          siteDetails.includes(q) || fund.includes(q));
+      });
+      renderTable(filteredData);
+      updateStamp(filteredData);
+    }
+
+    function clearSearch() { 
+      document.getElementById("searchInput").value = ""; 
+      filteredData = [...tableData];
+      renderTable(filteredData); 
+      updateStamp(filteredData); 
+    }
+
+    // Confirm modal actions
+    document.getElementById("confirmYes").onclick = async () => {
+      // Check which type of save we're doing
+      if (Array.isArray(modalRowIndex)) {
+        // Bulk save
+        const saveBtn = document.getElementById("saveBulkVendorBtn");
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
+
+        // perform actual save to server
+        const success = await bulkSaveVendors(modalRowIndex);
+
+        if (success) {
+          saveBtn.innerHTML = `Saved ✅`;
+          // keep 'Saved' state briefly so user sees it inside modal
+          setTimeout(() => {
+            // close confirm modal and bulk modal
+            document.getElementById("confirmModal").style.display = "none";
+            closeBulkVendorModal();
+            
+            // Refresh the table to show updated vendor assignments
+            renderTable(filteredData);
+          }, 900);
+        } else {
+          saveBtn.innerHTML = `Save`;
+          saveBtn.disabled = false;
+          document.getElementById("confirmModal").style.display = "none";
+        }
+      } else {
+        // Individual save
+        const saveBtn = document.getElementById("saveVendorModalBtn");
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
+
+        // perform actual save to server
+        const success = await saveVendors(modalRowIndex, modalChosenVendors, modalActionBtn, modalTdVendor);
+
+        if (success) {
+          saveBtn.innerHTML = `Saved ✅`;
+          // keep 'Saved' state briefly so user sees it inside modal
+          setTimeout(() => {
+            // update modal's action button state in table
+            const btn = modalActionBtn;
+            if (btn) {
+              btn.textContent = "Update";
+              btn.classList.remove("btn-save");
+              btn.classList.add("btn-update");
+              btn.onclick = () => openVendorModal(modalRowIndex, modalTdVendor, btn, modalChosenVendors);
+            }
+
+            // close confirm modal and vendor modal
+            document.getElementById("confirmModal").style.display = "none";
+            closeVendorModal();
+          }, 900);
+        } else {
+          saveBtn.innerHTML = `Save`;
+          saveBtn.disabled = false;
+          document.getElementById("confirmModal").style.display = "none";
+        }
+      }
+    };
+
+    document.getElementById("confirmNo").onclick = () => {
+      document.getElementById("confirmModal").style.display = "none";
+    };
+
+    // initial load
+    loadData();
+  </script>
+  
+  <!-- Include SheetJS library for Excel export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>

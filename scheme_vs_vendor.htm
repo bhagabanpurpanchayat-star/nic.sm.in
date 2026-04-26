@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCHEME VS VENDOR · ACCEPTED ONLY</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      font-size: 11px;
+      line-height: 1.3;
+      background: #eef2f5;
+      padding: 15px;
+    }
+
+    .register-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    .screen-header {
+      padding: 15px 20px 12px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      background: white;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-section h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0a1c2f;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge-accepted {
+      background: #2e7d32;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 30px;
+    }
+
+    .sub-title {
+      font-size: 0.65rem;
+      color: #5a6e85;
+      margin-top: 4px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: white;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #1a2c3e;
+      border-color: #1a2c3e;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0f1e2c;
+    }
+
+    .btn-excel {
+      background: #1e6f3f;
+      border-color: #1e6f3f;
+      color: white;
+    }
+
+    .btn-excel:hover {
+      background: #155a34;
+    }
+
+    .info-panel {
+      background: #f8fafc;
+      margin: 12px 20px 0 20px;
+      padding: 8px 15px;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.7rem;
+      border-left: 3px solid #2e7d32;
+    }
+
+    .stats-badge {
+      background: #e9ecef;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-family: monospace;
+      font-size: 0.65rem;
+      font-weight: 500;
+    }
+
+    .table-wrapper {
+      padding: 15px 20px 20px 20px;
+      overflow-x: auto;
+    }
+
+    .earnest-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.7rem;
+      background: white;
+    }
+
+    .earnest-table th {
+      background: #000000;
+      color: white;
+      font-weight: 600;
+      padding: 8px 6px;
+      border: 1px solid #333;
+      text-align: left;
+      font-size: 0.7rem;
+    }
+
+    .earnest-table td {
+      padding: 6px;
+      border: 1px solid #e2e8f0;
+      color: #1e293b;
+      vertical-align: top;
+      font-size: 0.7rem;
+    }
+
+    .earnest-table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .loading-state, .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #5a6e85;
+      font-size: 0.75rem;
+      background: white;
+    }
+
+    .error-state {
+      color: #b91c1c;
+      background: #fef2f2;
+    }
+
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      z-index: 1000;
+      font-size: 11px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* ========== PRINT STYLES - SAME WINDOW, CONTENT ONLY ========== */
+    @media print {
+      .screen-header,
+      .action-buttons,
+      .btn,
+      .info-panel,
+      .sub-title,
+      .stats-badge,
+      button {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+
+      .register-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .table-wrapper {
+        padding: 0;
+        margin: 0;
+        overflow-x: visible;
+      }
+
+      .earnest-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8pt;
+        margin: 0;
+      }
+
+      .earnest-table th {
+        background: #000000 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        border: 1px solid #000;
+        padding: 5px 4px;
+        font-size: 7pt;
+      }
+
+      .earnest-table td {
+        border: 1px solid #000;
+        padding: 4px;
+        font-size: 7pt;
+        background: white;
+        color: black;
+      }
+
+      thead {
+        display: table-header-group;
+      }
+
+      tr {
+        page-break-inside: avoid;
+      }
+
+      @page {
+        size: landscape;
+        margin: 0.2in;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 10px;
+      }
+      .screen-header {
+        padding: 12px;
+      }
+      .table-wrapper {
+        padding: 10px;
+      }
+      .earnest-table th, .earnest-table td {
+        padding: 4px;
+        font-size: 0.65rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="register-container">
+  <div class="screen-header">
+    <div class="title-section">
+      <h1>
+        SCHEME VS VENDOR
+        <span class="badge-accepted">ACCEPTED ONLY</span>
+      </h1>
+      <div class="sub-title">Column 11 = "ACCEPTED" | Columns: 3, 4, 5, 6, 7, 8</div>
+    </div>
+    <div class="action-buttons">
+      <button class="btn" onclick="refreshData()">Refresh</button>
+      <button class="btn btn-excel" onclick="exportToExcel()">Export Excel</button>
+      <button class="btn btn-primary" onclick="printReport()">Print</button>
+    </div>
+  </div>
+
+  <div class="info-panel" id="infoPanel">
+    <div>Filter: Column 11 = "ACCEPTED" | Columns: 3, 4, 5, 6, 7, 8</div>
+    <div class="stats-badge" id="statsBadge">Loading...</div>
+  </div>
+
+  <div class="table-wrapper" id="tableContainer">
+    <div class="loading-state">Loading data...</div>
+  </div>
+</div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5IoDTq1hHfwUEYjaj4HO4OXpS2XfBcWem3xZWybMTR2F8nOwlaR4At1VSPGSSldpU/exec';
+
+const DESIRED_COLUMNS = [3, 4, 5, 6, 7, 8];
+const ACCEPTED_COLUMN_INDEX = 10;
+
+let filteredData = null;
+let acceptedCount = 0;
+let totalRows = 0;
+
+function showMessage(msg, type) {
+  const existing = document.querySelector('.toast-message');
+  if (existing) existing.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast-message';
+  toast.innerHTML = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function escapeHtml(str) {
+  if (str === undefined || str === null) return '';
+  return String(str).replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+function renderTable() {
+  const container = document.getElementById('tableContainer');
+  const statsSpan = document.getElementById('statsBadge');
+  
+  if (!filteredData || filteredData.length < 2) {
+    container.innerHTML = '<div class="empty-state">No accepted records found</div>';
+    if (statsSpan) statsSpan.innerHTML = `0 accepted / ${totalRows} total`;
+    return;
+  }
+  
+  const headers = filteredData[0];
+  const rows = filteredData.slice(1);
+  const colIndices = DESIRED_COLUMNS.map(col => col - 1);
+  
+  let html = '<table class="earnest-table">';
+  html += '<thead><tr>';
+  for (let i = 0; i < colIndices.length; i++) {
+    const idx = colIndices[i];
+    let headerText = (headers && headers[idx] !== undefined && headers[idx] !== null) ? headers[idx] : `Col ${DESIRED_COLUMNS[i]}`;
+    html += `<th>${escapeHtml(headerText)}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+  
+  for (let r = 0; r < rows.length; r++) {
+    html += '<tr>';
+    for (let c = 0; c < colIndices.length; c++) {
+      const idx = colIndices[c];
+      let val = (rows[r] && rows[r][idx] !== undefined && rows[r][idx] !== null) ? rows[r][idx] : '';
+      html += `<td>${escapeHtml(val)}</td>`;
+    }
+    html += '</tr>';
+  }
+  
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  
+  if (statsSpan) {
+    statsSpan.innerHTML = `${acceptedCount} accepted / ${totalRows} total`;
+  }
+}
+
+function generateExcelHTML() {
+  if (!filteredData || filteredData.length < 2) {
+    return '<html><body>No data</body></html>';
+  }
+  
+  const headers = filteredData[0];
+  const rows = filteredData.slice(1);
+  const colIndices = DESIRED_COLUMNS.map(col => col - 1);
+  
+  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Scheme Vs Vendor - Accepted Only</title>';
+  html += '<style>';
+  html += 'th { background: #000000; color: #ffffff; padding: 8px; border: 1px solid #000; }';
+  html += 'td { border: 1px solid #ccc; padding: 6px; }';
+  html += 'table { border-collapse: collapse; width: 100%; }';
+  html += '</style></head><body>';
+  html += '<h2>SCHEME VS VENDOR - ACCEPTED ONLY</h2>';
+  html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+  html += '<p>Total Records: ' + acceptedCount + '</p>';
+  html += '<table border="1" cellpadding="6" cellspacing="0">';
+  html += '<thead><tr>';
+  
+  for (let i = 0; i < colIndices.length; i++) {
+    const idx = colIndices[i];
+    let headerText = (headers && headers[idx] !== undefined && headers[idx] !== null) ? headers[idx] : `Col ${DESIRED_COLUMNS[i]}`;
+    html += '<th>' + escapeHtml(headerText) + '</th>';
+  }
+  html += '</tr></thead><tbody>';
+  
+  for (let r = 0; r < rows.length; r++) {
+    html += '<tr>';
+    for (let c = 0; c < colIndices.length; c++) {
+      const idx = colIndices[c];
+      let val = (rows[r] && rows[r][idx] !== undefined && rows[r][idx] !== null) ? rows[r][idx] : '';
+      html += '<td>' + escapeHtml(val) + '</td>';
+    }
+    html += '</tr>';
+  }
+  
+  html += '</tbody></table></body></html>';
+  return html;
+}
+
+function exportToExcel() {
+  if (!filteredData || filteredData.length < 2) {
+    showMessage('No data to export', 'error');
+    return;
+  }
+  
+  const html = generateExcelHTML();
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = 'Scheme_Vs_Vendor_Accepted_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.xls';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  showMessage('Excel export complete!', 'success');
+}
+
+function printReport() {
+  window.print();
+  showMessage('Print dialog opened', 'success');
+}
+
+async function loadData() {
+  const container = document.getElementById('tableContainer');
+  const statsSpan = document.getElementById('statsBadge');
+  
+  container.innerHTML = '<div class="loading-state">Loading data...</div>';
+  statsSpan.innerHTML = 'Loading...';
+  
+  try {
+    const response = await fetch(WEB_APP_URL);
+    const data = await response.json();
+    
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      container.innerHTML = '<div class="empty-state">No data found</div>';
+      statsSpan.innerHTML = 'No data';
+      return;
+    }
+    
+    const headers = data[0];
+    const rows = data.slice(1);
+    totalRows = rows.length;
+    
+    const acceptedRows = rows.filter(row => {
+      if (!row || row.length <= ACCEPTED_COLUMN_INDEX) return false;
+      const val = row[ACCEPTED_COLUMN_INDEX];
+      if (val === undefined || val === null) return false;
+      return String(val).trim() === "ACCEPTED";
+    });
+    
+    filteredData = [headers, ...acceptedRows];
+    acceptedCount = acceptedRows.length;
+    
+    if (acceptedCount === 0) {
+      container.innerHTML = '<div class="empty-state">No ACCEPTED entries found. Column 11 must contain "ACCEPTED"</div>';
+      statsSpan.innerHTML = `0 accepted / ${totalRows} total`;
+    } else {
+      renderTable();
+      showMessage(`Loaded ${acceptedCount} accepted records`, 'success');
+    }
+    
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = '<div class="empty-state error-state">Error: ' + error.message + '</div>';
+    statsSpan.innerHTML = 'Error';
+    showMessage('Failed to load data', 'error');
+  }
+}
+
+function refreshData() {
+  loadData();
+}
+
+window.onload = loadData;
+</script>
+</body>
+</html>

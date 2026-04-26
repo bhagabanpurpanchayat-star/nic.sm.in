@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhagabanpur GP · VRP / CF · pastel theme</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            /* gradient baby pink ↔ violet */
+            background: linear-gradient(145deg, #fdddf2 0%, #e5c5f0 70%, #d1b3e8 100%);
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            align-items: center;
+        }
+        .card {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 38px;
+            padding: 28px 32px;
+            box-shadow: 0 30px 40px -18px #b47bb7;
+            border: 1px solid #fad0f0;
+            position: relative;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #6f3775;
+            margin: 0 0 5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            text-shadow: 0 2px 5px #f8d5ff;
+        }
+        .badge {
+            background: #fce2f8;
+            padding: 5px 20px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #7d4985;
+            border: 1px solid #e2b0dd;
+        }
+        .dynamic-hint {
+            background: #fbdefa;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size:0.9rem;
+            display:inline-block;
+            margin-bottom:8px;
+            color: #62246b;
+            border: 1px solid #e1b3db;
+        }
+        /* Certificate type selector */
+        .type-selector {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            background: #fae4fc;
+            padding: 15px 25px;
+            border-radius: 60px;
+            border: 1px solid #e9bce5;
+            justify-content: center;
+        }
+        .type-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 30px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            background: #ffeefc;
+        }
+        .type-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #d47ad0;
+            cursor: pointer;
+        }
+        .type-option.active {
+            background: #c987db;
+            color: white;
+        }
+        .type-option.active input[type="radio"] {
+            accent-color: white;
+        }
+        /* TWO COLUMN LAYOUT FOR INPUTS */
+        .input-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 25px;
+            background: #fbe6fc;
+            border-radius: 50px;
+            padding: 28px 30px;
+            margin: 20px 0 15px;
+            border: 1px solid #eec2ea;
+        }
+        .col {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .control-group {
+            background: white;
+            border-radius: 28px;
+            padding: 16px 22px;
+            border: 1px solid #f0c4ea;
+            box-shadow: 0 6px 14px #f3cfed;
+        }
+        .control-group label {
+            font-weight: 700;
+            color: #992e93;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+        }
+        .month-check-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 12px;
+            max-height: 230px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .month-check-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #ffe7fd;
+            padding: 5px 15px 5px 10px;
+            border-radius: 40px;
+            border: 1px solid #df9ddb;
+            font-size: 0.95rem;
+        }
+        .month-check-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #b951b9;
+        }
+        .month-check-item input[type="number"] {
+            width: 58px;
+            padding: 5px 6px;
+            border-radius: 30px;
+            border: 1px solid #cc81c7;
+            text-align: center;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #daa1d9;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #9e419b;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 6px #f3c0ec;
+        }
+        .btn-primary, .generate-btn {
+            background: #c066c0;
+            border-color: #b154b1;
+            color: white;
+            box-shadow: 0 8px 14px -8px #be67be;
+        }
+        .btn-primary:hover, .generate-btn:hover {
+            background: #a548a5;
+        }
+        .btn:hover {
+            background: #ffe1fd;
+        }
+        .person-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 18px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 5px 0;
+        }
+        .person-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffe2fc;
+            padding: 6px 18px 6px 12px;
+            border-radius: 40px;
+            border: 1px solid #cf94cf;
+        }
+        .person-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #c55ac5;
+        }
+        .error-message {
+            color: #c2448b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+        .generate-row {
+            grid-column: span 2;
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 5px;
+        }
+        .big-generate {
+            background: #a74daa;
+            border: none;
+            padding: 16px 45px;
+            font-size: 1.3rem;
+            border-radius: 60px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: white;
+            box-shadow: 0 12px 20px -10px #b564b5;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid #eab3ea;
+        }
+        .big-generate:hover {
+            background: #8c3c8f;
+            transform: scale(1.02);
+        }
+        .preview-block {
+            border: 3px dashed #d68fd0;
+            border-radius: 32px;
+            padding: 8px;
+            background: #fff1fe;
+            margin: 20px 0 10px;
+            position: relative;
+            min-height: 300px;
+        }
+        .certificate {
+            background: white;
+            padding: 30px 35px;
+            border-radius: 24px;
+            font-family: 'Times New Roman', Times, serif;
+            border: 1px solid #e9c2e4;
+        }
+        .office {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Times New Roman', serif;
+            color: #5b2d60;
+        }
+        .address {
+            text-align: center;
+            border-bottom: 1px solid #b076b0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .date-line {
+            text-align: right;
+            font-size: 1.1rem;
+            font-family: 'Times New Roman', serif;
+            margin: 15px 0 10px;
+        }
+        .to-line {
+            font-family: 'Times New Roman', serif;
+        }
+        .subject {
+            font-weight: 700;
+            text-decoration: underline;
+            margin: 20px 0 8px;
+            font-size: 1.2rem;
+            font-family: 'Times New Roman', serif;
+            /* CENTER ALIGN SUBJECT */
+            text-align: center;
+        }
+        .salutation {
+            font-family: 'Times New Roman', serif;
+        }
+        .intro {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.05rem;
+            text-align: justify;
+            margin: 12px 0 20px;
+        }
+        /* TABLE TEXT CENTERING FIX: all th + td centered */
+        .cert-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ad6aad;
+            margin: 20px 0;
+            font-family: 'Times New Roman', serif;
+        }
+        .cert-table th {
+            background: #f7d5f5;
+            border: 1px solid #b158b1;
+            padding: 9px;
+            font-size: 1.05rem;
+            text-align: center;      /* center header text */
+            vertical-align: middle;
+        }
+        .cert-table td {
+            border: 1px solid #b158b1;
+            padding: 8px 12px;
+            text-align: center;       /* ⬅️ CENTER ALL TD TEXT (SL NO, NAME, DAYS) */
+            vertical-align: middle;
+        }
+        /* ensure name column also centered */
+        .cert-table td:nth-child(2) {
+            text-align: center;       /* name of VRP/CF centered */
+        }
+        .signature {
+            margin-top: 35px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1rem;
+        }
+        .footer-note {
+            color: #a150a1;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .print-export {
+            display: flex;
+            gap: 18px;
+        }
+        /* Modern spinner styles */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background: rgba(255, 240, 253, 0.9);
+            border-radius: 24px;
+            gap: 20px;
+        }
+        .modern-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #fad2f5;
+            border-top: 5px solid #c060c0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .spinner-text {
+            color: #a34ba3;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background: #fad2f5;
+            padding: 8px 24px;
+            border-radius: 40px;
+            box-shadow: 0 4px 10px #e7b3e3;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* print adjustment: keep centering */
+        @media print {
+            body { background: white; }
+            .card { box-shadow: none; background: white; backdrop-filter: none; }
+            .input-panel, .type-selector, .dynamic-hint, .badge, .print-export, .footer-note, .big-generate, h1 > *:not(.office) { display: none; }
+            .certificate { border: none; padding: 0.5in; }
+            .preview-block { border: none; padding: 0; margin:0; background: white; }
+            .cert-table td { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="app">
+    <h1>🏛️ Bhagabanpur Gram Panchayat 
+        <span class="badge">VRP / CF · pastel vibe</span>
+    </h1>
+
+    <!-- rolling months hint -->
+    <div class="dynamic-hint" v-if="eligibleMonthsList.length">
+        🗓️ Today: {{ today }} — last 12 months (auto billing cycle): from {{ eligibleMonthsList[0].display }} to {{ eligibleMonthsList[eligibleMonthsList.length-1].display }}
+    </div>
+
+    <!-- Certificate Type Selector - Only one at a time -->
+    <div class="type-selector">
+        <div class="type-option" :class="{ 'active': certType === 'vrp' }">
+            <input type="radio" id="typeVRP" value="vrp" v-model="certType">
+            <label for="typeVRP">👥 VRP Certificate (Village Resource Persons)</label>
+        </div>
+        <div class="type-option" :class="{ 'active': certType === 'cf' }">
+            <input type="radio" id="typeCF" value="cf" v-model="certType">
+            <label for="typeCF">👤 CF Certificate (Community Facilitators)</label>
+        </div>
+    </div>
+
+    <!-- TWO COLUMN INPUT SECTION (split) -->
+    <div class="input-panel">
+        <!-- LEFT COLUMN: months + days (auto‑rolling billing months) -->
+        <div class="col">
+            <div class="control-group">
+                <label>📅 1. Select billing month(s) & set working days (past 12 months)</label>
+                <div class="month-check-grid">
+                    <div v-for="(m, idx) in eligibleMonthsList" :key="idx" class="month-check-item">
+                        <input type="checkbox" :value="m.fullLabel" :id="'c_'+m.fullLabel" v-model="selectedMonths">
+                        <label :for="'c_'+m.fullLabel" style="margin:0;">{{ m.display }}</label>
+                        <input type="number" v-model.number="daysPerMonth[m.fullLabel]" min="1" max="31" 
+                               placeholder="days" v-if="selectedMonths.includes(m.fullLabel)">
+                    </div>
+                </div>
+                <div class="action-buttons" style="margin-top:12px;">
+                    <button class="btn" @click="selectAllEligible">All 12 months</button>
+                    <button class="btn" @click="deselectAllMonths">Clear</button>
+                    <span class="error-message" v-if="selectedMonths.length === 0">⚠️ at least one</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Dynamic persons list based on certificate type -->
+        <div class="col">
+            <div class="control-group">
+                <label>👥 2. Choose {{ certType === 'vrp' ? 'Village Resource Persons (VRP)' : 'Community Facilitators (CF)' }}</label>
+                <div class="person-grid">
+                    <div v-for="(person, idx) in currentPersonList" :key="idx" class="person-item">
+                        <input type="checkbox" :id="'p_'+certType+'_'+idx" :value="person.name" v-model="selectedPersons">
+                        <label :for="'p_'+certType+'_'+idx">{{ person.name }}</label>
+                    </div>
+                </div>
+                <div class="action-buttons" style="margin-top:12px;">
+                    <button class="btn" @click="selectAllPersons">All {{ certType === 'vrp' ? 'VRP' : 'CF' }}</button>
+                    <button class="btn" @click="deselectAllPersons">None</button>
+                    <span class="error-message" v-if="selectedPersons.length === 0">⚠️ select {{ certType === 'vrp' ? 'VRP' : 'CF' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- GENERATE BUTTON spanning both columns -->
+        <div class="generate-row">
+            <button class="big-generate" @click="generateCertificate">📄 GENERATE {{ certType === 'vrp' ? 'VRP' : 'CF' }} CERTIFICATE</button>
+        </div>
+    </div>
+
+    <!-- certificate preview area with spinner -->
+    <div class="preview-block" id="certificateContainer">
+        <!-- Modern Spinner shown while loading -->
+        <div v-if="isLoading" class="spinner-container">
+            <div class="modern-spinner"></div>
+            <div class="spinner-text">Loading {{ certType === 'vrp' ? 'VRP' : 'CF' }} certificate...</div>
+        </div>
+        
+        <!-- Certificate content (shown when not loading) -->
+        <div v-else class="certificate" id="certificateContent" v-show="showCertificate">
+            <div class="office">Office of the</div>
+            <div class="office">BHAGABANPUR GRAM PANCHAYAT</div>
+            <div class="address">P.O. - Arbara, Dist.- Malda, (W. B.)</div>
+            <div class="date-line">Date : {{ currentDate }}</div>
+            <div class="to-line">To,</div>
+            <div class="to-line" style="font-weight:600;">The B.D.O<br>Chanchal-I Dev. Block<br>Chanchal, Malda.</div>
+            <!-- SUBJECT CENTERED (already .subject) -->
+            <div class="subject">Sub: Working Certificate For {{ certType === 'vrp' ? 'VBDC (VCT)' : 'VBDC (VCT)' }}</div>
+            <div class="salutation">Sir,</div>
+            <div class="intro">
+                The following {{ certType === 'vrp' ? 'VRPs' : 'CFs' }} belonging to Bhagabanpur Gram Panchayat completed the work of {{ certType === 'vrp' ? 'VBDC' : 'VBDC' }} in all the areas under the Panchayat during the billing month(s) 
+                <span v-if="selectedMonths.length">{{ formattedMonthList }}</span> in a regular and efficient manner.
+            </div>
+
+            <!-- DYNAMIC TABLE HEADER + CENTERED TEXT (td centered via CSS) -->
+            <table class="cert-table">
+                <thead>
+                    <!-- First header row: SL NO, Name, and Working Days Per Month spanning all months -->
+                    <tr>
+                        <th rowspan="2">SL NO</th>
+                        <th rowspan="2">Name of {{ certType === 'vrp' ? 'V.R.P' : 'C.F' }}</th>
+                        <th :colspan="selectedMonths.length">Working Days Per Month</th>
+                    </tr>
+                    <!-- Second header row: Month names (one column for single month, multiple for multiple months) -->
+                    <tr v-if="selectedMonths.length">
+                        <th v-for="month in selectedMonths" :key="month">{{ month }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(person, idx) in displayedList" :key="idx">
+                        <td>{{ idx+1 }}</td>
+                        <td>{{ person.name }}</td>
+                        <!-- One cell per selected month, all centered now -->
+                        <td v-for="month in selectedMonths" :key="month">
+                            {{ daysPerMonth[month] !== undefined ? daysPerMonth[month] : '—' }}
+                        </td>
+                    </tr>
+                    <tr v-if="displayedList.length === 0">
+                        <td :colspan="2 + selectedMonths.length" style="color:#b5488f; text-align:center;">❗ No {{ certType === 'vrp' ? 'VRP' : 'CF' }} selected</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="intro">This is your kind information and taking necessary action please.</div>
+            <div class="signature">
+                <div>Signature of Secretary/E.A</div>
+                <div style="font-weight:600;">Bhagabanpur Gram Panchayat</div>
+            </div>
+            <div style="color:#aa62aa; margin-top:12px; text-align:right;">** generated {{ certType === 'vrp' ? 'VRP' : 'CF' }} certificate (billing cycle) **</div>
+        </div>
+        
+        <!-- Empty state when no certificate shown -->
+        <div v-if="!showCertificate && !isLoading" style="text-align:center; margin:40px; color:#b259b2;">
+            ⬆️ click the big button to generate {{ certType === 'vrp' ? 'VRP' : 'CF' }} certificate
+        </div>
+    </div>
+
+    <!-- print/export always visible, only shown if certificate visible -->
+    <div class="footer-note" v-show="showCertificate">
+        <div class="print-export">
+            <button class="btn" @click="openPrintPreview">🖨️ print preview</button>
+            <button class="btn btn-primary" @click="exportDoc">📄 export .doc</button>
+        </div>
+        <span>✅ {{ certType === 'vrp' ? 'VRP' : 'CF' }} certificate ready</span>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    (function() {
+        // VRP List
+        const vrpList = [
+            { name: 'Munmun Ray (Das), supervisor' },
+            { name: 'Md Sakil Alam' },
+            { name: 'Mohammadul Hasan' },
+            { name: 'Sahajamal Hoque' },
+            { name: 'Mukti Das' },
+            { name: 'Mangala Karmakar Poddar' },
+            { name: 'Sahanaj Khatun' },
+            { name: 'Raju Julfikar' }
+        ];
+
+        // CF List
+        const cfList = [
+            { name: 'Nurjamal' },
+            { name: 'Md Mrinal Ajad' },
+            { name: 'Syed Numan Ali' },
+            { name: 'Miraj Hossain' },
+            { name: 'Md Firoj' },
+            { name: 'Najimuddin' },
+            { name: 'Md Afjal Hossain' },
+            { name: 'Eheshanul Hoque' },
+            { name: 'Rofikul Alam' }
+        ];
+
+        // AUTO-ROLLING 12 MONTHS
+        function generateLast12Months() {
+            const today = new Date();
+            let currentYear = today.getFullYear();
+            let currentMonth = today.getMonth();
+
+            const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            const result = [];
+
+            for (let i = 1; i <= 12; i++) {
+                let m = currentMonth - i;
+                let y = currentYear;
+                while (m < 0) {
+                    m += 12;
+                    y -= 1;
+                }
+                const monthName = monthNames[m];
+                const fullLabel = `${monthName}-${y}`;
+                const display = `${monthName} ${y}`;
+                result.push({ fullLabel, display, year: y, monthIndex: m });
+            }
+            return result;
+        }
+
+        new Vue({
+            el: '#app',
+            data: {
+                certType: 'vrp',
+                eligibleMonthsList: [],
+                selectedMonths: [],
+                daysPerMonth: {},
+                vrpList: vrpList,
+                cfList: cfList,
+                selectedPersons: [],
+                showCertificate: true,
+                isLoading: false,
+                today: ''
+            },
+            computed: {
+                currentPersonList() {
+                    return this.certType === 'vrp' ? this.vrpList : this.cfList;
+                },
+                displayedList() {
+                    return this.currentPersonList.filter(p => this.selectedPersons.includes(p.name));
+                },
+                currentDate() {
+                    const d = new Date();
+                    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                },
+                formattedMonthList() {
+                    return this.selectedMonths.join(', ');
+                }
+            },
+            watch: {
+                certType: {
+                    handler(newType) {
+                        this.selectedPersons = [];
+                        const list = newType === 'vrp' ? this.vrpList : this.cfList;
+                        this.selectedPersons = list.map(p => p.name);
+                        if (this.showCertificate) {
+                            this.isLoading = true;
+                            setTimeout(() => {
+                                this.isLoading = false;
+                            }, 600);
+                        }
+                    },
+                    immediate: true
+                },
+                selectedMonths: {
+                    handler(newMonths) {
+                        newMonths.forEach(m => {
+                            if (this.daysPerMonth[m] === undefined) {
+                                this.$set(this.daysPerMonth, m, 24);
+                            }
+                        });
+                    },
+                    immediate: true
+                }
+            },
+            methods: {
+                selectAllEligible() {
+                    this.selectedMonths = this.eligibleMonthsList.map(e => e.fullLabel);
+                },
+                deselectAllMonths() {
+                    this.selectedMonths = [];
+                },
+                selectAllPersons() {
+                    this.selectedPersons = this.currentPersonList.map(p => p.name);
+                },
+                deselectAllPersons() {
+                    this.selectedPersons = [];
+                },
+                generateCertificate() {
+                    if (this.selectedMonths.length === 0) {
+                        alert('Please select at least one billing month.');
+                        return;
+                    }
+                    if (this.selectedPersons.length === 0) {
+                        alert(`Please select at least one ${this.certType === 'vrp' ? 'VRP' : 'CF'}.`);
+                        return;
+                    }
+                    this.isLoading = true;
+                    this.showCertificate = false;
+                    setTimeout(() => {
+                        this.isLoading = false;
+                        this.showCertificate = true;
+                    }, 800);
+                },
+                openPrintPreview() {
+                    if (!this.showCertificate || this.selectedMonths.length === 0 || this.displayedList.length === 0) {
+                        alert('Generate certificate first and ensure months/persons are selected.');
+                        return;
+                    }
+                    const printWin = window.open('', '_blank');
+                    const style = `
+                        <style>
+                            body { font-family: 'Times New Roman', Times, serif; padding: 2cm 1.5cm; }
+                            .office { text-align: center; font-size: 2rem; font-weight: 700; }
+                            .address { border-bottom:1px solid #000; padding-bottom:12px; margin-bottom:20px; text-align:center; }
+                            .date-line { text-align:right; margin:20px 0; }
+                            .subject { font-weight:700; text-decoration:underline; margin:20px 0 10px; text-align:center; }
+                            table { border-collapse: collapse; width:100%; border:1px solid #000; }
+                            th { background:#f1d5f0; border:1px solid #000; padding:8px; text-align: center; }
+                            td { border:1px solid #000; padding:8px; text-align: center; }
+                            .signature { margin-top:40px; }
+                        </style>
+                    `;
+                    const contentElem = document.getElementById('certificateContent').cloneNode(true);
+                    contentElem.removeAttribute('id');
+                    printWin.document.write(`<html><head><title>${this.certType === 'vrp' ? 'VRP' : 'CF'} Certificate</title>${style}</head><body>${contentElem.outerHTML}</body></html>`);
+                    printWin.document.close();
+                    printWin.focus();
+                    printWin.print();
+                },
+                exportDoc() {
+                    if (!this.showCertificate || this.selectedMonths.length === 0 || this.displayedList.length === 0) {
+                        alert('Generate certificate with valid selections first.');
+                        return;
+                    }
+                    const header = `
+                        <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+                        <head><meta charset="utf-8"><title>${this.certType === 'vrp' ? 'VRP' : 'CF'}_Certificate</title>
+                        <style>body { font-family:'Times New Roman',serif; padding:2cm; } table { border-collapse:collapse; width:100%; border:1px solid black; } th, td { border:1px solid black; padding:6px; text-align:center; } .subject { text-align:center; }</style>
+                        </head><body>`;
+                    const footer = `</body></html>`;
+                    const content = document.getElementById('certificateContent').innerHTML;
+                    const full = header + content + footer;
+                    const blob = new Blob([full], { type: 'application/msword' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `${this.certType === 'vrp' ? 'VRP' : 'CF'}_${this.selectedMonths[0]}.doc`;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                }
+            },
+            created() {
+                const d = new Date();
+                this.today = d.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+                const rolling = generateLast12Months();
+                this.eligibleMonthsList = rolling;
+                if (rolling.length > 0) {
+                    this.selectedMonths = [rolling[0].fullLabel];
+                }
+                rolling.forEach(e => {
+                    if (!this.daysPerMonth[e.fullLabel]) {
+                        this.$set(this.daysPerMonth, e.fullLabel, 24);
+                    }
+                });
+            }
+        });
+    })();
+</script>
+</body>
+</html>

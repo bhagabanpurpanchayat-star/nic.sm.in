@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Order – Print Optimised (no ovals)</title>
+  <style>
+    /* === global styles === */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #eef2f6;
+      color: #000000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .print-header {
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 0 0 8px 0;
+      color: #000000;
+      font-size: 28px;
+      border-bottom: 3px solid #333333;
+      padding-bottom: 5px;
+      display: inline-block;
+    }
+
+    .controls {
+      background: white;
+      padding: 16px 24px;
+      border-radius: 60px;
+      box-shadow: 0 4px 12px rgba(0,40,60,0.1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 15px 0 25px 0;
+      width: fit-content;
+    }
+
+    select {
+      padding: 10px 20px;
+      border-radius: 40px;
+      border: 1px solid #666666;
+      font-size: 14px;
+      min-width: 260px;
+      background: #f8fcff;
+      color: #000000;
+    }
+
+    .btn {
+      background-color: #333333;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 10px 28px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      border: 1px solid transparent;
+    }
+
+    .btn:disabled {
+      background-color: #999999;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      background-color: #000000;
+    }
+
+    /* Loading animation */
+    .loading-animation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      padding: 40px;
+      border-radius: 80px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      margin: 20px auto;
+      width: fit-content;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #cccccc;
+      border-top: 5px solid #333333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 1.2rem;
+      color: #333333;
+      font-weight: 500;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* container where work orders appear */
+    #form-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* each page break - exactly A4 width, centered */
+    .page-break {
+      width: 210mm;
+      max-width: 100%;
+      background: white;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin: 0 auto 30px auto;
+      page-break-after: always;
+      break-after: page;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #aaaaaa;
+    }
+
+    .workorder-content {
+      width: 100%;
+    }
+
+    /* hide any old header */
+    .form-header {
+      display: none !important;
+    }
+
+    /* ========== PRINT OPTIMISATION ========== */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        display: block;
+        color: #000000;
+      }
+      .print-header, .controls {
+        display: none;
+      }
+      #form-container {
+        margin: 0;
+        padding: 0;
+      }
+      .page-break {
+        box-shadow: none;
+        border: none;
+        margin: 0 auto;
+        page-break-after: always;
+        break-after: page;
+        width: 210mm;
+        border-radius: 0;
+      }
+      .workorder-content * {
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+
+  <!-- ===== WORK ORDER DESIGN – NO OVALS, PLAIN TEXT ===== -->
+  <style>
+    .workorder-content {
+      font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: #ffffff;
+      font-size: 11pt;
+      line-height: 1.35;
+      color: #000000;
+      width: 210mm;
+      max-width: 100%;
+    }
+
+    /* HEADER */
+    .workorder-content .header-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px 8px 20px;
+      border-bottom: 2px solid #333333;
+    }
+
+    .workorder-content .gp-title h2 {
+      font-weight: 500;
+      font-size: 1.6rem;
+      letter-spacing: -0.5px;
+      color: #000000;
+      margin-bottom: 2px;
+    }
+
+    .workorder-content .gp-title .sub {
+      font-size: 0.7rem;
+      color: #000000;
+    }
+
+    .workorder-content .memo-ref {
+      text-align: right;
+      background: #f0f0f0;
+      padding: 5px 14px;
+      border-radius: 30px;
+      border: 1px solid #888;
+    }
+
+    .workorder-content .memo-ref .memo {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #000000;
+    }
+
+    .workorder-content .memo-ref .date {
+      font-size: 0.75rem;
+      color: #000000;
+    }
+
+    .workorder-content .ref-row-compact {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      background: #f5f5f5;
+      padding: 8px 20px;
+      border-bottom: 1px dashed #666;
+      font-size: 0.8rem;
+      color: #000000;
+    }
+
+    .workorder-content .ref-item span {
+      font-weight: 600;
+      color: #000000;
+      margin-right: 4px;
+    }
+
+    /* TWO COLUMN LAYOUT */
+    .workorder-content .content-panel {
+      display: flex;
+      padding: 12px 20px 15px 20px;
+      gap: 20px;
+    }
+
+    .workorder-content .left-side {
+      flex: 1.1;
+      min-width: 200px;
+    }
+
+    .workorder-content .right-side {
+      flex: 2;
+    }
+
+    /* cards */
+    .workorder-content .info-card {
+      background: #f9f9f9;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border: 1px solid #888;
+    }
+
+    .workorder-content .info-card h3 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #000000;
+      border-bottom: 1px solid #666;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .workorder-content .vendor-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #000000;
+    }
+
+    .workorder-content .vendor-addr {
+      color: #000000;
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+
+    .workorder-content .contact-line {
+      font-size: 0.75rem;
+      color: #000000;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .workorder-content .contact-line i {
+      font-style: normal;
+      background: #e0e0e0;
+      padding: 2px 8px;
+      border-radius: 40px;
+      border: 1px solid #666;
+    }
+
+    /* ===== SCHEME HIGHLIGHT – NO OVALS ===== */
+    .workorder-content .scheme-highlight {
+      background: transparent;        /* no background */
+      border-left: 5px solid #333;    /* keep left border for emphasis */
+      padding: 10px 12px;
+      border-radius: 0;                /* remove border radius */
+      margin: 12px 0 10px 0;
+      border: none;                    /* no border */
+    }
+
+    .workorder-content .scheme-row {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 5px;
+    }
+
+    .workorder-content .scheme-label {
+      width: 100px;
+      font-weight: 500;
+      color: #000000;
+      font-size: 0.75rem;
+    }
+
+    .workorder-content .scheme-value {
+      font-weight: 600;
+      color: #000000;
+      background: transparent;         /* no oval */
+      padding: 0;                      /* no padding */
+      border-radius: 0;                /* no oval */
+      font-size: 0.8rem;
+      border: none;                    /* no border */
+    }
+
+    /* BID BOX */
+    .workorder-content .bid-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #333333;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      margin: 8px 0 5px 0;
+      font-weight: 500;
+      min-height: 42px;
+      border: 1px solid #000;
+    }
+
+    .workorder-content .bid-box .label {
+      font-size: 0.8rem;
+      opacity: 0.95;
+      color: white;
+    }
+
+    .workorder-content .bid-box .amount {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: white;
+    }
+
+    /* acceptance note */
+    .workorder-content p {
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+      background: #f5f5f5;
+      padding: 6px 14px;
+      border-radius: 60px;
+      border: 1px solid #888;
+      color: #000000;
+    }
+    .workorder-content p strong {
+      color: #000000;
+    }
+
+    /* terms card */
+    .workorder-content .terms-card {
+      background: #ffffff;
+      border: 1px solid #666;
+      border-radius: 18px;
+      padding: 10px 16px;
+      margin-top: 5px;
+    }
+
+    .workorder-content .terms-card h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #000000;
+      margin-bottom: 8px;
+    }
+
+    .workorder-content .terms-list {
+      list-style: none;
+      counter-reset: term-counter;
+      padding-left: 0;
+    }
+
+    .workorder-content .terms-list li {
+      counter-increment: term-counter;
+      margin-bottom: 4px;
+      font-size: 0.75rem;
+      color: #000000;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+      border-bottom: 1px dashed #666;
+      padding-bottom: 3px;
+    }
+
+    .workorder-content .terms-list li::before {
+      content: counter(term-counter) ".";
+      font-weight: 600;
+      color: #000000;
+      min-width: 16px;
+      font-size: 0.75rem;
+    }
+
+    .workorder-content .signature-modern {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+      padding-top: 6px;
+      border-top: 1px solid #333;
+    }
+
+    .workorder-content .signature-box {
+      text-align: center;
+    }
+
+    .workorder-content .signature-box .stamp-style {
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: #000000;
+      border-bottom: 2px solid #000;
+      padding-bottom: 2px;
+      margin-bottom: 4px;
+      display: inline-block;
+      min-width: 120px;
+    }
+
+    .workorder-content .signature-box .post {
+      font-size: 0.7rem;
+      color: #000000;
+    }
+
+    /* remove bottom line */
+    .workorder-content .bottom-line {
+      display: none;
+    }
+
+    .workorder-content div[style*="text-align: right"] {
+      font-size: 0.55rem !important;
+      margin-top: 3px !important;
+      color: #000000 !important;
+    }
+
+    .workorder-content, .workorder-content * {
+      max-width: 100%;
+    }
+
+    @media print {
+      .workorder-content {
+        font-size: 10.5pt;
+      }
+      .workorder-content .header-grid {
+        padding: 8px 18px 5px 18px;
+      }
+      .workorder-content .content-panel {
+        padding: 8px 18px 10px 18px;
+        gap: 15px;
+      }
+      .workorder-content .bid-box {
+        background: #000000 !important;
+        color: white !important;
+      }
+      .workorder-content * {
+        color: #000000 !important;
+      }
+      .workorder-content .bid-box .label,
+      .workorder-content .bid-box .amount {
+        color: white !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-header">
+    <h2>Work Order/Supply Order _Bhagabanpur  Gram Panchayat </h2>
+  </div>
+
+  <div class="controls">
+    <label for="nitSelect">Select NIT:</label>
+    <select id="nitSelect">
+      <option value="">--Loading NITs--</option>
+    </select>
+
+    <button class="btn" id="previewBtn">Preview</button>
+    <button class="btn" id="printBtn" disabled>Print</button>
+  </div>
+
+  <div id="form-container"></div>
+
+  <script>
+    const baseUrl = "https://script.google.com/macros/s/AKfycbxYTe_2cZmxTfvmuGwqJQ2tr9B6d9OzxzYRVDu7mmRAN7vk5Jdd8LTe1QDRlWMzyIZG/exec";
+
+    const nitSelect = document.getElementById("nitSelect");
+    const previewBtn = document.getElementById("previewBtn");
+    const printBtn = document.getElementById("printBtn");
+    const container = document.getElementById("form-container");
+
+    let currentForms = null;
+    let currentNit = null;
+
+    function showLoading() {
+      container.innerHTML = `
+        <div class="loading-animation">
+          <div class="spinner"></div>
+          <div class="loading-text">Loading work orders...</div>
+        </div>
+      `;
+    }
+
+    // Load NITs
+    fetch(baseUrl + "?function=getNITs")
+      .then(res => res.json())
+      .then(nits => {
+        nitSelect.innerHTML = "<option value=''>--Select NIT--</option>";
+        nits.forEach(nit => {
+          const opt = document.createElement("option");
+          opt.value = nit;
+          opt.textContent = nit;
+          nitSelect.appendChild(opt);
+        });
+      })
+      .catch(err => console.error("NIT load error:", err));
+
+    // Preview selected NIT
+    previewBtn.addEventListener("click", async () => {
+      const nit = nitSelect.value;
+      if (!nit) { alert("Select a NIT"); return; }
+
+      showLoading();
+      printBtn.disabled = true;
+
+      try {
+        const res = await fetch(baseUrl + "?function=getNITData&nit=" + encodeURIComponent(nit));
+        const forms = await res.json();
+
+        if (!forms || forms.length === 0) {
+          container.innerHTML = "<p>No data found.</p>";
+          return;
+        }
+
+        currentForms = forms;
+        currentNit = nit;
+
+        container.innerHTML = "";
+
+        forms.forEach((item, index) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "page-break";
+
+          const contentDiv = document.createElement("div");
+          contentDiv.className = "workorder-content";
+
+          let filledHtml = item.html || "";
+          const tenderNumber = `TF-${item.SL || (index+1)}/${item.totalForms || forms.length}`;
+          filledHtml = filledHtml.replace(/\{\{TenderFormNo\}\}/gi, tenderNumber);
+
+          const fallbackMap = {
+            '{{WORK_ORDER_NO}}': item.WORK_ORDER_NO || `WO-${nit}-${item.SL}`,
+            '{{WORK_ORDER_DATE}}': item.WORK_ORDER_DATE || new Date().toLocaleDateString('en-IN'),
+            '{{NIT}}': nit,
+            '{{SL}}': item.SL || index+1,
+            '{{NIT_DATE}}': item.NIT_DATE || '',
+            '{{VENDOR}}': item.VENDOR || 'Vendor Name',
+            '{{ADDRESS}}': item.ADDRESS || 'Address',
+            '{{Name_of_the_work}}': item.Name_of_the_work || 'Scheme name',
+            '{{ACTIVITY_ID}}': item.ACTIVITY_ID || 'ACT-001',
+            '{{ESTIMATE_VALUE}}': item.ESTIMATE_VALUE || '0.00',
+            '{{BID_AMOUNT}}': item.BID_AMOUNT || '0.00',
+            '{{TIME_ALLOWED}}': item.TIME_ALLOWED || '30'
+          };
+
+          for (let [key, value] of Object.entries(fallbackMap)) {
+            const regex = new RegExp(key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+            filledHtml = filledHtml.replace(regex, value);
+          }
+
+          contentDiv.innerHTML = filledHtml;
+          wrapper.appendChild(contentDiv);
+          container.appendChild(wrapper);
+        });
+
+        printBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Error loading preview.</p>";
+      }
+    });
+
+    // Print using iframe
+    printBtn.addEventListener("click", () => {
+      if (!container.innerHTML.trim() || container.innerText.includes("Loading")) {
+        alert("Nothing to print. Preview first.");
+        return;
+      }
+
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "absolute";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write('<html><head><title>Work Orders</title>');
+
+      const styles = document.querySelectorAll('style');
+      let styleText = '';
+      styles.forEach(style => {
+        styleText += style.innerHTML;
+      });
+      doc.write('<style>' + styleText + '</style>');
+      doc.write('<style>@media print{.print-header,.controls{display:none;}.page-break{margin:0;box-shadow:none;}}</style>');
+      doc.write('</head><body>');
+      doc.write(container.innerHTML);
+      doc.write('</body></html>');
+      doc.close();
+
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    });
+  </script>
+</body>
+</html>

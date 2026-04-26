@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>GP Payment Letter Generator - Main Menu</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --secondary-dark: #27ae60;
+      --dark: #2c3e50;
+      --darker: #1a2530;
+      --light: #ecf0f1;
+      --card-bg: #243447;
+      --border: #34495e;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .menu-container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 32px;
+      color: white;
+    }
+    
+    h1 i {
+      color: var(--primary);
+      margin-right: 10px;
+    }
+    
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      padding: 20px;
+    }
+    
+    .menu-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-decoration: none;
+      color: var(--light);
+      display: block;
+    }
+    
+    .menu-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border-color: var(--primary);
+    }
+    
+    .menu-card i {
+      font-size: 64px;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+    
+    .menu-card h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: white;
+    }
+    
+    .menu-card p {
+      color: var(--light);
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+    
+    .menu-card .badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 16px;
+      background: var(--primary);
+      border-radius: 20px;
+      font-size: 14px;
+      color: white;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--gray);
+      font-size: 14px;
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 24px;
+      }
+      
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="menu-container">
+    <h1><i class="fas fa-file-invoice-dollar"></i> GP Payment Letter Generator</h1>
+    
+    <div class="menu-grid">
+      <!-- EMD Refund Card -->
+      <a href="emdapplication.htm" class="menu-card">
+        <i class="fas fa-hand-holding-usd"></i>
+        <h2>EMD Refund Letter</h2>
+        <p>Generate earnest money refund letters for vendors. Select multiple unpaid EMD entries and merge them into a single refund request letter.</p>
+        <span class="badge">Apply</span>
+      </a>
+      
+      <!-- Bill Payment Card -->
+      <a href="billapplication.htm" class="menu-card">
+        <i class="fas fa-file-invoice"></i>
+        <h2>Bill Payment Letter</h2>
+        <p>Generate payment request letters for completed works. Single selection with work order details and scheme information.</p>
+        <span class="badge">Apply</span>
+      </a>
+
+      <!-- Security Money Application Card (New) -->
+      <a href="securityapplication.htm" class="menu-card">
+        <i class="fas fa-shield-alt"></i>
+        <h2>Security Money Application</h2>
+        <p>Generate security money deposit applications for contractors. Manage security deposits and generate letters.</p>
+        <span class="badge">Apply</span>
+      </a>
+    </div>
+    
+    <div class="footer">
+      <p>Bhagabanpur Gram Panchayat - Payment Letter Management System</p>
+    </div>
+  </div>
+</body>
+</html>

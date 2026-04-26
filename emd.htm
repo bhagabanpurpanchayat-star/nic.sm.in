@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Earnest Money Register</title>
+  <style>
+    body { font-family: "Segoe UI", sans-serif; margin: 30px; background: #fafafa; color: #333; }
+    h1 { text-align:center; font-size:22px; margin-bottom:20px; }
+    select, button { padding:8px 12px; font-size:15px; margin:5px 5px 20px 0; }
+    select { border-radius:6px; border:1px solid #ccc; min-width:200px; }
+    button { border:none; border-radius:6px; cursor:pointer; background:#1976d2; color:white; }
+    button:hover { background:#1565c0; }
+    #output { background:white; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.15); overflow-x:auto; }
+
+    @media print {
+      body, html { margin:0; background:white; }
+      body * { visibility:hidden; }
+      #output, #output * { visibility:visible; }
+      #output { position:absolute; top:0; left:0; width:100%; padding:0; }
+      .annexure { width:277mm; min-height:190mm; margin:0 auto; padding:8mm; box-sizing:border-box; page-break-after:always; display:flex; flex-direction:column; }
+      table { width:100%; border-collapse:collapse; flex:1; }
+      table, th, td { border:1px solid #000; page-break-inside:avoid; }
+      thead { display:table-header-group; }
+      tbody { display:table-row-group; }
+      tbody tr td { vertical-align:middle; padding:6px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>REGISTER OF EARNEST MONEY</h1>
+
+  <div>
+    <label for="nitSelect"><b>Select NIT:</b></label>
+    <select id="nitSelect">
+      <option value="">-- Choose NIT --</option>
+    </select>
+    <button onclick="loadNITData()">Show</button>
+    <button onclick="window.print()">Print</button>
+  </div>
+
+  <div id="output"></div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2DRP8ndu6a-XRhKpXcOwo2ei6fzYLGyLFJ40AxjfuSUiIY4EFPicf8fFqsuHvodhHYQ/exec";
+
+    async function loadNITs() {
+      try {
+        const res = await fetch(`${WEB_APP_URL}?function=getNITs`);
+        const nits = await res.json();
+        const select = document.getElementById("nitSelect");
+        nits.forEach(nit => {
+          const opt = document.createElement("option");
+          opt.value = nit;
+          opt.textContent = nit;
+          select.appendChild(opt);
+        });
+      } catch(err) {
+        alert("Error loading NITs: " + err);
+      }
+    }
+
+    async function loadNITData() {
+      const nit = document.getElementById("nitSelect").value;
+      if (!nit) { alert("Please select a NIT."); return; }
+      document.getElementById("output").innerHTML = "<p>Loading...</p>";
+      try {
+        const res = await fetch(`${WEB_APP_URL}?function=getEMDRegister&nit=${encodeURIComponent(nit)}`);
+        const result = await res.json();
+        if (result && result.length) {
+          let html = "";
+          result.forEach(item => {
+            html += `<div class="annexure">${item.html}</div>`;
+          });
+          document.getElementById("output").innerHTML = html;
+        } else {
+          document.getElementById("output").innerHTML = "<p>No records found for this NIT.</p>";
+        }
+      } catch(err) {
+        document.getElementById("output").innerHTML = "<p>Error loading data.</p>";
+        console.error(err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadNITs);
+  </script>
+</body>
+</html>

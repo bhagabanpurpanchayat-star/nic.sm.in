@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Letter of Aggrement Preview</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #1a73e8;
+      font-size: 28px;
+      border-bottom: 2px solid #1a73e8;
+      padding-bottom: 5px;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    label {
+      font-size: 15px;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      min-width: 200px;
+    }
+
+    .btn {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .btn:disabled {
+      background-color: #a0c4ff;
+      cursor: not-allowed;
+    }
+
+    .btn:hover:not(:disabled) {
+      background-color: #155ab6;
+    }
+
+    #form-container {
+      margin-top: 20px;
+    }
+
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+      background-color: white;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      border-radius: 6px;
+    }
+
+    .form-header {
+      background-color: #1a73e8;
+      color: white;
+      padding: 10px 15px;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 4px 4px 0 0;
+      margin: -25px -25px 15px -25px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .page-break + .page-break {
+      margin-top: 30px;
+    }
+
+    p, label {
+      font-size: 14px;
+    }
+
+    .placeholder {
+      color: #222;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <h2>Letter of Aggrement – Print Preview</h2>
+
+  <div class="controls">
+    <label for="nitSelect">Select NIT:</label>
+    <select id="nitSelect">
+      <option value="">--Loading NITs--</option>
+    </select>
+
+    <button class="btn" id="previewBtn">Preview</button>
+    <button class="btn" id="printBtn" disabled>Print</button>
+  </div>
+
+  <div id="form-container"></div>
+
+  <script>
+    // ⚙️ Replace with your deployed Web App URL
+    const baseUrl = "https://script.google.com/macros/s/AKfycbzPDo25YAgsPiNtEGPSGh6wowcsz6Ah_3dUfPauxogLHhdEVpYBitMEqeRJrFM6ZwQ3qw/exec";
+
+    const nitSelect = document.getElementById("nitSelect");
+    const previewBtn = document.getElementById("previewBtn");
+    const printBtn = document.getElementById("printBtn");
+    const container = document.getElementById("form-container");
+
+    // --- Load NITs from Web App ---
+    fetch(baseUrl + "?function=getNITs")
+      .then(res => res.json())
+      .then(nits => {
+        nitSelect.innerHTML = "<option value=''>--Select NIT--</option>";
+        nits.forEach(nit => {
+          const opt = document.createElement("option");
+          opt.value = nit;
+          opt.textContent = nit;
+          nitSelect.appendChild(opt);
+        });
+      })
+      .catch(err => console.error("Error loading NITs:", err));
+
+    // --- Preview selected NIT ---
+    previewBtn.addEventListener("click", async () => {
+      const nit = nitSelect.value;
+      if (!nit) { alert("Select a NIT first!"); return; }
+
+      container.innerHTML = "Loading preview...";
+      printBtn.disabled = true;
+
+      try {
+        const res = await fetch(baseUrl + "?function=getNITData&nit=" + encodeURIComponent(nit));
+        const forms = await res.json();
+
+        if (!forms || forms.length === 0) {
+          container.innerHTML = "<p>No data found for this NIT.</p>";
+          return;
+        }
+
+        container.innerHTML = "";
+        const totalForms = forms.length;
+
+        forms.forEach((item, i) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "page-break";
+
+          const headerDiv = document.createElement("div");
+          headerDiv.className = "form-header";
+          headerDiv.innerHTML = `
+            <span>NIT: ${nit} | Vendor: ${item.Vendor}</span>
+            <span>SL: ${item.SL} | Page ${i + 1} of ${totalForms}</span>
+          `;
+
+          wrapper.appendChild(headerDiv);
+
+          const contentDiv = document.createElement("div");
+          contentDiv.innerHTML = item.html;
+          wrapper.appendChild(contentDiv);
+
+          container.appendChild(wrapper);
+        });
+
+        printBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Error loading preview data.</p>";
+      }
+    });
+
+    // --- Print function using hidden iframe ---
+    printBtn.addEventListener("click", () => {
+      if (!container.innerHTML.trim()) { alert("No preview to print."); return; }
+
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "absolute";
+      iframe.style.width = "0px";
+      iframe.style.height = "0px";
+      iframe.style.border = "0";
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write('<html><head><title>Print</title>');
+      doc.write('<style>.page-break{page-break-after:always;break-after:page;}.form-header{background-color:#1a73e8;color:white;padding:10px 15px;font-weight:bold;display:flex;justify-content:space-between;}</style>');
+      doc.write('</head><body>');
+      doc.write(container.innerHTML);
+      doc.write('</body></html>');
+      doc.close();
+
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      document.body.removeChild(iframe);
+    });
+  </script>
+</body>
+</html>
+

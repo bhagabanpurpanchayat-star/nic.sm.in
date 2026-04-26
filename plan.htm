@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Annual & Supplementary Action Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #eef2f7;
+        margin: 0;
+    }
+
+    header {
+        background: linear-gradient(90deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 16px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 700;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #importForm {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    input[type="file"] {
+        background: white;
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 13px;
+    }
+
+    button {
+        background: #2563eb;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+        background: #1e4fbb;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: auto;
+        margin-top: 25px;
+        background: #fff;
+        padding: 25px;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+    }
+
+    .filters {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .filters input, .filters select {
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid #cfd8e3;
+        border-radius: 8px;
+        min-width: 160px;
+        flex: 1;
+        background: #f9fbff;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        transition: 0.2s ease;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    thead {
+        background: #1e3c72;
+        color: white;
+    }
+
+    th {
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+        border: 1px dotted #000;
+    }
+
+    td {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px dotted #000;
+    }
+
+    tr:hover td {
+        background: #eff4ff;
+    }
+
+    /* ✅ Loader Overlay */
+    #loaderOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.35);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+        backdrop-filter: blur(3px);
+    }
+
+    /* ✅ Spinner */
+    .spinner {
+        width: 65px;
+        height: 65px;
+        border: 7px solid #fff;
+        border-top: 7px solid #2563eb;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+
+    /* ✅ RESPONSIVE SCROLL ONLY WHEN NEEDED */
+    .table-wrapper {
+        max-height: calc(100vh - 320px);
+        overflow-y: auto;
+        overflow-x: auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+    }
+
+    /* ✅ Frozen Header */
+    #dataTable thead th {
+        position: sticky;
+        top: 0;
+        background: #1e3c72;
+        z-index: 10;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- ✅ Loader Overlay -->
+<div id="loaderOverlay">
+    <div class="spinner"></div>
+</div>
+
+<header>
+    Annual & Supplementary Action Plan
+
+    <form id="importForm" enctype="multipart/form-data">
+        <input type="file" id="excelFile" accept=".xls,.xlsx">
+        <button type="button" onclick="uploadExcel()">Upload & Import</button>
+    </form>
+</header>
+
+<div class="container">
+
+    <div class="filters">
+        <input type="text" id="searchInput" placeholder="🔍 Search anything...">
+
+        <select id="filterFY">
+            <option value="">Financial Year</option>
+        </select>
+
+        <select id="filterPlanType">
+            <option value="">PLAN TYPE</option>
+        </select>
+
+        <select id="filterScheme">
+            <option value="">Scheme</option>
+        </select>
+
+        <button id="exportBtn">⬇ Export Excel</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Financial Year</th>
+                    <th>PLAN TYPE</th>
+                    <th>Activity Code</th>
+                    <th>Activity Description</th>
+                    <th>Sector</th>
+                    <th>Location of Asset</th>
+                    <th>Estimated Cost</th>
+                    <th>Scheme Name</th>
+                    <th>Theme Name</th>
+                    <th>Tender Status</th>
+                </tr>
+            </thead>
+            <tbody id="dataBody"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+let originalData = [];
+let filteredData = [];
+
+document.addEventListener("DOMContentLoaded", () => loadData());
+
+async function loadData() {
+    let res = await fetch("https://script.google.com/macros/s/AKfycbyzlB34iTwHptzKhk7wu7Ma0-Zq43_U_mA6kVWfxemaipm5UHb7lmxwlYFHfYHpT84/exec");
+    originalData = await res.json();
+    filteredData = [...originalData];
+
+    renderTable(filteredData);
+    populateFilters(originalData);
+    setListeners();
+}
+
+function populateFilters(data) {
+    const fill = (id, col) => {
+        let list = [...new Set(data.map(r => r[col]).filter(x => x))].sort();
+        let sel = document.getElementById(id);
+        list.forEach(v => sel.innerHTML += `<option value="${v}">${v}</option>`);
+    };
+
+    fill("filterFY", 1);
+    fill("filterPlanType", 2);
+    fill("filterScheme", 8);
+}
+
+function setListeners() {
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.querySelectorAll("select").forEach(s => s.addEventListener("change", applyFilters));
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+        const tableHtml = document.getElementById('dataTable').outerHTML.replace(/ /g, '%20');
+        const filename = 'ActionPlan.xls';
+        const dataUri = 'data:application/vnd.ms-excel;charset=utf-8,' + tableHtml;
+
+        const a = document.createElement('a');
+        a.href = dataUri;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    });
+}
+
+function applyFilters() {
+    let txt = document.getElementById("searchInput").value.toLowerCase();
+    let fy = document.getElementById("filterFY").value;
+    let pt = document.getElementById("filterPlanType").value;
+    let sc = document.getElementById("filterScheme").value;
+
+    filteredData = originalData.filter(r => {
+        let ok = true;
+
+        if (txt) ok = r.join(" ").toLowerCase().includes(txt);
+        if (ok && fy) ok = r[1] == fy;
+        if (ok && pt) ok = r[2] == pt;
+        if (ok && sc) ok = r[8] == sc;
+
+        return ok;
+    });
+
+    renderTable(filteredData);
+}
+
+function renderTable(data) {
+    let body = document.getElementById("dataBody");
+    body.innerHTML = "";
+
+    data.forEach(row => {
+        let tr = document.createElement("tr");
+
+        row.forEach(c => {
+            let td = document.createElement("td");
+            td.textContent = c;
+            td.style.border = "1px dotted #000";
+            tr.appendChild(td);
+        });
+
+        body.appendChild(tr);
+    });
+}
+
+async function uploadExcel() {
+    let f = document.getElementById("excelFile").files[0];
+    if (!f) return alert("Please select a file.");
+
+    let overlay = document.getElementById("loaderOverlay");
+    overlay.style.display = "flex";
+
+    let fd = new FormData();
+    fd.append("file", f);
+
+    let res = await fetch("https://script.google.com/macros/s/AKfycbyzlB34iTwHptzKhk7wu7Ma0-Zq43_U_mA6kVWfxemaipm5UHb7lmxwlYFHfYHpT84/exec", {
+        method: "POST",
+        body: fd
+    });
+
+    overlay.style.display = "none";
+
+    let output = await res.json();
+
+    alert(`Imported: ${output.added ?? "0"} rows\nSkipped: ${output.skipped ?? "0"}`);
+
+    loadData();
+}
+</script>
+
+</body>
+</html>
