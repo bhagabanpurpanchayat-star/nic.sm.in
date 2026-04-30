@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SECC List Download - Bhagabanpur Gram Panchayat</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.header p {
+  margin: 10px 0 0;
+  opacity: 0.9;
+}
+
+.stats-section {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.stats-info {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1b5e20;
+}
+
+.search-box {
+  padding: 10px 20px;
+  border: 2px solid #4CAF50;
+  border-radius: 25px;
+  font-size: 14px;
+  width: 250px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.search-box:focus {
+  border-color: #45a049;
+  box-shadow: 0 0 8px rgba(76,175,80,0.3);
+  width: 300px;
+}
+
+.eb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  padding: 30px;
+}
+
+.eb-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.eb-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.eb-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.eb-number {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.eb-badge {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.eb-body {
+  padding: 20px;
+}
+
+.eb-info {
+  margin-bottom: 15px;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.info-label {
+  font-weight: bold;
+  width: 100px;
+  color: #666;
+}
+
+.info-value {
+  color: #333;
+  flex: 1;
+  word-break: break-word;
+}
+
+.download-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.download-btn:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: scale(1.02);
+}
+
+.download-btn:active {
+  transform: scale(0.98);
+}
+
+.no-results {
+  text-align: center;
+  padding: 50px;
+  color: #999;
+  font-size: 18px;
+  grid-column: 1 / -1;
+}
+
+.footer {
+  background: #f8f9fa;
+  padding: 15px 30px;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  font-size: 12px;
+  color: #666;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4CAF50;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  z-index: 1000;
+  animation: slideInRight 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+  
+  .header h1 {
+    font-size: 20px;
+  }
+  
+  .stats-section {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .eb-grid {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  
+  .search-box {
+    width: 100%;
+  }
+  
+  .search-box:focus {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📄 SECC List Download Portal</h1>
+    <p>Bhagabanpur Gram Panchayat - Electoral Booth Wise SECC Lists</p>
+  </div>
+  
+  <div class="stats-section">
+    <div class="stats-info">
+      <div class="stat-item">
+        <div class="stat-label">Total Files</div>
+        <div class="stat-number" id="totalFiles">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Available for Download</div>
+        <div class="stat-number" id="availableFiles">0</div>
+      </div>
+    </div>
+    <div>
+      <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search by file name..." onkeyup="filterFiles()">
+    </div>
+  </div>
+  
+  <div class="eb-grid" id="fileGrid">
+    <div class="loading">
+      <div class="spinner"></div>
+      Loading files from Google Drive...
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>⚠️ Note: Click on Download button to save PDF to your device. Files are securely stored in Google Drive.</p>
+    <p>For any issues, please contact Gram Panchayat Office</p>
+  </div>
+</div>
+
+<script>
+// 🔴 PASTE YOUR WEB APP URL HERE 🔴
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx4PSpWY87ekaYCOBqovtv85e6u3y5_EROJzLskJBlhR-ZXEnhlP4o2QadXN5dcnVVV/exec";
+
+let allFiles = [];
+let currentFiles = [];
+
+async function loadFiles() {
+  const grid = document.getElementById('fileGrid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading files from Google Drive...</div>';
+  
+  try {
+    const response = await fetch(WEB_APP_URL);
+    const data = await response.json();
+    
+    if (data.success) {
+      allFiles = data.files;
+      currentFiles = [...allFiles];
+      renderFiles();
+      updateStats();
+    } else {
+      grid.innerHTML = `<div class="no-results">❌ Error: ${data.error}</div>`;
+    }
+  } catch (error) {
+    grid.innerHTML = `<div class="no-results">❌ Failed to load files: ${error.message}</div>`;
+  }
+}
+
+function downloadFile(fileId, fileName) {
+  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = fileName;
+  link.target = '_blank';
+  
+  showNotification(`📥 Downloading ${fileName}...`);
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function showNotification(message) {
+  let notification = document.getElementById('notification');
+  if (!notification) {
+    notification = document.createElement('div');
+    notification.id = 'notification';
+    document.body.appendChild(notification);
+  }
+  
+  notification.className = 'notification';
+  notification.textContent = message;
+  notification.style.display = 'block';
+  
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 3000);
+}
+
+function renderFiles() {
+  const grid = document.getElementById('fileGrid');
+  
+  if (currentFiles.length === 0) {
+    grid.innerHTML = '<div class="no-results">❌ No matching files found</div>';
+    return;
+  }
+  
+  let html = '';
+  currentFiles.forEach((file, index) => {
+    // Extract EB number from filename (looks for 3-digit number)
+    const ebMatch = file.name.match(/\b\d{3}\b/);
+    const ebNumber = ebMatch ? ebMatch[0] : (index + 1).toString();
+    
+    // Format file size
+    const fileSize = file.size ? (file.size / 1024).toFixed(2) + ' KB' : 'Unknown';
+    
+    html += `
+      <div class="eb-card">
+        <div class="eb-header">
+          <span class="eb-number">📄 File ${index + 1}</span>
+          <span class="eb-badge">✅ Available</span>
+        </div>
+        <div class="eb-body">
+          <div class="eb-info">
+            <div class="info-row">
+              <div class="info-label">File Name:</div>
+              <div class="info-value" style="font-size: 12px;">${file.name}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Size:</div>
+              <div class="info-value">${fileSize}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Date:</div>
+              <div class="info-value">${new Date(file.date).toLocaleDateString()}</div>
+            </div>
+          </div>
+          <button class="download-btn" onclick="downloadFile('${file.id}', '${file.name}')">
+            📥 Download PDF
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  
+  grid.innerHTML = html;
+}
+
+function updateStats() {
+  document.getElementById('totalFiles').textContent = allFiles.length;
+  document.getElementById('availableFiles').textContent = allFiles.length;
+}
+
+function filterFiles() {
+  const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+  
+  if (searchTerm === '') {
+    currentFiles = [...allFiles];
+  } else {
+    currentFiles = allFiles.filter(file => 
+      file.name.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  renderFiles();
+}
+
+// Load files on page load
+document.addEventListener('DOMContentLoaded', () => {
+  loadFiles();
+});
+</script>
+</body>
+</html>
