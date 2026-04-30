@@ -332,7 +332,7 @@ let currentFiles = [];
 
 async function loadFiles() {
   const grid = document.getElementById('fileGrid');
-  grid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading files from Google Drive...</div>';
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div>Connecting to Panchayat server, Plz wait..........</div>';
   
   try {
     const response = await fetch(WEB_APP_URL);
