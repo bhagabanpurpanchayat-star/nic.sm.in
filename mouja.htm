@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>মৌজা তথ্য | Mouja Information - বাংলা ও ইংরেজি</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e9f0e6;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1rem;
+            color: #1e2a2e;
+        }
+
+        /* বেঙ্গলি ফন্টের জন্য সুনির্দিষ্ট সমর্থন - আদর্শ ইউনিকোড ফন্ট */
+        /* বাংলা টেক্সট যাতে সুন্দর ও স্পষ্ট দেখায় */
+        .bengali-text, td:first-child, .lang-bn {
+            font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Bangla', 'SolaimanLipi', 'SutonnyMJ', 'SutonnyMJ Regular', 'Kalpurush', 'Siyam Rupali', 'Nirmala UI', sans-serif;
+            font-weight: normal;
+        }
+
+        /* পুরো টেবিলের বাংলা কলামের জন্য আলাদা নির্দেশনা */
+        .mouja-name-bn {
+            font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Bangla', 'SolaimanLipi', 'SutonnyMJ', 'Kalpurush', 'Siyam Rupali', 'Nirmala UI', sans-serif;
+            font-size: 1.05rem;
+            letter-spacing: normal;
+            word-break: break-word;
+        }
+
+        .english-text {
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, sans-serif;
+            font-weight: 500;
+            color: #1f3b3c;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffffdd;
+            backdrop-filter: blur(0px);
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #1f4e3b, #2a5e48);
+            padding: 1.5rem 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-section h1 span {
+            background: #ffd966cc;
+            background: #f9b81b;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e3b2c;
+        }
+
+        .subhead {
+            font-size: 1rem;
+            opacity: 0.9;
+            border-top: 1px solid rgba(255,255,240,0.3);
+            display: inline-block;
+            margin-top: 0.6rem;
+            padding-top: 0.5rem;
+            font-weight: 400;
+        }
+
+        .lang-badge {
+            background: #f1f9f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 0.6rem 2rem;
+            border-bottom: 1px solid #cfe3cf;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2c5a42;
+        }
+
+        .badge-item {
+            background: #eaf6ea;
+            padding: 0.2rem 1rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 0 1rem 0;
+            scroll-behavior: smooth;
+        }
+
+        .mouja-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1rem;
+            min-width: 480px;
+        }
+
+        .mouja-table th {
+            background: #eef3ea;
+            padding: 1rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #c0dbc0;
+            color: #1f4e2f;
+            text-align: center;
+        }
+
+        .mouja-table td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid #dbebdb;
+            vertical-align: middle;
+            transition: background 0.1s ease;
+        }
+
+        .mouja-table tr:hover td {
+            background-color: #f6fef2;
+        }
+
+        /* সিরিয়াল নম্বর ও ইংলিশ নামের জন্য */
+        .sl-col {
+            text-align: center;
+            font-weight: 600;
+            width: 75px;
+            background-color: #fcfef9;
+            font-size: 0.95rem;
+            color: #2d4a2e;
+        }
+
+        .mouja-name-col {
+            font-weight: 500;
+        }
+
+        /* বাংলা কলাম আরও স্পেসিং */
+        .mouja-name-bn {
+            font-size: 1.04rem;
+            line-height: 1.4;
+        }
+
+        /* ইংরেজি মুজা নামের কলাম যাতে readable */
+        .mouja-name-en {
+            font-size: 0.96rem;
+            font-weight: 500;
+            color: #23644c;
+            letter-spacing: 0.2px;
+        }
+
+        .footer-note {
+            background: #f9fbf7;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            border-top: 1px solid #cfe0cd;
+            color: #3f6652;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .header-section h1 {
+                font-size: 1.5rem;
+            }
+            .mouja-table th, .mouja-table td {
+                padding: 0.7rem 0.5rem;
+            }
+            .sl-col {
+                width: 60px;
+            }
+            .mouja-name-bn {
+                font-size: 0.96rem;
+            }
+        }
+
+        /* ইংরেজি ও বাংলার মধ্যে ভারসাম্য */
+        .two-lang-indicator {
+            background: #f3f9ef;
+            border-radius: 20px;
+            padding: 0px 8px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <h1>
+            📄 মৌজা তালিকা 
+            <span>Mouja Register</span>
+        </h1>
+        <div class="subhead">পশ্চিমবঙ্গের গুরুত্বপূর্ণ মৌজা তথ্য | Important Mouja Information (Bengali & English)</div>
+    </div>
+    
+    <div class="lang-badge">
+        <div class="badge-item">🇧🇩 বাংলা (Bengali)</div>
+        <div class="badge-item">🇬🇧 English (Roman Script)</div>
+        <div class="badge-item">✓ ডুয়াল ল্যাঙ্গুয়েজ</div>
+    </div>
+    
+    <div class="table-wrapper">
+        <table class="mouja-table" summary="মৌজার নামের তালিকা সিরিয়াল নম্বর সহ, ইংরেজি ও বাংলা বিন্যাসে">
+            <thead>
+                <tr>
+                    <th>ক্রমিক নং<br><span class="two-lang-indicator">SL No.</span></th>
+                    <th>মৌজার নাম (বাংলা লিপি)<br><span class="two-lang-indicator">Mouja Name in Bengali</span></th>
+                    <th>Mouja Name (English Translit.)<br><span class="two-lang-indicator">ইংরেজি প্রতিবর্ণীকরণ</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- তথ্য যথাযথভাবে প্রদত্ত তালিকা অনুযায়ী (মোট ১৭টি মৌজা) 
+                     প্রতিটি স্ল নম্বর, বাংলা নাম (বন্ধনী সহ কোড) এবং ইংরেজি সংস্করণ -->
+                <!-- 1. [007]পশ্চিম ভগবানপুর -->
+                <tr>
+                    <td class="sl-col">1</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span></td>
+                    <td class="mouja-name-en english-text">[007] Pashchim Bhagabanpur</td>
+                </tr>
+                <!-- 2. [020]হরিপুর -->
+                <tr>
+                    <td class="sl-col">2</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[020]হরিপুর</span></td>
+                    <td class="mouja-name-en english-text">[020] Haripur</td>
+                </tr>
+                <!-- 3. [021]খদিয়ারপুর -->
+                <tr>
+                    <td class="sl-col">3</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[021]খদিয়ারপুর</span></td>
+                    <td class="mouja-name-en english-text">[021] Khadiyarpur</td>
+                </tr>
+                <!-- 4. [023]বলতর -->
+                <tr>
+                    <td class="sl-col">4</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[023]বলতর</span></td>
+                    <td class="mouja-name-en english-text">[023] Baltar</td>
+                </tr>
+                <!-- 5. [024]গৌরীপুর -->
+                <tr>
+                    <td class="sl-col">5</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[024]গৌরীপুর</span></td>
+                    <td class="mouja-name-en english-text">[024] Gauripur</td>
+                </tr>
+                <!-- 6. [025]রায়ঘাটা -->
+                <tr>
+                    <td class="sl-col">6</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[025]রায়ঘাটা</span></td>
+                    <td class="mouja-name-en english-text">[025] Rayghata</td>
+                </tr>
+                <!-- 7. [032]নয়নপুর -->
+                <tr>
+                    <td class="sl-col">7</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[032]নয়নপুর</span></td>
+                    <td class="mouja-name-en english-text">[032] Nayanpur</td>
+                </tr>
+                <!-- 8. [033]রামদেবপুর -->
+                <tr>
+                    <td class="sl-col">8</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[033]রামদেবপুর</span></td>
+                    <td class="mouja-name-en english-text">[033] Ramdebpur</td>
+                </tr>
+                <!-- 9. [034]রানাপুর -->
+                <tr>
+                    <td class="sl-col">9</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[034]রানাপুর</span></td>
+                    <td class="mouja-name-en english-text">[034] Ranapur</td>
+                </tr>
+                <!-- 10. [035]জোতচণ্ডী -->
+                <tr>
+                    <td class="sl-col">10</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[035]জোতচণ্ডী</span></td>
+                    <td class="mouja-name-en english-text">[035] Jotchandi</td>
+                </tr>
+                <!-- 11. [036]পূর্ব ভগবানপুর -->
+                <tr>
+                    <td class="sl-col">11</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[036]পূর্ব ভগবানপুর</span></td>
+                    <td class="mouja-name-en english-text">[036] Purba Bhagabanpur</td>
+                </tr>
+                <!-- 12. [037]সেরবাবর বলরামপুর -->
+                <tr>
+                    <td class="sl-col">12</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[037]সেরবাবর বলরামপুর</span></td>
+                    <td class="mouja-name-en english-text">[037] Serbabar Balarampur</td>
+                </tr>
+                <!-- 13. [038]বাগুঞ্জ -->
+                <tr>
+                    <td class="sl-col">13</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[038]বাগুঞ্জ</span></td>
+                    <td class="mouja-name-en english-text">[038] Bagunja</td>
+                </tr>
+                <!-- 14. [040]চণ্ডীপুর -->
+                <tr>
+                    <td class="sl-col">14</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[040]চণ্ডীপুর</span></td>
+                    <td class="mouja-name-en english-text">[040] Chandipur</td>
+                </tr>
+                <!-- 15. [041]ভেবাকালিগঞ্জ -->
+                <tr>
+                    <td class="sl-col">15</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[041]ভেবাকালিগঞ্জ</span></td>
+                    <td class="mouja-name-en english-text">[041] Bheba Kaliganj</td>
+                </tr>
+                <!-- 16. [056]খোসালপুর -->
+                <tr>
+                    <td class="sl-col">16</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[056]খোসালপুর</span></td>
+                    <td class="mouja-name-en english-text">[056] Khosalpur</td>
+                </tr>
+                <!-- 17. [057]অরবরা -->
+                <tr>
+                    <td class="sl-col">17</td>
+                    <td class="mouja-name-col"><span class="mouja-name-bn">[057]অরবরা</span></td>
+                    <td class="mouja-name-en english-text">[057] Aravara / Arabara</td>
+                </tr>
+                <!-- তথ্য সম্পূর্ণ: ১৭টি এন্ট্রি উপাত্ত অনুযায়ী সঠিক ক্রমে -->
+            </tbody>
+        </table>
+    </div>
+    <div class="footer-note">
+        🌾 মোট মৌজা সংখ্যা: <strong>১৭টি</strong> | মোট মৌজা (Total Mouja): <strong>17</strong> &nbsp;|&nbsp; তথ্য নির্ভুল ও পূর্ণাঙ্গ &nbsp;|&nbsp; বাংলা ও ইংরেজি লিপিতে উপস্থাপন  
+    </div>
+</div>
+
+<!-- এডিশনাল ফন্ট সাপোর্টের জন্য গুগল ফন্টস (ঐচ্ছিক তবে ভালো ইউনিকোড রেন্ডারিং)  -->
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+<style>
+    /* নিশ্চিত করা যে হিন্দ সিলিগুড়ি ও বাংলা ফন্ট কাজ করছে */
+    body, .bengali-text, .mouja-name-bn, td:nth-child(2), .lang-bn {
+        font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Bangla', 'SolaimanLipi', 'SutonnyMJ', 'Kalpurush', 'Nirmala UI', system-ui, sans-serif;
+    }
+    .english-text, .mouja-name-en, .sl-col, th span.two-lang-indicator, .badge-item:last-child, .footer-note, .subhead {
+        font-family: 'Inter', 'Segoe UI', 'Roboto', 'Noto Sans', sans-serif;
+    }
+    th {
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        font-weight: 700;
+    }
+    /* টেবিলের বাংলা কলামে আরও স্পষ্ট বাংলা */
+    .mouja-name-bn {
+        font-weight: 500;
+        font-size: 1.07rem;
+        letter-spacing: 0.3px;
+    }
+    /* ছোট ডিভাইসে স্থিতিশীলতা */
+    @media (max-width: 550px) {
+        .mouja-name-bn {
+            font-size: 0.9rem;
+        }
+        .mouja-name-en {
+            font-size: 0.8rem;
+        }
+        .header-section h1 {
+            font-size: 1.3rem;
+        }
+        .badge-item {
+            padding: 0.1rem 0.6rem;
+            font-size: 0.7rem;
+        }
+        .lang-badge {
+            padding: 0.5rem 1rem;
+        }
+    }
+</style>
+
+<!-- স্ক্রিপ্ট (কোনো টেবিল ইন্টারঅ্যাক্টিভিটি নেই, তবে প্রয়োজনীয় UI স্টেবিলিটি) -->
+<script>
+    (function() {
+        // মোবাইলে টেবিল স্ক্রলিং সহজ করার জন্য ইভেন্ট লিস্টার অথবা ইউজার এজেন্ট ডিটেক্ট - প্রয়োজন নেই, তবে সাবলীলতার জন্য কিছু 
+        console.log("মৌজা তথ্য পৃষ্ঠা সাফল্যের সাথে লোড হয়েছে। বাংলা ও ইংরেজি ফন্ট সমর্থিত।");
+        // ছোট স্ক্রিনে টেবিলের ফোকাসের জন্য কোনও হ্যান্ডলার ঐচ্ছিক 
+        let wrapper = document.querySelector('.table-wrapper');
+        if(wrapper && window.innerWidth < 700) {
+            wrapper.setAttribute('tabindex', '0');
+            wrapper.style.outline = 'none';
+        }
+    })();
+</script>
+
+</body>
+</html>
