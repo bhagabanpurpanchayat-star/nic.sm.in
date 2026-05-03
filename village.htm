@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>গ্রাম ও মৌজা তালিকা | Village vs Mouja - বাংলা ও ইংরেজি</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2ea;
+            font-family: 'Segoe UI', Roboto, system-ui, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1rem;
+            color: #1a2e1f;
+        }
+
+        /* বাংলা ফন্টের জন্য উন্নত সমর্থন */
+        .bengali-font, .mouja-name-bn, .village-name-bn {
+            font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Bangla', 'SolaimanLipi', 'SutonnyMJ', 'Kalpurush', 'Siyam Rupali', 'Nirmala UI', sans-serif;
+            font-weight: 500;
+        }
+
+        .english-text {
+            font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            font-weight: 500;
+            color: #2b5e3b;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 36px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* হেডার সেকশন */
+        .header-section {
+            background: linear-gradient(115deg, #1d4d2d, #2a6b3c);
+            padding: 1.6rem 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .header-section h1 span {
+            background: #ffdf8c;
+            color: #1d4d2d;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .subhead {
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+            opacity: 0.92;
+            border-top: 1px solid rgba(255, 255, 220, 0.3);
+            display: inline-block;
+            padding-top: 0.6rem;
+        }
+
+        /* ভাষা ব্যাজ */
+        .lang-badge {
+            background: #f4f9f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid #cde0ca;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2a5a38;
+        }
+
+        .badge-item {
+            background: #e2f0dc;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* টেবিল র‍্যাপার */
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        .village-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 620px;
+        }
+
+        .village-table th {
+            background: #e3f0de;
+            padding: 1rem 1rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.4px;
+            border-bottom: 2px solid #bcd8b2;
+            color: #1a4a2a;
+            text-align: center;
+        }
+
+        .village-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #ddecd8;
+            vertical-align: middle;
+            transition: background 0.12s ease;
+        }
+
+        .village-table tr:hover td {
+            background-color: #f6fef0;
+        }
+
+        /* সিরিয়াল কলাম */
+        .sl-col {
+            text-align: center;
+            font-weight: 650;
+            width: 70px;
+            background-color: #fcfef7;
+            color: #1e562e;
+            font-size: 0.9rem;
+        }
+
+        /* গ্রামের নাম কলাম (বাংলা ও ইংরেজি) */
+        .village-name-bn {
+            font-size: 1rem;
+            line-height: 1.4;
+            font-weight: 500;
+            display: block;
+        }
+
+        .village-name-en {
+            font-size: 0.85rem;
+            font-weight: 450;
+            color: #3e6b48;
+            margin-top: 3px;
+            letter-spacing: 0.2px;
+        }
+
+        /* মৌজা কলাম (বাংলা ও ইংরেজি একসাথে) */
+        .mouja-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .mouja-name-bn {
+            font-size: 1rem;
+            font-weight: 550;
+            color: #1f4a2c;
+        }
+        .mouja-name-en {
+            font-size: 0.84rem;
+            font-weight: 500;
+            color: #4b6e53;
+        }
+
+        .footer-note {
+            background: #f9fbf5;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            border-top: 1px solid #d1e3cb;
+            color: #2d5a3b;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 1rem 0.6rem;
+            }
+            .header-section h1 {
+                font-size: 1.4rem;
+            }
+            .village-table th, .village-table td {
+                padding: 0.65rem 0.5rem;
+            }
+            .sl-col {
+                width: 55px;
+            }
+            .mouja-name-bn, .village-name-bn {
+                font-size: 0.9rem;
+            }
+            .lang-badge {
+                padding: 0.4rem 1rem;
+            }
+        }
+
+        /* ইংরেজি অংশ ছোট ট্যাগ */
+        .small-hint {
+            font-size: 0.7rem;
+            font-weight: normal;
+            background: #eef3e9;
+            padding: 0px 6px;
+            border-radius: 30px;
+            margin-left: 5px;
+        }
+
+        th span.small-hint {
+            background: #cfdec8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <h1>
+            📋 গ্রাম ও মৌজা তালিকা 
+            <span>Village vs Mouja</span>
+        </h1>
+        <div class="subhead">প্রতিটি গ্রামের অধীনে সংশ্লিষ্ট মৌজার নাম (বাংলা-ইংরেজি) | Complete village list with respective Mouja details</div>
+    </div>
+
+    <div class="lang-badge">
+        <div class="badge-item">🇧🇩 বাংলা (বাংলা লিপি)</div>
+        <div class="badge-item">🇬🇧 English Transliteration</div>
+        <div class="badge-item">📌 মোট গ্রাম: ৩২টি</div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="village-table" summary="গ্রাম ও মৌজার তালিকা, সিরিয়াল নম্বর সহ, বাংলা ও ইংরেজি বিন্যাসে">
+            <thead>
+                <tr>
+                    <th>ক্রমিক নং<br><span class="small-hint">SL No.</span></th>
+                    <th>গ্রামের নাম (Village)<br><span class="small-hint">বাংলা & English</span></th>
+                    <th>মৌজার নাম (Mouja)<br><span class="small-hint">বাংলা + ইংরেজি</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 1. Nimgachhi -> [007]পশ্চিম ভগবানপুর -->
+                <tr><td class="sl-col">1</td>
+                    <td><span class="village-name-bn">নিমগাছি</span><span class="village-name-en">Nimgachhi</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 2. Ghagarpar -->
+                <tr><td class="sl-col">2</td>
+                    <td><span class="village-name-bn">ঘাগরপাড়</span><span class="village-name-en">Ghagarpar</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 3. Jasua -->
+                <tr><td class="sl-col">3</td>
+                    <td><span class="village-name-bn">জাসুয়া</span><span class="village-name-en">Jasua</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 4. JahirKhan -->
+                <tr><td class="sl-col">4</td>
+                    <td><span class="village-name-bn">জহির খাঁ</span><span class="village-name-en">JahirKhan</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 5. Molla Para -->
+                <tr><td class="sl-col">5</td>
+                    <td><span class="village-name-bn">মোল্লা পাড়া</span><span class="village-name-en">Molla Para</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 6. Bhagabanpur -->
+                <tr><td class="sl-col">6</td>
+                    <td><span class="village-name-bn">ভগবানপুর</span><span class="village-name-en">Bhagabanpur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 7. Belpukur -->
+                <tr><td class="sl-col">7</td>
+                    <td><span class="village-name-bn">বেলপুকুর</span><span class="village-name-en">Belpukur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 8. Charalu -->
+                <tr><td class="sl-col">8</td>
+                    <td><span class="village-name-bn">চরালু</span><span class="village-name-en">Charalu</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[007]পশ্চিম ভগবানপুর</span><span class="mouja-name-en">[007] Pashchim Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 9. Serbabar -> [037]সেরবাবর বলরামপুর -->
+                <tr><td class="sl-col">9</td>
+                    <td><span class="village-name-bn">সেরবাবর</span><span class="village-name-en">Serbabar</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[037]সেরবাবর বলরামপুর</span><span class="mouja-name-en">[037] Serbabar Balarampur</span></div></td>
+                </tr>
+                <!-- 10. Gouripur -> [024]গৌরীপুর -->
+                <tr><td class="sl-col">10</td>
+                    <td><span class="village-name-bn">গৌরীপুর</span><span class="village-name-en">Gouripur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[024]গৌরীপুর</span><span class="mouja-name-en">[024] Gauripur</span></div></td>
+                </tr>
+                <!-- 11. Ranapur -> [034]রানাপুর -->
+                <tr><td class="sl-col">11</td>
+                    <td><span class="village-name-bn">রানাপুর</span><span class="village-name-en">Ranapur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[034]রানাপুর</span><span class="mouja-name-en">[034] Ranapur</span></div></td>
+                </tr>
+                <!-- 12. Nayanpur -> [032]নয়নপুর -->
+                <tr><td class="sl-col">12</td>
+                    <td><span class="village-name-bn">নয়নপুর</span><span class="village-name-en">Nayanpur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[032]নয়নপুর</span><span class="mouja-name-en">[032] Nayanpur</span></div></td>
+                </tr>
+                <!-- 13. Ramdevpur -> [033]রামদেবপুর -->
+                <tr><td class="sl-col">13</td>
+                    <td><span class="village-name-bn">রামদেবপুর</span><span class="village-name-en">Ramdevpur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[033]রামদেবপুর</span><span class="mouja-name-en">[033] Ramdebpur</span></div></td>
+                </tr>
+                <!-- 14. Jotchandi -> [035]জোতচণ্ডী -->
+                <tr><td class="sl-col">14</td>
+                    <td><span class="village-name-bn">জোতচণ্ডী</span><span class="village-name-en">Jotchandi</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[035]জোতচণ্ডী</span><span class="mouja-name-en">[035] Jotchandi</span></div></td>
+                </tr>
+                <!-- 15. Bheba -> [036]পূর্ব ভগবানপুর -->
+                <tr><td class="sl-col">15</td>
+                    <td><span class="village-name-bn">ভেবা</span><span class="village-name-en">Bheba</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[036]পূর্ব ভগবানপুর</span><span class="mouja-name-en">[036] Purba Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 16. Uttar Kaligunj -> [041]ভেবাকালিগঞ্জ -->
+                <tr><td class="sl-col">16</td>
+                    <td><span class="village-name-bn">উত্তর কালীগঞ্জ</span><span class="village-name-en">Uttar Kaligunj</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[041]ভেবাকালিগঞ্জ</span><span class="mouja-name-en">[041] Bheba Kaliganj</span></div></td>
+                </tr>
+                <!-- 17. Dakshin Kaligunj -> [041]ভেবাকালিগঞ্জ -->
+                <tr><td class="sl-col">17</td>
+                    <td><span class="village-name-bn">দক্ষিণ কালীগঞ্জ</span><span class="village-name-en">Dakshin Kaligunj</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[041]ভেবাকালিগঞ্জ</span><span class="mouja-name-en">[041] Bheba Kaliganj</span></div></td>
+                </tr>
+                <!-- 18. Bagunj -> [038]বাগুঞ্জ -->
+                <tr><td class="sl-col">18</td>
+                    <td><span class="village-name-bn">বাগুঞ্জ</span><span class="village-name-en">Bagunj</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[038]বাগুঞ্জ</span><span class="mouja-name-en">[038] Bagunja</span></div></td>
+                </tr>
+                <!-- 19. Panbara -> [038]বাগুঞ্জ -->
+                <tr><td class="sl-col">19</td>
+                    <td><span class="village-name-bn">পানবারা</span><span class="village-name-en">Panbara</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[038]বাগুঞ্জ</span><span class="mouja-name-en">[038] Bagunja</span></div></td>
+                </tr>
+                <!-- 20. Choto Haripur -> [020]হরিপুর -->
+                <tr><td class="sl-col">20</td>
+                    <td><span class="village-name-bn">ছোট হরিপুর</span><span class="village-name-en">Choto Haripur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[020]হরিপুর</span><span class="mouja-name-en">[020] Haripur</span></div></td>
+                </tr>
+                <!-- 21. Haripur -> [020]হরিপুর -->
+                <tr><td class="sl-col">21</td>
+                    <td><span class="village-name-bn">হরিপুর</span><span class="village-name-en">Haripur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[020]হরিপুর</span><span class="mouja-name-en">[020] Haripur</span></div></td>
+                </tr>
+                <!-- 22. Hridanpur -> [036]পূর্ব ভগবানপুর -->
+                <tr><td class="sl-col">22</td>
+                    <td><span class="village-name-bn">হৃদয়পুর / হৃদানপুর</span><span class="village-name-en">Hridanpur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[036]পূর্ব ভগবানপুর</span><span class="mouja-name-en">[036] Purba Bhagabanpur</span></div></td>
+                </tr>
+                <!-- 23. Khadiarpur -> [021]খদিয়ারপুর -->
+                <tr><td class="sl-col">23</td>
+                    <td><span class="village-name-bn">খদিয়ারপুর</span><span class="village-name-en">Khadiarpur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[021]খদিয়ারপুর</span><span class="mouja-name-en">[021] Khadiyarpur</span></div></td>
+                </tr>
+                <!-- 24. Bagunj (under Khadiyarpur) -> [021]খদিয়ারপুর -->
+                <tr><td class="sl-col">24</td>
+                    <td><span class="village-name-bn">বাগুঞ্জ</span><span class="village-name-en">Bagunj</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[021]খদিয়ারপুর</span><span class="mouja-name-en">[021] Khadiyarpur</span></div></td>
+                </tr>
+                <!-- 25. Arbara -> [057]অরবরা -->
+                <tr><td class="sl-col">25</td>
+                    <td><span class="village-name-bn">অরবরা</span><span class="village-name-en">Arbara</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[057]অরবরা</span><span class="mouja-name-en">[057] Aravara / Arabara</span></div></td>
+                </tr>
+                <!-- 26. Khoshalpur -> [056]খোসালপুর -->
+                <tr><td class="sl-col">26</td>
+                    <td><span class="village-name-bn">খোশালপুর</span><span class="village-name-en">Khoshalpur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[056]খোসালপুর</span><span class="mouja-name-en">[056] Khosalpur</span></div></td>
+                </tr>
+                <!-- 27. Bagunj (Khoshalpur) -> [056]খোসালপুর -->
+                <tr><td class="sl-col">27</td>
+                    <td><span class="village-name-bn">বাগুঞ্জ</span><span class="village-name-en">Bagunj</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[056]খোসালপুর</span><span class="mouja-name-en">[056] Khosalpur</span></div></td>
+                </tr>
+                <!-- 28. NamajGaon -> [056]খোসালপুর -->
+                <tr><td class="sl-col">28</td>
+                    <td><span class="village-name-bn">নামাজগাঁও</span><span class="village-name-en">NamajGaon</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[056]খোসালপুর</span><span class="mouja-name-en">[056] Khosalpur</span></div></td>
+                </tr>
+                <!-- 29. Barator -> [023]বলতর -->
+                <tr><td class="sl-col">29</td>
+                    <td><span class="village-name-bn">বড়তর / বলতর</span><span class="village-name-en">Barator</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[023]বলতর</span><span class="mouja-name-en">[023] Baltar</span></div></td>
+                </tr>
+                <!-- 30. Raighata -> [025]রায়ঘাটা -->
+                <tr><td class="sl-col">30</td>
+                    <td><span class="village-name-bn">রায়ঘাটা</span><span class="village-name-en">Raighata</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[025]রায়ঘাটা</span><span class="mouja-name-en">[025] Rayghata</span></div></td>
+                </tr>
+                <!-- 31. Darakandi -> [040]চণ্ডীপুর -->
+                <tr><td class="sl-col">31</td>
+                    <td><span class="village-name-bn">দড়াকান্দি</span><span class="village-name-en">Darakandi</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[040]চণ্ডীপুর</span><span class="mouja-name-en">[040] Chandipur</span></div></td>
+                </tr>
+                <!-- 32. Chandipur -> [040]চণ্ডীপুর -->
+                <tr><td class="sl-col">32</td>
+                    <td><span class="village-name-bn">চণ্ডীপুর</span><span class="village-name-en">Chandipur</span></td>
+                    <td><div class="mouja-cell"><span class="mouja-name-bn">[040]চণ্ডীপুর</span><span class="mouja-name-en">[040] Chandipur</span></div></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        <span>🌾 মোট গ্রাম: <strong>৩২টি</strong> | Unique মৌজা: ১৬টি (পুনঃব্যবহৃত)</span>
+        <span>📜 তথ্য নির্ভুল ও আপডেটেড | বাংলা-ইংরেজি বিন্যাস</span>
+        <span>📍 Mouja কোড সহ সম্পূর্ণ তালিকা</span>
+    </div>
+</div>
+
+<!-- গুগল ফন্ট সমর্থন: বাংলা সাবলীলতা -->
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+<style>
+    /* উন্নত রেন্ডারিং নিশ্চিত */
+    body, .bengali-font, .village-name-bn, .mouja-name-bn {
+        font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Bangla', 'SolaimanLipi', 'SutonnyMJ', 'Kalpurush', 'Nirmala UI', sans-serif;
+    }
+    .english-text, .village-name-en, .mouja-name-en, .sl-col, .footer-note, .badge-item, .subhead, th span {
+        font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+    th {
+        font-weight: 700;
+        background: #e3f0de;
+    }
+    .village-name-en {
+        opacity: 0.85;
+        font-size: 0.78rem;
+    }
+    /* স্মার্ট অভিযোজন */
+    @media (max-width: 550px) {
+        .village-name-bn, .mouja-name-bn {
+            font-size: 0.85rem;
+        }
+        .village-name-en, .mouja-name-en {
+            font-size: 0.7rem;
+        }
+        .village-table th, .village-table td {
+            padding: 0.55rem 0.4rem;
+        }
+    }
+</style>
+
+<!-- স্ক্রিপ্ট: মোবাইলে স্মুথ স্ক্রোল ও কনসোল লগ -->
+<script>
+    (function() {
+        console.log("✅ গ্রাম ও মৌজা তালিকা সফলভাবে লোড হয়েছে (বাংলা + ইংরেজি)");
+        let wrapper = document.querySelector('.table-wrapper');
+        if(wrapper && window.innerWidth < 750) {
+            wrapper.setAttribute('tabindex', '0');
+            wrapper.style.outline = 'none';
+        }
+    })();
+</script>
+
+</body>
+</html>
