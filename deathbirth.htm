@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>জন্ম ও মৃত্যু নিবন্ধন ফর্ম | Birth & Death Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #d9e2ef 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Noto Sans Bengali', 'Hind Siliguri', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* main elegant container */
+        .premium-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 20, 30, 0.35), 0 1px 2px rgba(0,0,0,0.02);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* modern hero header */
+        .hero-header {
+            background: linear-gradient(112deg, #0b2b26 0%, #1a4d3e 100%);
+            padding: 1.8rem 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-icon {
+            background: #f9d56e;
+            width: 48px;
+            height: 48px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 14px rgba(0,0,0,0.2);
+        }
+
+        .brand-text h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: white;
+            margin-bottom: 0.2rem;
+        }
+
+        .brand-text p {
+            font-size: 0.85rem;
+            color: #cfe6df;
+            font-weight: 450;
+        }
+
+        .download-card {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(4px);
+            padding: 0.65rem 1.6rem;
+            border-radius: 80px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+
+        .download-card span {
+            color: #fef9e6;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .btn-download-glow {
+            background: #f4b942;
+            border: none;
+            padding: 0.7rem 1.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            color: #1e2f2a;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+            font-family: inherit;
+        }
+
+        .btn-download-glow:hover {
+            background: #ffcd6b;
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 12px 22px rgba(0,0,0,0.25);
+        }
+
+        /* guidelines section - bilingual cards */
+        .guidelines-section {
+            background: #fefcf5;
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 1px solid #e0ece6;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f5e4a;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 5px solid #f4b942;
+            padding-left: 1rem;
+        }
+
+        .guideline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .guideline-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e9f0eb;
+        }
+
+        .guideline-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #f0e5d2;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .lang-badge {
+            background: #1a4d3e;
+            color: white;
+            border-radius: 40px;
+            padding: 0.2rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c5a4a;
+        }
+
+        .guideline-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .guideline-list li {
+            margin-bottom: 0.9rem;
+            padding-left: 1.6rem;
+            position: relative;
+            font-size: 0.92rem;
+            line-height: 1.45;
+            color: #1e3a34;
+        }
+
+        .guideline-list li::before {
+            content: "✓";
+            color: #1f8a5c;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .bn-text {
+            font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+            font-weight: 500;
+        }
+
+        /* PDF viewer */
+        .pdf-pavilion {
+            background: #eef2f0;
+            padding: 2rem 2rem 1.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pdf-mirror {
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 1100px;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+
+        .pdf-embed-modern {
+            width: 100%;
+            height: 72vh;
+            min-height: 520px;
+            border: none;
+            display: block;
+            background: #fffcf0;
+        }
+
+        .viewer-footer-note {
+            background: #fbfdfc;
+            padding: 0.9rem 1.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #4a6a5e;
+            border-top: 1px solid #e0ece6;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .action-mini {
+            background: #f0f4f2;
+            border-radius: 60px;
+            padding: 0.2rem 1rem;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .footer-grace {
+            background: #f9fbfa;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5e7c70;
+            border-top: 1px solid #e2ece6;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 750px) {
+            body {
+                padding: 0.8rem;
+            }
+            .hero-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1.2rem 1.5rem;
+            }
+            .download-card {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .pdf-embed-modern {
+                height: 55vh;
+                min-height: 380px;
+            }
+            .brand-text h1 {
+                font-size: 1.3rem;
+            }
+            .guidelines-section {
+                padding: 1.2rem;
+            }
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        .pdf-mirror:hover {
+            box-shadow: 0 24px 42px -12px rgba(0, 32, 24, 0.3);
+        }
+
+        @keyframes gentlePulse {
+            0% { box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 6px 20px rgba(244,185,66,0.6); }
+            100% { box-shadow: 0 6px 14px rgba(0,0,0,0.2); }
+        }
+        .btn-download-glow:hover {
+            animation: gentlePulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="premium-container">
+    <!-- Header with download -->
+    <div class="hero-header">
+        <div class="brand">
+            <div class="brand-icon">
+                🌿
+            </div>
+            <div class="brand-text">
+                <h1>জন্ম ও মৃত্যু নিবন্ধন ফর্ম</h1>
+                <p>Birth & Death Registration Official Form | সরকারি নথি</p>
+            </div>
+        </div>
+        <div class="download-card">
+            <span>📄 ফর্ম ডাউনলোড করুন / Download Form</span>
+            <button class="btn-download-glow" id="elegantDownloadBtn">
+                ⬇️ Download PDF
+                <span style="font-size:1.1rem;">📎</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bilingual Guidelines Section -->
+    <div class="guidelines-section">
+        <div class="section-title">
+            <span>📋 নিবন্ধন নির্দেশিকা</span>
+            <span style="font-size: 1.2rem;">|</span>
+            <span>Registration Guidelines</span>
+        </div>
+        <div class="guideline-grid">
+            <!-- Bengali Guideline Card -->
+            <div class="guideline-card">
+                <div class="card-header">
+                    <span class="lang-badge">বাংলা</span>
+                    <h3>জন্ম ও মৃত্যু নিবন্ধন</h3>
+                </div>
+                <ul class="guideline-list bn-text">
+                    <li>জন্মের ৪৫ দিনের মধ্যে নিবন্ধন বাধ্যতামূলক।</li>
+                    <li>মৃত্যুর ৩০ দিনের মধ্যে স্থানীয় ইউনিয়ন/পৌরসভায় নিবন্ধন করতে হবে।</li>
+                    <li>প্রয়োজনীয় কাগজপত্র: হাসপাতালের সনদ, পরিচয়পত্র, এনআইডি/জন্ম নিবন্ধন সনদ।</li>
+                    <li>অনলাইন ফর্ম পূরণ করে নিকটস্থ সিটি কর্পোরেশন/ইউনিয়ন পরিষদে জমা দিন।</li>
+                    <li>নিবন্ধন ফি নির্ধারিত: সাধারণ নাগরিক ১০০ টাকা, জরুরি সেবা ২০০ টাকা।</li>
+                    <li>সঠিক তথ্য প্রদান করুন: নাম, পিতা-মাতা, ঠিকানা, তারিখ সঠিক হতে হবে।</li>
+                    <li>নিবন্ধনের পর সনদ প্রদান করা হবে (সাধারণত ৭-১৫ কার্যদিবস)।</li>
+                    <li>সংশোধনের জন্য নির্দিষ্ট ফর্ম ও আবেদন প্রয়োজন।</li>
+                </ul>
+            </div>
+            <!-- English Guideline Card -->
+            <div class="guideline-card">
+                <div class="card-header">
+                    <span class="lang-badge">English</span>
+                    <h3>Birth & Death Registration</h3>
+                </div>
+                <ul class="guideline-list">
+                    <li>Birth must be registered within 45 days of occurrence.</li>
+                    <li>Death registration is mandatory within 30 days at local Union/Council.</li>
+                    <li>Required documents: Hospital certificate, valid ID/NID, existing birth certificate (if any).</li>
+                    <li>Fill out the official form online or offline and submit to city corporation/union council.</li>
+                    <li>Standard fee: 100 BDT for regular, 200 BDT for urgent processing.</li>
+                    <li>Provide accurate details: name, parents' names, permanent address, exact dates.</li>
+                    <li>Certificate issuance usually takes 7–15 working days after verification.</li>
+                    <li>For corrections/adjustments, submit a separate rectification application form.</li>
+                </ul>
+            </div>
+        </div>
+        <div style="margin-top: 1rem; font-size: 0.75rem; color: #6c8b7e; text-align: center; border-top: 1px dashed #d0e0d8; padding-top: 0.8rem;">
+            ⚖️ জাতীয় নিবন্ধন আইন অনুযায়ী নির্দেশনা | Guidelines under National Registration Act
+        </div>
+    </div>
+
+    <!-- PDF viewing area -->
+    <div class="pdf-pavilion">
+        <div class="pdf-mirror">
+            <iframe 
+                class="pdf-embed-modern"
+                src="https://drive.google.com/file/d/1rOh1gnaS6Pe-nUDiW9imeqocT2NkgBP_/preview?embedded=true"
+                title="Birth and Death Registration Form — official document"
+                frameborder="0"
+                allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media"
+                referrerpolicy="strict-origin-when-cross-origin"
+                loading="eager"
+            ></iframe>
+            <div class="viewer-footer-note">
+                <span class="action-mini">🔍 দেখুন ও জুম করুন | View & Zoom</span>
+                <span class="action-mini">📱 মোবাইল বান্ধব | Mobile Ready</span>
+                <span class="action-mini">⚡ নির্ভরযোগ্য দলিল | Official Document</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer with bilingual note -->
+    <div class="footer-grace">
+        <span>📋 ফর্মটি পূরণ করে স্থানীয় অফিসে জমা দিন | Submit filled form to local civil registration office</span>
+        <span>🕊️ ডাউনলোড করে সংরক্ষণ করুন | Keep a digital copy for future reference</span>
+    </div>
+</div>
+
+<script>
+    // Google Drive File ID (only for download, no drive prompts or navigation)
+    const FILE_ID = "1rOh1gnaS6Pe-nUDiW9imeqocT2NkgBP_";
+    const DIRECT_DOWNLOAD_URL = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
+    
+    const downloadButton = document.getElementById('elegantDownloadBtn');
+    
+    // Silent download trigger - no redirects, no drive UI, no prompts
+    function triggerSilentDownload(url, suggestedFilename = "Birth_Death_Registration_Form_Official.pdf") {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = suggestedFilename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+            document.body.removeChild(link);
+        }, 150);
+    }
+    
+    function showDownloadFeedback() {
+        const originalHTML = downloadButton.innerHTML;
+        downloadButton.innerHTML = "⏳ প্রস্তুত হচ্ছে / Preparing...";
+        downloadButton.style.opacity = '0.9';
+        downloadButton.disabled = true;
+        
+        setTimeout(() => {
+            downloadButton.innerHTML = originalHTML;
+            downloadButton.style.opacity = '1';
+            downloadButton.disabled = false;
+        }, 1800);
+    }
+    
+    downloadButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showDownloadFeedback();
+        triggerSilentDownload(DIRECT_DOWNLOAD_URL, "Birth_Death_Registration_Form.pdf");
+    });
+    
+    // Micro-interaction effects
+    downloadButton.addEventListener('mousedown', function(e) {
+        this.style.transform = 'scale(0.97)';
+    });
+    downloadButton.addEventListener('mouseup', function() {
+        this.style.transform = 'scale(1)';
+    });
+    downloadButton.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+    });
+    
+    // Override window.open to block any potential drive.google.com popups (extra safety)
+    const originalWindowOpen = window.open;
+    window.open = function(url, name, features) {
+        if (typeof url === 'string' && url.includes('drive.google.com')) {
+            console.warn("Blocked drive navigation");
+            return null;
+        }
+        return originalWindowOpen.call(window, url, name, features);
+    };
+    
+    // Block any accidental clicks on anchors pointing to drive (none exist, but safe)
+    document.addEventListener('click', function(event) {
+        let target = event.target.closest('a');
+        if (target && target.href && target.href.includes('drive.google.com')) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+    });
+    
+    // Optional: improve iframe embed to minimize drive toolbar (already appended embedded=true)
+    const pdfFrame = document.querySelector('.pdf-embed-modern');
+    if (pdfFrame && pdfFrame.src && !pdfFrame.src.includes('embedded=true')) {
+        pdfFrame.src = pdfFrame.src + (pdfFrame.src.includes('?') ? '&embedded=true' : '?embedded=true');
+    }
+    
+    // Ensure no text content mentions "Open in Drive" – remove if any dynamic text
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    const nodesToClean = [];
+    while(walker.nextNode()) {
+        const node = walker.currentNode;
+        if (node.textContent && (node.textContent.includes('drive.google.com') || node.textContent.includes('Go to Drive'))) {
+            nodesToClean.push(node);
+        }
+    }
+    nodesToClean.forEach(node => {
+        if (node.parentNode) node.parentNode.removeChild(node);
+    });
+    
+    console.log("✅ Guidelines added in Bengali & English. Download ready — no drive prompts.");
+</script>
+</body>
+</html>
