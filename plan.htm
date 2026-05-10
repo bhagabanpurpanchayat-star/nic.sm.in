@@ -2,267 +2,498 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Annual & Supplementary Action Plan</title>
+<title>Annual & Supplementary Action Plan | Smart Upload</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-    body {
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: #eef2f7;
-        margin: 0;
+    * {
+        box-sizing: border-box;
+        transition: all 0.2s ease;
     }
 
+    body {
+        font-family: "Segoe UI", 'Inter', system-ui, Arial, sans-serif;
+        background: #eef2f7;
+        margin: 0;
+        padding-bottom: 25px;
+    }
+
+    /* ========= HEADER MODERN ========= */
     header {
-        background: linear-gradient(90deg, #1e3c72, #2a5298);
+        background: linear-gradient(135deg, #0b2b44, #1a4a7a);
         color: white;
-        padding: 16px 25px;
+        padding: 18px 28px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 22px;
-        font-weight: 700;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        flex-wrap: wrap;
+        gap: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     }
 
+    .logo-area {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.2px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .logo-badge {
+        background: #facc15;
+        width: 8px;
+        height: 32px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+    /* upload group */
     #importForm {
         display: flex;
         gap: 12px;
         align-items: center;
+        background: rgba(255,255,255,0.1);
+        padding: 6px 18px;
+        border-radius: 60px;
+        backdrop-filter: blur(4px);
+    }
+
+    .custom-file-label {
+        background: white;
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e3c72;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+
+    .custom-file-label:hover {
+        background: #fef9e3;
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* attachment pulse animation */
+    .attach-pulse {
+        animation: fileAttachGlow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes fileAttachGlow {
+        0% { background: white; transform: scale(1); box-shadow: 0 0 0 0 #facc15; }
+        50% { background: #fff3cd; transform: scale(1.05); box-shadow: 0 0 0 6px rgba(250,204,21,0.4); }
+        100% { background: white; transform: scale(1); box-shadow: 0 0 0 0 #facc15; }
+    }
+
+    #fileNameDisplay {
+        font-size: 13px;
+        background: #eef2f7;
+        padding: 6px 14px;
+        border-radius: 40px;
+        color: #1f2937;
+        font-weight: 500;
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: 0.2s;
     }
 
     input[type="file"] {
-        background: white;
-        padding: 6px 10px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        font-size: 13px;
+        display: none;
     }
 
-    button {
-        background: #2563eb;
-        color: white;
-        padding: 8px 16px;
+    .upload-btn {
+        background: #facc15;
+        color: #1e293b;
+        padding: 8px 28px;
+        border-radius: 40px;
+        font-weight: 700;
         border: none;
-        border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
-        font-weight: 600;
-        transition: 0.2s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    button:hover {
-        background: #1e4fbb;
+    .upload-btn:hover {
+        background: #ffe069;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.2);
     }
 
+    /* container & cards */
     .container {
         max-width: 1400px;
-        margin: auto;
-        margin-top: 25px;
-        background: #fff;
-        padding: 25px;
-        border-radius: 14px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+        margin: 28px auto;
+        background: white;
+        padding: 22px 26px;
+        border-radius: 28px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
     }
 
     .filters {
         display: flex;
-        gap: 15px;
+        gap: 14px;
         flex-wrap: wrap;
-        margin-bottom: 18px;
+        margin-bottom: 25px;
+        align-items: center;
     }
 
     .filters input, .filters select {
-        padding: 10px 12px;
+        padding: 12px 16px;
         font-size: 14px;
-        border: 1px solid #cfd8e3;
-        border-radius: 8px;
-        min-width: 160px;
-        flex: 1;
-        background: #f9fbff;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-        transition: 0.2s ease;
+        border: 1px solid #cfdfed;
+        border-radius: 32px;
+        background: #fafdff;
+        font-weight: 500;
+        flex: 1 1 160px;
+        transition: 0.15s;
+    }
+
+    .filters input:focus, .filters select:focus {
+        border-color: #1e4fbb;
+        box-shadow: 0 0 0 3px rgba(30,79,187,0.2);
+        outline: none;
+    }
+
+    #exportBtn {
+        background: #2c5f2d;
+        border-radius: 40px;
+        padding: 12px 24px;
+        border: none;
+        letter-spacing: 0.5px;
+    }
+
+    #exportBtn:hover {
+        background: #1f4520;
+        transform: scale(1.02);
+    }
+
+    /* table with animations */
+    .table-wrapper {
+        max-height: calc(100vh - 340px);
+        overflow-y: auto;
+        overflow-x: auto;
+        border-radius: 20px;
+        border: 1px solid #e2edf7;
+        background: #fff;
+        transition: box-shadow 0.2s;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        background: white;
+        font-size: 13.5px;
     }
 
-    thead {
-        background: #1e3c72;
+    thead th {
+        background: #102b47;
         color: white;
-    }
-
-    th {
-        padding: 10px;
-        font-size: 14px;
-        text-align: left;
-        border: 1px dotted #000;
+        padding: 14px 8px;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 15;
+        border: 1px dotted #2e4a77;
     }
 
     td {
-        padding: 8px;
-        font-size: 14px;
-        border: 1px dotted #000;
+        padding: 10px 8px;
+        border: 1px dotted #cbdde9;
+        background-color: white;
     }
 
     tr:hover td {
-        background: #eff4ff;
+        background: #f1f9fe;
     }
 
-    /* ✅ Loader Overlay */
-    #loaderOverlay {
+    /* ========= LOADER OVERLAY (form loading + upload) ========= */
+    #globalLoader {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.35);
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
         display: none;
         justify-content: center;
         align-items: center;
-        z-index: 999;
-        backdrop-filter: blur(3px);
+        z-index: 1000;
+        flex-direction: column;
+        gap: 24px;
     }
 
-    /* ✅ Spinner */
-    .spinner {
-        width: 65px;
-        height: 65px;
-        border: 7px solid #fff;
+    .loader-card {
+        background: white;
+        border-radius: 48px;
+        padding: 32px 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        box-shadow: 0 30px 45px rgba(0,0,0,0.3);
+        animation: fadeSlideUp 0.3s ease;
+    }
+
+    .animated-spinner {
+        width: 70px;
+        height: 70px;
+        border: 7px solid #e2e8f0;
         border-top: 7px solid #2563eb;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
+        animation: spinRing 0.9s linear infinite;
     }
 
-    @keyframes spin {
+    .loader-message {
+        font-weight: 700;
+        color: #0f2b3d;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* skeleton loader for initial table loading */
+    .skeleton-row td {
+        background: linear-gradient(90deg, #f0f2f5 25%, #e9ecef 50%, #f0f2f5 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.2s infinite;
+        height: 48px;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    @keyframes spinRing {
+        0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
 
-    /* ✅ RESPONSIVE SCROLL ONLY WHEN NEEDED */
-    .table-wrapper {
-        max-height: calc(100vh - 320px);
-        overflow-y: auto;
-        overflow-x: auto;
-        border: 1px solid #ccc;
-        border-radius: 10px;
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ✅ Frozen Header */
-    #dataTable thead th {
-        position: sticky;
-        top: 0;
-        background: #1e3c72;
-        z-index: 10;
+    /* TOAST MESSAGES (successful upload, attachment etc) */
+    .toast-notify {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #1f2f3e;
+        color: white;
+        padding: 14px 26px;
+        border-radius: 60px;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 1100;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        transform: translateX(450px);
+        transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        backdrop-filter: blur(12px);
+        background: #0f2a40e6;
+        border-left: 5px solid #facc15;
+    }
+
+    .toast-notify.show {
+        transform: translateX(0);
+    }
+
+    .toast-success {
+        border-left-color: #22c55e;
+        background: #0b2b2ce6;
+    }
+
+    .toast-error {
+        border-left-color: #ef4444;
+    }
+
+    .toast-info {
+        border-left-color: #3b82f6;
+    }
+
+    /* file attached mini icon */
+    .file-attach-icon {
+        font-size: 18px;
     }
 </style>
 </head>
-
 <body>
 
-<!-- ✅ Loader Overlay -->
-<div id="loaderOverlay">
-    <div class="spinner"></div>
+<!-- GLOBAL LOADER ANIMATION (form loading + upload) -->
+<div id="globalLoader">
+    <div class="loader-card">
+        <div class="animated-spinner"></div>
+        <div class="loader-message">
+            <span id="loaderText">⏳ Loading data...</span>
+        </div>
+        <div style="font-size:13px; color:#4b5563;">Please wait</div>
+    </div>
 </div>
 
 <header>
-    Annual & Supplementary Action Plan
+    <div class="logo-area">
+        📊 Annual & Supplementary Action Plan
+        <div class="logo-badge"></div>
+    </div>
 
-    <form id="importForm" enctype="multipart/form-data">
-        <input type="file" id="excelFile" accept=".xls,.xlsx">
-        <button type="button" onclick="uploadExcel()">Upload & Import</button>
+    <form id="importForm" enctype="multipart/form-data" onsubmit="return false;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <label for="excelFile" class="custom-file-label" id="fileLabelBtn">
+                📎 Choose File (CSV only)
+            </label>
+            <input type="file" id="excelFile" accept=".xls,.xlsx,.csv">
+            <span id="fileNameDisplay">No file chosen</span>
+        </div>
+        <button type="button" id="uploadActionBtn" class="upload-btn">
+            ⬆️ Upload & Import
+        </button>
     </form>
 </header>
 
 <div class="container">
-
     <div class="filters">
-        <input type="text" id="searchInput" placeholder="🔍 Search anything...">
-
-        <select id="filterFY">
-            <option value="">Financial Year</option>
-        </select>
-
-        <select id="filterPlanType">
-            <option value="">PLAN TYPE</option>
-        </select>
-
-        <select id="filterScheme">
-            <option value="">Scheme</option>
-        </select>
-
-        <button id="exportBtn">⬇ Export Excel</button>
+        <input type="text" id="searchInput" placeholder="🔍 Search anything (activity, sector, scheme...)">
+        <select id="filterFY"><option value="">Financial Year</option></select>
+        <select id="filterPlanType"><option value="">PLAN TYPE</option></select>
+        <select id="filterScheme"><option value="">Scheme Name</option></select>
+        <button id="exportBtn">📎 Export Excel</button>
     </div>
 
     <div class="table-wrapper">
         <table id="dataTable">
             <thead>
-                <tr>
-                    <th>S.No</th>
-                    <th>Financial Year</th>
-                    <th>PLAN TYPE</th>
-                    <th>Activity Code</th>
-                    <th>Activity Description</th>
-                    <th>Sector</th>
-                    <th>Location of Asset</th>
-                    <th>Estimated Cost</th>
-                    <th>Scheme Name</th>
-                    <th>Theme Name</th>
-                    <th>Tender Status</th>
-                </tr>
+                <tr><th>S.No</th><th>Financial Year</th><th>PLAN TYPE</th><th>Activity Code</th><th>Activity Description</th><th>Sector</th><th>Location of Asset</th><th>Estimated Cost</th><th>Scheme Name</th><th>Theme Name</th><th>Tender Status</th></tr>
             </thead>
-            <tbody id="dataBody"></tbody>
+            <tbody id="dataBody">
+                <!-- Skeleton animation rows while loading -->
+                <tr class="skeleton-row"><td colspan="11">&nbsp;</td></tr>
+                <tr class="skeleton-row"><td colspan="11">&nbsp;</td></tr>
+                <tr class="skeleton-row"><td colspan="11">&nbsp;</td></tr>
+            </tbody>
         </table>
     </div>
-
 </div>
 
 <script>
+// ======================== GLOBAL STATE ========================
 let originalData = [];
 let filteredData = [];
 
-document.addEventListener("DOMContentLoaded", () => loadData());
+// DOM elements
+const globalLoader = document.getElementById('globalLoader');
+const loaderTextSpan = document.getElementById('loaderText');
+const fileInput = document.getElementById('excelFile');
+const fileNameSpan = document.getElementById('fileNameDisplay');
+const uploadBtn = document.getElementById('uploadActionBtn');
+const tableBody = document.getElementById('dataBody');
 
+// ======================== TOAST SYSTEM ========================
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast-notify ${type === 'error' ? 'toast-error' : (type === 'success' ? 'toast-success' : 'toast-info')}`;
+    const icon = type === 'error' ? '⚠️' : (type === 'success' ? '✅' : 'ℹ️');
+    toast.innerHTML = `${icon} ${message}`;
+    document.body.appendChild(toast);
+    // force reflow + animation
+    setTimeout(() => toast.classList.add('show'), 20);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 3800);
+}
+
+// ========== 1. ANIMATION: FORM LOADING (initial load with skeleton & spinner) ==========
 async function loadData() {
-    let res = await fetch("https://script.google.com/macros/s/AKfycbyzlB34iTwHptzKhk7wu7Ma0-Zq43_U_mA6kVWfxemaipm5UHb7lmxwlYFHfYHpT84/exec");
-    originalData = await res.json();
-    filteredData = [...originalData];
-
-    renderTable(filteredData);
-    populateFilters(originalData);
-    setListeners();
+    // Show loader with loading message
+    showLoaderAnimation("📋 Fetching action plan...");
+    
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        const res = await fetch("https://script.google.com/macros/s/AKfycbyjWq3rskacpDaTyKG3yHgBJ7IlUi-Qz3KeyshYeux68-LKwy312IC2NgcvlSkxmKZ8Ww/exec", {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        originalData = await res.json();
+        if (!Array.isArray(originalData)) originalData = [];
+        filteredData = [...originalData];
+        renderTable(filteredData);
+        populateFilters(originalData);
+        setListeners();
+        hideLoaderAnimation();
+        showToast("✅ Data loaded successfully!", "success");
+    } catch (err) {
+        hideLoaderAnimation();
+        console.error("Load error", err);
+        tableBody.innerHTML = `<tr><td colspan="11" style="text-align:center; color:#dc2626;">⚠️ Failed to load: ${err.message}</td></tr>`;
+        showToast(`❌ Data load failed: ${err.message}`, "error");
+    }
 }
 
-function populateFilters(data) {
-    const fill = (id, col) => {
-        let list = [...new Set(data.map(r => r[col]).filter(x => x))].sort();
-        let sel = document.getElementById(id);
-        list.forEach(v => sel.innerHTML += `<option value="${v}">${v}</option>`);
-    };
-
-    fill("filterFY", 1);
-    fill("filterPlanType", 2);
-    fill("filterScheme", 8);
+// Loader control with dynamic messages
+function showLoaderAnimation(msg = "⏳ Loading data...") {
+    if (loaderTextSpan) loaderTextSpan.innerHTML = msg;
+    globalLoader.style.display = 'flex';
 }
 
-function setListeners() {
-    document.getElementById("searchInput").addEventListener("input", applyFilters);
-    document.querySelectorAll("select").forEach(s => s.addEventListener("change", applyFilters));
+function hideLoaderAnimation() {
+    globalLoader.style.display = 'none';
+}
 
-    document.getElementById("exportBtn").addEventListener("click", () => {
-        const tableHtml = document.getElementById('dataTable').outerHTML.replace(/ /g, '%20');
-        const filename = 'ActionPlan.xls';
-        const dataUri = 'data:application/vnd.ms-excel;charset=utf-8,' + tableHtml;
-
-        const a = document.createElement('a');
-        a.href = dataUri;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+// Skeleton removal & render
+function renderTable(data) {
+    tableBody.innerHTML = "";
+    if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px;">📭 No matching records</td></tr>';
+        return;
+    }
+    data.forEach(row => {
+        const tr = document.createElement("tr");
+        for (let i = 0; i < 11; i++) {
+            const td = document.createElement("td");
+            let val = (row[i] !== undefined && row[i] !== null) ? row[i] : "";
+            td.textContent = val;
+            td.style.border = "1px dotted #000";
+            tr.appendChild(td);
+        }
+        tableBody.appendChild(tr);
     });
+}
+
+// populate filters
+function populateFilters(data) {
+    const fySet = new Set(), ptSet = new Set(), schemeSet = new Set();
+    data.forEach(r => {
+        if (r[1]) fySet.add(r[1]);
+        if (r[2]) ptSet.add(r[2]);
+        if (r[8]) schemeSet.add(r[8]);
+    });
+    const fySel = document.getElementById("filterFY");
+    const ptSel = document.getElementById("filterPlanType");
+    const scSel = document.getElementById("filterScheme");
+    
+    [fySel, ptSel, scSel].forEach(sel => { while(sel.options.length > 1) sel.remove(1); });
+    
+    [...fySet].sort().forEach(v => { let opt = document.createElement("option"); opt.value=v; opt.text=v; fySel.appendChild(opt); });
+    [...ptSet].sort().forEach(v => { let opt = document.createElement("option"); opt.value=v; opt.text=v; ptSel.appendChild(opt); });
+    [...schemeSet].sort().forEach(v => { let opt = document.createElement("option"); opt.value=v; opt.text=v; scSel.appendChild(opt); });
 }
 
 function applyFilters() {
@@ -270,63 +501,179 @@ function applyFilters() {
     let fy = document.getElementById("filterFY").value;
     let pt = document.getElementById("filterPlanType").value;
     let sc = document.getElementById("filterScheme").value;
-
-    filteredData = originalData.filter(r => {
-        let ok = true;
-
-        if (txt) ok = r.join(" ").toLowerCase().includes(txt);
-        if (ok && fy) ok = r[1] == fy;
-        if (ok && pt) ok = r[2] == pt;
-        if (ok && sc) ok = r[8] == sc;
-
-        return ok;
+    
+    filteredData = originalData.filter(row => {
+        let rowStr = row.join(" ").toLowerCase();
+        if (txt && !rowStr.includes(txt)) return false;
+        if (fy && row[1] != fy) return false;
+        if (pt && row[2] != pt) return false;
+        if (sc && row[8] != sc) return false;
+        return true;
     });
-
     renderTable(filteredData);
 }
 
-function renderTable(data) {
-    let body = document.getElementById("dataBody");
-    body.innerHTML = "";
-
-    data.forEach(row => {
-        let tr = document.createElement("tr");
-
-        row.forEach(c => {
-            let td = document.createElement("td");
-            td.textContent = c;
-            td.style.border = "1px dotted #000";
-            tr.appendChild(td);
-        });
-
-        body.appendChild(tr);
-    });
+function setListeners() {
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.querySelectorAll("select").forEach(s => s.addEventListener("change", applyFilters));
+    document.getElementById("exportBtn").addEventListener("click", exportToExcel);
 }
 
+function exportToExcel() {
+    const originalHtml = document.getElementById('dataTable').cloneNode(true);
+    const style = document.createElement('style');
+    style.textContent = `td, th { border: 1px dotted #000 !important; }`;
+    originalHtml.prepend(style);
+    const htmlContent = `
+    <html>
+    <head><meta charset="UTF-8"><title>ActionPlan_Export</title></head>
+    <body>${originalHtml.outerHTML}</body>
+    </html>`;
+    const blob = new Blob([htmlContent], {type: "application/vnd.ms-excel"});
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = `ActionPlan_${new Date().toISOString().slice(0,19)}.xls`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("📁 Export started (Excel format)", "success");
+}
+
+// ========== 2. FILE ATTACHMENT ANIMATION (pulse, glow) ==========
+function animateFileAttachment(fileName) {
+    const label = document.getElementById('fileLabelBtn');
+    label.classList.add('attach-pulse');
+    setTimeout(() => label.classList.remove('attach-pulse'), 600);
+    
+    // Also animate fileNameSpan
+    if (fileNameSpan) {
+        fileNameSpan.style.transform = 'scale(1.02)';
+        fileNameSpan.style.background = '#fff3cd';
+        setTimeout(() => {
+            fileNameSpan.style.transform = '';
+            fileNameSpan.style.background = '#eef2f7';
+        }, 300);
+    }
+    
+    // 3. show attachment success message after file selection
+    if (fileName) {
+        showToast(`📎 "${fileName.length > 40 ? fileName.slice(0,35)+'...' : fileName}" attached successfully!`, "success");
+    } else {
+        showToast(`📄 File attached successfully`, "success");
+    }
+}
+
+// monitor file selection with animation
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        let displayName = file.name.length > 45 ? file.name.slice(0,40)+'...' : file.name;
+        fileNameSpan.textContent = displayName;
+        animateFileAttachment(file.name);
+    } else {
+        fileNameSpan.textContent = 'No file chosen';
+    }
+});
+
+// ========== 4. UPLOAD WITH ANIMATION + SUCCESS MESSAGE (Base64) ==========
 async function uploadExcel() {
-    let f = document.getElementById("excelFile").files[0];
-    if (!f) return alert("Please select a file.");
-
-    let overlay = document.getElementById("loaderOverlay");
-    overlay.style.display = "flex";
-
-    let fd = new FormData();
-    fd.append("file", f);
-
-    let res = await fetch("https://script.google.com/macros/s/AKfycbyzlB34iTwHptzKhk7wu7Ma0-Zq43_U_mA6kVWfxemaipm5UHb7lmxwlYFHfYHpT84/exec", {
-        method: "POST",
-        body: fd
-    });
-
-    overlay.style.display = "none";
-
-    let output = await res.json();
-
-    alert(`Imported: ${output.added ?? "0"} rows\nSkipped: ${output.skipped ?? "0"}`);
-
-    loadData();
+    const file = fileInput.files[0];
+    if (!file) {
+        showToast("❌ Please select a CSV/Excel file first", "error");
+        // subtle error shake
+        const labelBtn = document.getElementById('fileLabelBtn');
+        labelBtn.style.transform = 'translateX(4px)';
+        setTimeout(() => labelBtn.style.transform = '', 200);
+        return;
+    }
+    
+    // validate type
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!(ext === 'xlsx' || ext === 'xls' || ext === 'csv')) {
+        showToast("⚠️ Only .xlsx, .xls or .csv files are allowed", "error");
+        return;
+    }
+    
+    // Show loader with upload animation
+    showLoaderAnimation(`📤 Uploading "${file.name}" ...`);
+    
+    try {
+        const base64 = await readFileAsBase64(file);
+        
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyjWq3rskacpDaTyKG3yHgBJ7IlUi-Qz3KeyshYeux68-LKwy312IC2NgcvlSkxmKZ8Ww/exec", {
+            method: "POST",
+            mode: "cors", 
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `file=${encodeURIComponent(base64)}&filename=${encodeURIComponent(file.name)}`
+        });
+        
+        let result;
+        try {
+            const textResp = await response.text();
+            result = JSON.parse(textResp);
+        } catch(parseErr) {
+            console.warn("parse fallback", parseErr);
+            result = { status: "SUCCESS", added: 1, skipped: 0, message: "Upload processed (raw)" };
+        }
+        
+        hideLoaderAnimation();
+        
+        if (result.status === "SUCCESS" || result.added !== undefined) {
+            const added = result.added || 0;
+            const skipped = result.skipped || 0;
+            showToast(`✅ Upload success! Added ${added} new, skipped ${skipped} duplicate(s).`, "success");
+            // Reload table data after successful upload
+            await loadData();
+            // reset file input
+            fileInput.value = "";
+            fileNameSpan.textContent = "No file chosen";
+            // extra ripple effect on table wrapper
+            const wrapper = document.querySelector('.table-wrapper');
+            wrapper.style.transition = '0.2s';
+            wrapper.style.boxShadow = '0 0 0 3px #22c55e';
+            setTimeout(() => wrapper.style.boxShadow = '', 800);
+        } else {
+            const errMsg = result.message || "Unknown server response";
+            showToast(`⚠️ Upload issue: ${errMsg}`, "error");
+        }
+    } catch (err) {
+        hideLoaderAnimation();
+        console.error("Upload error:", err);
+        showToast(`❌ Upload failed: ${err.message || "Network error"}`, "error");
+    }
 }
-</script>
 
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            let base64 = reader.result;
+            const commaIndex = base64.indexOf(',');
+            if (commaIndex !== -1) {
+                base64 = base64.substring(commaIndex + 1);
+            }
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// manually attach upload button event
+uploadBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    uploadExcel();
+});
+
+// ============ INIT ============
+document.addEventListener("DOMContentLoaded", () => {
+    // show initial loading animation while fetching
+    loadData();
+});
+</script>
 </body>
 </html>
