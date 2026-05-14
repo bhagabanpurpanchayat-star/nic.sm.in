@@ -2,954 +2,846 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voucher Data Manager - Multi-Select Filters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Voucher Manager · Ultra Compact (Buttons inside Stamp Row)</title>
     <style>
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
+            background: linear-gradient(135deg, #eef2f9 0%, #d9e2ef 100%);
             padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
         }
-        .container {
+
+        .app-wrapper {
             max-width: 1600px;
             margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        /* header */
+        .header-bar {
+            background: #0f172a;
+            padding: 12px 24px;
+            border-bottom: 1px solid #1e293b;
+        }
+        .header-bar h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
             color: white;
-            padding: 20px 24px;
+            letter-spacing: -0.2px;
         }
-        .header h1 {
-            margin: 0 0 5px 0;
-            font-size: 28px;
+        .header-bar p {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 2px;
         }
-        .header p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 14px;
-        }
-        
-        .filters {
-            padding: 20px 24px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        .filter-row {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            align-items: flex-start;
-        }
-        .filter-group {
-            flex: 1;
-            min-width: 260px;
-        }
-        .filter-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #5f6368;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .multi-select-container {
-            position: relative;
-            width: 100%;
-        }
-        .multi-select-btn {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #dadce0;
-            border-radius: 6px;
-            font-size: 14px;
+
+        /* ========== ONE-LINE ROW: filters + date switchers + buttons inside stamp row ========== */
+        .one-line-filters {
+            padding: 10px 20px;
             background: white;
-            cursor: pointer;
-            text-align: left;
+            border-bottom: 1px solid #eef2f8;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 14px;
+        }
+
+        /* filter groups */
+        .filter-group-sm {
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-label-micro {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #475569;
+            letter-spacing: 0.4px;
+            margin-bottom: 4px;
+        }
+
+        /* modern multi select compact */
+        .ms-compact {
+            position: relative;
+        }
+        .ms-trigger-compact {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 500;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #fff;
+            cursor: pointer;
+            transition: 0.1s;
         }
-        .multi-select-btn span:first-child {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #333;
+        .ms-trigger-compact:hover {
+            border-color: #94a3b8;
+            background: #fafcff;
         }
-        .multi-select-btn .arrow {
-            font-size: 12px;
-            color: #888;
-        }
-        .multi-select-dropdown {
+        .ms-dropdown-compact {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 4px);
             left: 0;
             right: 0;
-            max-height: 250px;
-            overflow-y: auto;
             background: white;
-            border: 1px solid #dadce0;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 12px 20px -8px rgba(0,0,0,0.12);
+            z-index: 120;
             display: none;
-            margin-top: 2px;
+            max-height: 220px;
+            overflow-y: auto;
         }
-        .multi-select-dropdown.show {
+        .ms-dropdown-compact.show {
             display: block;
         }
-        .multi-select-option {
-            padding: 8px 12px;
+        .option-list-sm {
+            padding: 6px 0;
+        }
+        .option-item-sm {
+            padding: 6px 12px;
             display: flex;
             align-items: center;
             gap: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .multi-select-option:hover {
-            background: #f1f3f4;
-        }
-        .multi-select-option input {
-            margin: 0;
+            font-size: 11px;
             cursor: pointer;
         }
-        .multi-select-option label {
-            margin: 0;
-            cursor: pointer;
-            font-weight: normal;
-            text-transform: none;
-            letter-spacing: normal;
-            font-size: 13px;
-            color: #202124;
-            flex: 1;
+        .option-item-sm:hover {
+            background: #f8fafc;
         }
-        .multi-select-actions {
-            padding: 8px 12px;
-            border-top: 1px solid #e0e0e0;
+        .dropdown-actions-sm {
+            padding: 6px 12px;
+            border-top: 1px solid #edf2f7;
             display: flex;
-            gap: 12px;
-            background: #fafafa;
+            gap: 14px;
+            background: #fefefe;
         }
-        .multi-select-actions button {
+        .dd-btn-sm {
             background: none;
             border: none;
-            font-size: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #2563eb;
             cursor: pointer;
-            color: #1a73e8;
-            font-weight: 500;
         }
-        .multi-select-actions button:hover {
-            text-decoration: underline;
-        }
-        
-        .date-range-slider {
+
+        /* ===== COMPACT DATE SWITCHERS ===== */
+        .date-switch-row {
+            display: flex;
+            gap: 12px;
             flex: 2;
-            min-width: 350px;
-        }
-        .slider-container {
-            padding: 10px 0;
-            position: relative;
-        }
-        .slider-wrapper {
-            position: relative;
-            padding: 10px 0;
-        }
-        input[type="range"] {
-            width: 100%;
-            height: 8px;
-            border-radius: 10px;
-            background: linear-gradient(90deg, 
-                #ff6b6b 0%, 
-                #ffa502 20%, 
-                #7bed9f 40%, 
-                #70a1ff 60%, 
-                #eccc68 80%, 
-                #ff6b6b 100%);
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 3px solid #764ba2;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            background: #764ba2;
-        }
-        .slider-tooltip {
-            position: absolute;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 12px;
+            min-width: 340px;
+            background: #f8fafd;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            white-space: nowrap;
-            pointer-events: none;
-            transform: translateX(-50%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.2s;
+            padding: 6px 12px;
+            border: 1px solid #ecf3fa;
         }
-        .slider-tooltip.active { opacity: 1; }
-        .date-labels {
+        .date-card-micro {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            padding: 6px 10px;
+            border: 1px solid #eef2fa;
+        }
+        .date-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .stamp-start-micro {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .stamp-end-micro {
+            background: #ffedd5;
+            color: #c2410c;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .date-preview-micro {
+            font-family: monospace;
+            font-size: 10px;
+            font-weight: 700;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 30px;
+        }
+        .slider-micro-row {
+            width: 100%;
+            height: 3px;
+            border-radius: 10px;
+            -webkit-appearance: none;
+            background: #e2e8f0;
+            margin: 6px 0 2px;
+            cursor: pointer;
+        }
+        .slider-start-micro {
+            background: linear-gradient(90deg, #3b82f6, #3b82f6 var(--fill, 0%), #e2e8f0 var(--fill, 0%));
+        }
+        .slider-end-micro {
+            background: linear-gradient(90deg, #f97316, #f97316 var(--fill, 0%), #e2e8f0 var(--fill, 0%));
+        }
+        .slider-micro-row::-webkit-slider-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .slider-start-micro::-webkit-slider-thumb {
+            border-color: #2563eb;
+        }
+        .slider-end-micro::-webkit-slider-thumb {
+            border-color: #f97316;
+        }
+        .hint-mini {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            margin-top: 15px;
-            font-weight: 500;
+            font-size: 7px;
+            color: #6c7a91;
+            margin-top: 2px;
         }
-        
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-        .btn {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
-        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
-        .btn-secondary { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
-        .btn-danger { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
-        .btn:hover { transform: translateY(-2px); }
-        
-        .totals-section {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 20px 24px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        .totals-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
+
+        /* ========== STAMP ROW + BUTTONS INSIDE (saves space) ========== */
+        .stamp-bar-with-buttons {
             display: flex;
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
-        }
-        .excluded-badge {
-            background: #e74c3c;
-            color: white;
+            background: #ffffffcc;
+            border-radius: 40px;
             padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
         }
-        .totals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 10px;
-        }
-        .total-card {
+        .colorful-stamp {
             background: white;
-            padding: 12px 16px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-            cursor: pointer;
+            border-radius: 40px;
+            padding: 3px 12px;
+            font-size: 9px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
-        .total-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        .stamp-blue {
+            background: #e0f2fe;
+            color: #0369a1;
         }
-        .total-label {
-            font-size: 11px;
+        .stamp-orange {
+            background: #fff4e6;
+            color: #b45309;
+        }
+        .stamp-green {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .stamp-red {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        /* action buttons inside stamp row - tiny and clean */
+        .inline-action-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-left: 4px;
+        }
+        .btn-stamp {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 9px;
             font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #1f2937;
+        }
+        .btn-stamp-primary {
+            background: #1e3a8a;
+            color: white;
+        }
+        .btn-stamp-success {
+            background: #0e7c32;
+            color: white;
+        }
+        .btn-stamp-outline {
+            background: white;
+            border: 1px solid #cbd5e1;
+        }
+        .btn-stamp-secondary {
+            background: #475569;
+            color: white;
+        }
+        .btn-stamp:hover {
+            transform: translateY(-1px);
+            filter: brightness(0.96);
+        }
+
+        /* totals & tables */
+        .totals-area {
+            padding: 12px 20px;
+            background: #fafcff;
+            border-top: 1px solid #eef2f6;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .totals-header-sm {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .excluded-badge-sm {
+            background: #fee2e2;
+            color: #b91c1c;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .totals-grid-sm {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 8px;
+        }
+        .total-card-sm {
+            background: white;
+            border-radius: 16px;
+            padding: 6px 10px;
+            border: 1px solid #eef2fa;
+        }
+        .total-label-sm {
+            font-size: 9px;
+            font-weight: 700;
             text-transform: uppercase;
-            color: #7f8c8d;
-            margin-bottom: 5px;
+            color: #5b6e8c;
         }
-        .total-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
+        .total-value-sm {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 2px;
         }
-        .total-stamp {
+        .status-line {
+            padding: 6px 20px;
             font-size: 10px;
-            color: #95a5a6;
-            margin-top: 5px;
+            background: #fef9e3;
+            color: #b45309;
         }
-        
-        .status {
-            padding: 8px 24px;
-            font-size: 13px;
-            background: #fff3e0;
-            border-bottom: 1px solid #ffe0b2;
-            color: #e65100;
-        }
-        .status.success { background: #e8f5e9; color: #2e7d32; }
-        .status.error { background: #ffebee; color: #c62828; }
-        .status.loading { background: #e3f2fd; color: #1565c0; }
-        
         .table-wrapper {
             overflow-x: auto;
-            max-height: 500px;
+            max-height: 420px;
             overflow-y: auto;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 10px;
         }
         th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1e293b;
             color: white;
-            padding: 10px 6px;
-            text-align: left;
+            padding: 8px 6px;
             position: sticky;
             top: 0;
             white-space: nowrap;
-            z-index: 10;
         }
         td {
-            padding: 8px 6px;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 7px 6px;
+            border-bottom: 1px solid #f0f2f5;
             white-space: nowrap;
         }
-        tr:hover { background: #f8f9fa; }
-        .no-data { text-align: center; padding: 40px; color: #5f6368; }
-        .stats { padding: 12px 24px; background: #f8f9fa; border-top: 1px solid #e0e0e0; font-size: 13px; color: #5f6368; }
-        .badge { display: inline-block; background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 8px; }
-        
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            th, td { font-size: 10px; padding: 4px; }
+        .footer-stats-sm {
+            padding: 8px 20px;
+            background: #f9fbfd;
+            font-size: 10px;
+            color: #334155;
+        }
+        @media (max-width: 1050px) {
+            .one-line-filters { flex-direction: column; align-items: stretch; }
+            .date-switch-row { flex-wrap: wrap; }
+            .stamp-bar-with-buttons { justify-content: space-between; }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>📊 Voucher Data Manager</h1>
-        <p>✅ Column 11 (Voucher No) EXCLUDED from totals | Multi-Select Dropdowns | Date filter with tooltip</p>
+<div class="app-wrapper">
+    <div class="header-bar">
+        <h1>📊 Voucher Manager · One‑Row + Buttons inside Stamp Bar</h1>
+        <p>Column 11 excluded | Colourful stamps | Maximum space saving</p>
     </div>
-    
-    <div class="filters">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label>📌 COLUMN 1 FILTER (MULTI-SELECT)</label>
-                <div class="multi-select-container" id="col1Container">
-                    <div class="multi-select-btn" onclick="toggleDropdown('col1')">
-                        <span id="col1SelectedText">ALL VALUES</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <div class="multi-select-dropdown" id="col1Dropdown">
-                        <div class="multi-select-actions">
-                            <button type="button" onclick="selectAllCol1()">✓ Select All</button>
-                            <button type="button" onclick="clearAllCol1()">✗ Clear All</button>
-                        </div>
-                        <div id="col1Options"></div>
-                    </div>
+
+    <!-- 🔥 ALL FILTERS + DATE SWITCHERS + BUTTONS INSIDE STAMP ROW 🔥 -->
+    <div class="one-line-filters">
+        <!-- COLUMN 1 FILTER -->
+        <div class="filter-group-sm">
+            <div class="filter-label-micro">🔽 COLUMN 1</div>
+            <div class="ms-compact" id="col1Wrapper">
+                <div class="ms-trigger-compact" id="col1Trigger">
+                    <span id="col1SelectedText">ALL VALUES</span>
+                    <span>▼</span>
                 </div>
-            </div>
-            <div class="filter-group">
-                <label>📌 COLUMN 2 FILTER (MULTI-SELECT)</label>
-                <div class="multi-select-container" id="col2Container">
-                    <div class="multi-select-btn" onclick="toggleDropdown('col2')">
-                        <span id="col2SelectedText">ALL VALUES</span>
-                        <span class="arrow">▼</span>
+                <div class="ms-dropdown-compact" id="col1Dropdown">
+                    <div class="dropdown-actions-sm">
+                        <button class="dd-btn-sm" id="selectAllCol1Btn">✓ Select All</button>
+                        <button class="dd-btn-sm" id="clearAllCol1Btn">✗ Clear</button>
                     </div>
-                    <div class="multi-select-dropdown" id="col2Dropdown">
-                        <div class="multi-select-actions">
-                            <button type="button" onclick="selectAllCol2()">✓ Select All</button>
-                            <button type="button" onclick="clearAllCol2()">✗ Clear All</button>
-                        </div>
-                        <div id="col2Options"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="filter-group date-range-slider">
-                <label>📅 DATE RANGE FILTER</label>
-                <div class="slider-container">
-                    <div class="slider-wrapper">
-                        <input type="range" id="dateSlider" min="0" max="100" value="100" oninput="updateDateRangeWithTooltip(event)">
-                        <div id="sliderTooltip" class="slider-tooltip">Date</div>
-                    </div>
-                    <div class="date-labels">
-                        <span id="minDateLabel">📅 Start Date</span>
-                        <span id="maxDateLabel">📅 End Date</span>
-                    </div>
+                    <div class="option-list-sm" id="col1OptionsList"></div>
                 </div>
             </div>
         </div>
-        <div class="action-buttons">
-            <button onclick="fetchData()" class="btn btn-primary">🔄 Refresh Data</button>
-            <button onclick="exportFilteredDataOnly()" class="btn btn-success">📊 EXPORT FILTERED DATA ONLY</button>
-            <button onclick="exportToExcel()" class="btn btn-warning">📎 Export All Data</button>
-            <button onclick="resetAllFilters()" class="btn btn-secondary">🗑️ Reset All Filters</button>
-            <button onclick="clearAllSelections()" class="btn btn-danger">🎯 Clear Multi-Select</button>
+
+        <!-- COLUMN 2 FILTER -->
+        <div class="filter-group-sm">
+            <div class="filter-label-micro">🔽 COLUMN 2</div>
+            <div class="ms-compact" id="col2Wrapper">
+                <div class="ms-trigger-compact" id="col2Trigger">
+                    <span id="col2SelectedText">ALL VALUES</span>
+                    <span>▼</span>
+                </div>
+                <div class="ms-dropdown-compact" id="col2Dropdown">
+                    <div class="dropdown-actions-sm">
+                        <button class="dd-btn-sm" id="selectAllCol2Btn">✓ Select All</button>
+                        <button class="dd-btn-sm" id="clearAllCol2Btn">✗ Clear</button>
+                    </div>
+                    <div class="option-list-sm" id="col2OptionsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDE-BY-SIDE DATE SWITCHERS -->
+        <div class="date-switch-row">
+            <!-- START DATE CARD -->
+            <div class="date-card-micro">
+                <div class="date-card-header">
+                    <span class="stamp-start-micro">🔵 START</span>
+                    <span class="date-preview-micro" id="startDatePreview">—</span>
+                </div>
+                <input type="range" id="startSlider" class="slider-micro-row slider-start-micro" min="0" max="100" value="0" step="1">
+                <div class="hint-mini"><span>📅 earliest</span><span>⏺</span></div>
+            </div>
+            <!-- END DATE CARD -->
+            <div class="date-card-micro">
+                <div class="date-card-header">
+                    <span class="stamp-end-micro">🟠 END</span>
+                    <span class="date-preview-micro" id="endDatePreview">—</span>
+                </div>
+                <input type="range" id="endSlider" class="slider-micro-row slider-end-micro" min="0" max="100" value="100" step="1">
+                <div class="hint-mini"><span>◀</span><span>📅 latest</span></div>
+            </div>
+
+            <!-- MULTI-COLOURED STAMPS + BUTTONS INSIDE (space efficient) -->
+            <div class="stamp-bar-with-buttons">
+                <div class="colorful-stamp stamp-blue">🔵 <strong id="rangeStartLabel">—</strong></div>
+                <div class="colorful-stamp stamp-orange">🟠 <strong id="rangeEndLabel">—</strong></div>
+                <div id="rangeModeStamp" class="colorful-stamp stamp-green">📅 Full Range</div>
+                
+                <!-- action buttons inside stamp row — tiny & clean -->
+                <div class="inline-action-buttons">
+                    <button id="refreshBtn" class="btn-stamp btn-stamp-primary" title="Refresh data">🔄</button>
+                    <button id="exportFilteredBtn" class="btn-stamp btn-stamp-success" title="Export filtered">📊 Filtered</button>
+                    <button id="resetDatesBtn" class="btn-stamp btn-stamp-outline" title="Reset dates">🎚️ Reset Dates</button>
+                    <button id="resetAllBtn" class="btn-stamp btn-stamp-secondary" title="Reset all filters">🗑️ Reset</button>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="totals-section">
-        <div class="totals-title">
-            💰 REAL-TIME TOTALS (Filtered Data Only)
-            <span id="timestamp"></span>
-            <span class="excluded-badge">🚫 EXCLUDED: Column 11 (Voucher No) | Financial Year | Name of Fund | Vendor | Payment Date</span>
+
+    <!-- TOTALS SECTION -->
+    <div class="totals-area">
+        <div class="totals-header-sm">
+            <span><strong>💰 FILTERED TOTALS</strong> <span id="timestampTotals"></span></span>
+            <span class="excluded-badge-sm">🚫 Voucher No (Col11) excluded</span>
         </div>
-        <div id="totalsContainer" class="totals-grid">
-            <div class="total-card"><div class="total-label">Loading...</div><div class="total-value">-</div></div>
-        </div>
+        <div id="totalsGrid" class="totals-grid-sm"><div class="total-card-sm">Loading data...</div></div>
     </div>
-    
-    <div id="status" class="status">Loading data...</div>
-    <div class="table-wrapper"><div id="tableContainer"><div class="no-data">Fetching data...</div></div></div>
-    <div class="stats" id="stats"></div>
+
+    <div id="statusMsg" class="status-line">📡 Fetching from Google Sheets ...</div>
+    <div class="table-wrapper"><div id="tableContainer">Loading voucher data...</div></div>
+    <div class="footer-stats-sm" id="statsFooter"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
+    // ---------- CONFIG ----------
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoMe4JoLQo-JLpdJC-Iu81p_dBZdzHROGsnyO9LrlwxqxKzkljUElHtwJIqUyW0HN9/exec';
+    let fullDataset = [];
+    let headersList = [];
+    let filteredDataRows = [];
     
-    let originalData = [];
-    let columnHeaders = [];
-    let currentFilteredData = [];
-    let uniqueCol1Values = [];
-    let uniqueCol2Values = [];
-    let selectedCol1Values = new Set(); // empty set means ALL (no filter)
-    let selectedCol2Values = new Set(); // empty set means ALL
+    // column filters
+    let selectedCol1 = new Set();
+    let selectedCol2 = new Set();
+    let uniqueCol1 = [];
+    let uniqueCol2 = [];
     
-    // FORCE EXCLUDE Column 11 (index 10, zero-based) - VOUCHER NO
-    const FORCE_EXCLUDED_COLUMN_INDICES = [10];
+    // date range
+    let globalMinDateObj = null, globalMaxDateObj = null;
+    let currentStartDate = null, currentEndDate = null;
     
-    function isExcludedFromTotals(columnName, columnIndex) {
-        if (FORCE_EXCLUDED_COLUMN_INDICES.includes(columnIndex)) return true;
-        if (!columnName) return false;
-        const lowerName = columnName.toString().toLowerCase().trim();
-        const excludedNames = ['financial year', 'name of fund', 'vendor', 'payment date'];
-        return excludedNames.some(excluded => lowerName.includes(excluded));
+    const EXCLUDED_IDX = [10];
+    function isExcludedColumn(colName, idx) {
+        if (EXCLUDED_IDX.includes(idx)) return true;
+        if (!colName) return false;
+        const lower = colName.toString().toLowerCase();
+        return ['financial year', 'name of fund', 'vendor', 'payment date'].some(k => lower.includes(k));
     }
     
+    // helpers
     function formatNumber(num) {
-        if (num === 0 || !num) return '0';
-        return num.toLocaleString('en-IN', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
+        if (num === undefined || num === null) return '0';
+        return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function formatDateDMY(date) {
+        if (!date || isNaN(date.getTime())) return '—';
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear();
+        return `${d}/${m}/${y}`;
+    }
+    function parseDateCell(cell) {
+        if (!cell) return null;
+        const d = new Date(cell);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    function isDateLikeString(v) {
+        if (!v || typeof v !== 'string') return false;
+        return /^\d{4}-\d{2}-\d{2}/.test(v) || /\d{2}\/\d{2}\/\d{4}/.test(v);
     }
     
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        try {
-            let date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
-            let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        } catch(e) {
-            return dateString;
+    function collectAllDateObjects() {
+        let dates = [];
+        if (!fullDataset.length) return dates;
+        for (let i = 1; i < fullDataset.length; i++) {
+            for (let cell of fullDataset[i]) {
+                if (isDateLikeString(cell)) {
+                    const d = parseDateCell(cell);
+                    if (d) dates.push(d);
+                }
+            }
+        }
+        return dates;
+    }
+    
+    function initDateSliders() {
+        const allDates = collectAllDateObjects();
+        if (!allDates.length) {
+            document.getElementById('startSlider').disabled = true;
+            document.getElementById('endSlider').disabled = true;
+            return;
+        }
+        globalMinDateObj = new Date(Math.min(...allDates));
+        globalMaxDateObj = new Date(Math.max(...allDates));
+        currentStartDate = new Date(globalMinDateObj);
+        currentEndDate = new Date(globalMaxDateObj);
+        updateSliderUI();
+        attachSliderEvents();
+    }
+    
+    function attachSliderEvents() {
+        const startSlider = document.getElementById('startSlider');
+        const endSlider = document.getElementById('endSlider');
+        if (!startSlider) return;
+        const rangeMs = globalMaxDateObj - globalMinDateObj;
+        startSlider.oninput = (e) => {
+            let percent = parseFloat(e.target.value) / 100;
+            let newStart = new Date(globalMinDateObj.getTime() + (rangeMs * percent));
+            if (newStart > currentEndDate) {
+                newStart = new Date(currentEndDate);
+                startSlider.value = ((newStart - globalMinDateObj) / rangeMs) * 100;
+            }
+            currentStartDate = newStart;
+            updateSliderUI();
+            applyAllFilters();
+        };
+        endSlider.oninput = (e) => {
+            let percent = parseFloat(e.target.value) / 100;
+            let newEnd = new Date(globalMinDateObj.getTime() + (rangeMs * percent));
+            if (newEnd < currentStartDate) {
+                newEnd = new Date(currentStartDate);
+                endSlider.value = ((newEnd - globalMinDateObj) / rangeMs) * 100;
+            }
+            currentEndDate = newEnd;
+            updateSliderUI();
+            applyAllFilters();
+        };
+    }
+    
+    function updateSliderUI() {
+        if (!globalMinDateObj || !globalMaxDateObj) return;
+        const rangeMs = globalMaxDateObj - globalMinDateObj;
+        const startPercent = ((currentStartDate - globalMinDateObj) / rangeMs) * 100;
+        const endPercent = ((currentEndDate - globalMinDateObj) / rangeMs) * 100;
+        const startSlider = document.getElementById('startSlider');
+        const endSlider = document.getElementById('endSlider');
+        if (startSlider) startSlider.value = startPercent;
+        if (endSlider) endSlider.value = endPercent;
+        document.querySelector('.slider-start-micro')?.style.setProperty('--fill', startPercent + '%');
+        document.querySelector('.slider-end-micro')?.style.setProperty('--fill', endPercent + '%');
+        
+        const startFmt = formatDateDMY(currentStartDate);
+        const endFmt = formatDateDMY(currentEndDate);
+        document.getElementById('startDatePreview').innerText = startFmt;
+        document.getElementById('endDatePreview').innerText = endFmt;
+        document.getElementById('rangeStartLabel').innerHTML = startFmt;
+        document.getElementById('rangeEndLabel').innerHTML = endFmt;
+        
+        const isFull = (currentStartDate.getTime() === globalMinDateObj.getTime() && currentEndDate.getTime() === globalMaxDateObj.getTime());
+        const modeStamp = document.getElementById('rangeModeStamp');
+        if (isFull) {
+            modeStamp.className = 'colorful-stamp stamp-green';
+            modeStamp.innerHTML = '📅 Full Range';
+        } else {
+            modeStamp.className = 'colorful-stamp stamp-red';
+            modeStamp.innerHTML = '🎯 Custom Range';
         }
     }
     
-    function formatDateForTooltip(date) {
-        if (!date) return 'No date';
-        try {
-            let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        } catch(e) {
-            return 'Invalid date';
-        }
-    }
-    
-    function updateDateRangeWithTooltip(event) {
-        let sliderValue = parseInt(event.target.value) / 100;
-        if (!window.dateRange) return;
-        
-        let rangeMs = window.dateRange.max - window.dateRange.min;
-        let currentDate = new Date(window.dateRange.min.getTime() + (rangeMs * sliderValue));
-        
-        const tooltip = document.getElementById('sliderTooltip');
-        const slider = event.target;
-        const rect = slider.getBoundingClientRect();
-        const percent = sliderValue * 100;
-        const tooltipX = rect.left + (percent / 100) * rect.width;
-        
-        tooltip.style.left = `${tooltipX}px`;
-        tooltip.textContent = `📅 ${formatDateForTooltip(currentDate)}`;
-        tooltip.classList.add('active');
-        
-        clearTimeout(window.tooltipTimeout);
-        window.tooltipTimeout = setTimeout(() => tooltip.classList.remove('active'), 2000);
-        
-        document.getElementById('maxDateLabel').innerHTML = `📅 Up to: ${formatDate(currentDate.toISOString())}`;
+    function resetDateSwitches() {
+        if (!globalMinDateObj || !globalMaxDateObj) return;
+        currentStartDate = new Date(globalMinDateObj);
+        currentEndDate = new Date(globalMaxDateObj);
+        updateSliderUI();
         applyAllFilters();
+        showStatus('Date range reset to full', 'success');
     }
     
-    function setupSliderTooltip() {
-        const slider = document.getElementById('dateSlider');
-        const tooltip = document.getElementById('sliderTooltip');
-        
-        slider.addEventListener('mousemove', function(e) {
-            if (!window.dateRange) return;
-            const rect = slider.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
-            const clampedPercent = Math.max(0, Math.min(1, percent));
-            const rangeMs = window.dateRange.max - window.dateRange.min;
-            const dateAtCursor = new Date(window.dateRange.min.getTime() + (rangeMs * clampedPercent));
-            
-            tooltip.style.left = `${e.clientX}px`;
-            tooltip.textContent = `📅 ${formatDateForTooltip(dateAtCursor)}`;
-            tooltip.classList.add('active');
+    function isRowInDateRange(row) {
+        if (!currentStartDate || !currentEndDate) return true;
+        let hasMatch = false;
+        let anyDateExists = false;
+        for (let cell of row) {
+            if (isDateLikeString(cell)) {
+                let d = parseDateCell(cell);
+                if (d) {
+                    anyDateExists = true;
+                    if (d >= currentStartDate && d <= currentEndDate) hasMatch = true;
+                }
+            }
+        }
+        if (!anyDateExists) return true;
+        return hasMatch;
+    }
+    
+    function applyAllFilters() {
+        if (!fullDataset.length || fullDataset.length < 2) { renderEmptyState(); return; }
+        const rows = fullDataset.slice(1);
+        let filtered = rows.filter(row => {
+            if (selectedCol1.size > 0) {
+                let v = row[0]?.toString().trim() || '';
+                if (!selectedCol1.has(v)) return false;
+            }
+            if (selectedCol2.size > 0) {
+                let v = row[1]?.toString().trim() || '';
+                if (!selectedCol2.has(v)) return false;
+            }
+            if (!isRowInDateRange(row)) return false;
+            return true;
         });
-        
-        slider.addEventListener('mouseleave', () => tooltip.classList.remove('active'));
+        filteredDataRows = filtered;
+        const totals = computeTotals(filteredDataRows);
+        renderTotals(totals);
+        renderTable(filteredDataRows);
+        document.getElementById('statsFooter').innerHTML = `📊 Showing ${filtered.length} of ${rows.length} rows | ${formatDateDMY(currentStartDate)} → ${formatDateDMY(currentEndDate)} | ${new Date().toLocaleTimeString()}`;
     }
     
-    function isNumeric(value) {
-        if (!value) return false;
-        const cleanValue = value.toString().replace(/,/g, '');
-        const num = parseFloat(cleanValue);
-        return !isNaN(num) && isFinite(num);
-    }
-    
-    function calculateTotals(data, headers) {
-        if (!data || data.length === 0) return {};
-        
-        const totals = {};
-        headers.forEach((header, idx) => {
-            if (!isExcludedFromTotals(header, idx)) {
-                totals[idx] = {
-                    label: header || `Column ${idx + 1}`,
-                    sum: 0,
-                    nonEmptyCount: 0,
-                    numericCount: 0
-                };
+    function computeTotals(data) {
+        if (!data.length) return {};
+        let totalsMap = {};
+        headersList.forEach((h, idx) => {
+            if (!isExcludedColumn(h, idx)) {
+                totalsMap[idx] = { label: h || `Col${idx+1}`, sum: 0, nonEmpty: 0, numericCount: 0 };
             }
         });
-        
         data.forEach(row => {
-            headers.forEach((header, idx) => {
-                if (!isExcludedFromTotals(header, idx)) {
-                    const value = row[idx];
-                    if (value !== undefined && value !== null && value !== '') {
-                        totals[idx].nonEmptyCount++;
-                        if (isNumeric(value)) {
-                            const cleanValue = value.toString().replace(/,/g, '');
-                            totals[idx].sum += parseFloat(cleanValue);
-                            totals[idx].numericCount++;
+            headersList.forEach((_, idx) => {
+                if (totalsMap[idx]) {
+                    let val = row[idx];
+                    if (val !== undefined && val !== null && val !== '') {
+                        totalsMap[idx].nonEmpty++;
+                        let cleaned = val.toString().replace(/,/g, '');
+                        if (!isNaN(parseFloat(cleaned)) && isFinite(cleaned)) {
+                            totalsMap[idx].sum += parseFloat(cleaned);
+                            totalsMap[idx].numericCount++;
                         }
                     }
                 }
             });
         });
-        
-        return totals;
+        return totalsMap;
     }
     
     function renderTotals(totals) {
-        const container = document.getElementById('totalsContainer');
-        document.getElementById('timestamp').innerHTML = `🕐 ${new Date().toLocaleString()}`;
-        
+        const container = document.getElementById('totalsGrid');
+        document.getElementById('timestampTotals').innerHTML = `🕐 ${new Date().toLocaleString()}`;
         if (Object.keys(totals).length === 0) {
-            container.innerHTML = '<div class="total-card"><div class="total-label">No Data</div><div class="total-value">-</div><div class="total-stamp">All columns excluded</div></div>';
+            container.innerHTML = '<div class="total-card-sm">No numeric data</div>';
             return;
         }
-        
-        const colors = [
-            { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: 'white' },
-            { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', text: 'white' },
-            { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', text: 'white' },
-            { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', text: '#2c3e50' },
-            { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', text: '#2c3e50' }
-        ];
-        
         let html = '';
-        let cardIndex = 0;
-        
-        Object.entries(totals).forEach(([idx, data]) => {
-            const color = colors[cardIndex % colors.length];
-            let displayValue = data.numericCount > 0 ? formatNumber(data.sum) : data.nonEmptyCount.toLocaleString();
-            let displayType = data.numericCount > 0 ? '💰 Sum (₹)' : '📊 Count';
-            let label = data.label.length > 20 ? data.label.substring(0, 17) + '...' : data.label;
-            
-            html += `
-                <div class="total-card" style="background: ${color.bg}; color: ${color.text};">
-                    <div class="total-label" style="color: ${color.text === 'white' ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)'}">
-                        ${escapeHtml(label)}
-                    </div>
-                    <div class="total-value" style="color: ${color.text};">${displayValue}</div>
-                    <div class="total-stamp" style="color: ${color.text === 'white' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'}">
-                        ${displayType} | ${data.nonEmptyCount} rows
-                    </div>
-                </div>
-            `;
-            cardIndex++;
-        });
-        
+        for (let [idx, t] of Object.entries(totals)) {
+            let displayVal = t.numericCount > 0 ? formatNumber(t.sum) : t.nonEmpty.toLocaleString();
+            let typeIcon = t.numericCount > 0 ? '💰 Sum' : '📊 Count';
+            html += `<div class="total-card-sm"><div class="total-label-sm">${escapeHtml(t.label.length > 20 ? t.label.slice(0,18)+'…' : t.label)}</div><div class="total-value-sm">${displayVal}</div><div style="font-size:7px; margin-top:2px;">${typeIcon} · ${t.nonEmpty} rows</div></div>`;
+        }
         container.innerHTML = html;
     }
     
-    function updateSelectedText() {
-        const col1Text = selectedCol1Values.size === 0 ? 'ALL VALUES' : Array.from(selectedCol1Values).slice(0, 2).join(', ') + (selectedCol1Values.size > 2 ? ` +${selectedCol1Values.size-2}` : '');
-        document.getElementById('col1SelectedText').innerText = col1Text;
-        const col2Text = selectedCol2Values.size === 0 ? 'ALL VALUES' : Array.from(selectedCol2Values).slice(0, 2).join(', ') + (selectedCol2Values.size > 2 ? ` +${selectedCol2Values.size-2}` : '');
-        document.getElementById('col2SelectedText').innerText = col2Text;
+    function renderTable(data) {
+        const cont = document.getElementById('tableContainer');
+        if (!data.length) { cont.innerHTML = '<div style="padding:24px; text-align:center;">📭 No matching records</div>'; return; }
+        let html = '<table><thead><tr>';
+        headersList.forEach((h, idx) => {
+            let excl = (idx === 10 || isExcludedColumn(h, idx)) ? ' ⛔' : '';
+            html += `<th>${escapeHtml(h || `Col${idx+1}`)}${excl}</th>`;
+        });
+        html += `</tr></thead><tbody>`;
+        data.forEach(row => {
+            html += '<tr>';
+            row.forEach((cell, ci) => {
+                let display = isDateLikeString(cell) ? formatDateDMY(parseDateCell(cell)) : (cell ?? '');
+                html += `<td title="${escapeHtml(display.toString().slice(0,80))}">${escapeHtml(display.toString().slice(0, 50))}${display.toString().length > 50 ? '…' : ''}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        cont.innerHTML = html;
     }
     
-    function toggleDropdown(col) {
-        const dropdown = document.getElementById(`${col}Dropdown`);
-        const isOpen = dropdown.classList.contains('show');
-        document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('show'));
-        if (!isOpen) dropdown.classList.add('show');
-        document.addEventListener('click', function closeClick(e) {
-            if (!e.target.closest(`.multi-select-container`)) {
-                document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('show'));
-                document.removeEventListener('click', closeClick);
-            }
-        });
+    function renderEmptyState() {
+        document.getElementById('tableContainer').innerHTML = '<div>No data loaded</div>';
+        document.getElementById('statsFooter').innerHTML = '';
+    }
+    function escapeHtml(s) { if(!s) return ''; return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    // Multi-select
+    function buildUniqueFilters() {
+        if (!fullDataset.length) return;
+        const rows = fullDataset.slice(1);
+        const c1Set = new Set(); rows.forEach(r => { if(r[0]?.toString().trim()) c1Set.add(r[0].toString().trim()); });
+        const c2Set = new Set(); rows.forEach(r => { if(r[1]?.toString().trim()) c2Set.add(r[1].toString().trim()); });
+        uniqueCol1 = Array.from(c1Set).sort();
+        uniqueCol2 = Array.from(c2Set).sort();
+        renderMultiSelect();
     }
     
-    function renderMultiSelectOptions() {
-        const col1OptionsDiv = document.getElementById('col1Options');
-        col1OptionsDiv.innerHTML = '';
-        uniqueCol1Values.forEach(val => {
-            const div = document.createElement('div');
-            div.className = 'multi-select-option';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.value = val;
-            cb.checked = selectedCol1Values.has(val);
-            cb.onchange = (e) => {
-                if (e.target.checked) selectedCol1Values.add(val);
-                else selectedCol1Values.delete(val);
-                updateSelectedText();
-                applyAllFilters();
-            };
-            const label = document.createElement('label');
-            label.textContent = val;
-            div.appendChild(cb);
-            div.appendChild(label);
-            col1OptionsDiv.appendChild(div);
+    function renderMultiSelect() {
+        const col1Div = document.getElementById('col1OptionsList');
+        col1Div.innerHTML = '';
+        uniqueCol1.forEach(val => {
+            const div = document.createElement('div'); div.className = 'option-item-sm';
+            const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = val; cb.checked = selectedCol1.has(val);
+            cb.addEventListener('change', (e) => {
+                if(e.target.checked) selectedCol1.add(val); else selectedCol1.delete(val);
+                updateSelectedText(); applyAllFilters();
+            });
+            const lbl = document.createElement('label'); lbl.innerText = val;
+            div.appendChild(cb); div.appendChild(lbl); col1Div.appendChild(div);
         });
-        
-        const col2OptionsDiv = document.getElementById('col2Options');
-        col2OptionsDiv.innerHTML = '';
-        uniqueCol2Values.forEach(val => {
-            const div = document.createElement('div');
-            div.className = 'multi-select-option';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.value = val;
-            cb.checked = selectedCol2Values.has(val);
-            cb.onchange = (e) => {
-                if (e.target.checked) selectedCol2Values.add(val);
-                else selectedCol2Values.delete(val);
-                updateSelectedText();
-                applyAllFilters();
-            };
-            const label = document.createElement('label');
-            label.textContent = val;
-            div.appendChild(cb);
-            div.appendChild(label);
-            col2OptionsDiv.appendChild(div);
+        const col2Div = document.getElementById('col2OptionsList');
+        col2Div.innerHTML = '';
+        uniqueCol2.forEach(val => {
+            const div = document.createElement('div'); div.className = 'option-item-sm';
+            const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = val; cb.checked = selectedCol2.has(val);
+            cb.addEventListener('change', (e) => {
+                if(e.target.checked) selectedCol2.add(val); else selectedCol2.delete(val);
+                updateSelectedText(); applyAllFilters();
+            });
+            const lbl = document.createElement('label'); lbl.innerText = val;
+            div.appendChild(cb); div.appendChild(lbl); col2Div.appendChild(div);
         });
         updateSelectedText();
     }
     
-    function selectAllCol1() {
-        uniqueCol1Values.forEach(v => selectedCol1Values.add(v));
-        renderMultiSelectOptions();
-        applyAllFilters();
-    }
-    function clearAllCol1() {
-        selectedCol1Values.clear();
-        renderMultiSelectOptions();
-        applyAllFilters();
-    }
-    function selectAllCol2() {
-        uniqueCol2Values.forEach(v => selectedCol2Values.add(v));
-        renderMultiSelectOptions();
-        applyAllFilters();
-    }
-    function clearAllCol2() {
-        selectedCol2Values.clear();
-        renderMultiSelectOptions();
-        applyAllFilters();
+    function updateSelectedText() {
+        const t1 = selectedCol1.size === 0 ? 'ALL VALUES' : Array.from(selectedCol1).slice(0,2).join(', ') + (selectedCol1.size > 2 ? ` +${selectedCol1.size-2}` : '');
+        document.getElementById('col1SelectedText').innerText = t1;
+        const t2 = selectedCol2.size === 0 ? 'ALL VALUES' : Array.from(selectedCol2).slice(0,2).join(', ') + (selectedCol2.size > 2 ? ` +${selectedCol2.size-2}` : '');
+        document.getElementById('col2SelectedText').innerText = t2;
     }
     
-    function applyAllFilters() {
-        if (!originalData.length || originalData.length <= 1) {
-            renderEmpty();
-            return;
-        }
-        
-        const headers = originalData[0];
-        let dataRows = originalData.slice(1);
-        const sliderValue = parseInt(document.getElementById('dateSlider').value) / 100;
-        
-        let filtered = dataRows.filter(row => {
-            if (selectedCol1Values.size > 0) {
-                const rowVal = row[0] ? row[0].toString().trim() : '';
-                if (!selectedCol1Values.has(rowVal)) return false;
-            }
-            if (selectedCol2Values.size > 0) {
-                const rowVal = row[1] ? row[1].toString().trim() : '';
-                if (!selectedCol2Values.has(rowVal)) return false;
-            }
-            if (window.dateRange && sliderValue < 1) {
-                let rangeMs = window.dateRange.max - window.dateRange.min;
-                let currentMaxDate = new Date(window.dateRange.min.getTime() + (rangeMs * sliderValue));
-                let hasDateInRange = false;
-                for (let cell of row) {
-                    if (isDateLike(cell)) {
-                        let cellDate = parseDate(cell);
-                        if (cellDate && cellDate <= currentMaxDate) {
-                            hasDateInRange = true;
-                            break;
-                        }
-                    }
-                }
-                if (!hasDateInRange) return false;
-            }
-            return true;
-        });
-        
-        currentFilteredData = filtered;
-        const totals = calculateTotals(currentFilteredData, headers);
-        renderTotals(totals);
-        renderTable(currentFilteredData, headers);
-        document.getElementById('stats').innerHTML = `📊 Showing: ${filtered.length} of ${dataRows.length} rows | ❌ Column 11 (Voucher No) EXCLUDED | ${new Date().toLocaleTimeString()}`;
-    }
+    function selectAllCol1() { uniqueCol1.forEach(v => selectedCol1.add(v)); renderMultiSelect(); applyAllFilters(); }
+    function clearAllCol1() { selectedCol1.clear(); renderMultiSelect(); applyAllFilters(); }
+    function selectAllCol2() { uniqueCol2.forEach(v => selectedCol2.add(v)); renderMultiSelect(); applyAllFilters(); }
+    function clearAllCol2() { selectedCol2.clear(); renderMultiSelect(); applyAllFilters(); }
+    function resetAllFilters() { selectedCol1.clear(); selectedCol2.clear(); renderMultiSelect(); resetDateSwitches(); applyAllFilters(); showStatus('All filters & dates reset', 'success'); }
+    function showStatus(msg, type) { const el = document.getElementById('statusMsg'); el.innerText = msg; setTimeout(() => { if(el.innerText === msg) el.innerText = '✅ Ready'; }, 1800); }
     
-    function isDateLike(value) {
-        if (!value || typeof value !== 'string') return false;
-        return /^\d{4}-\d{2}-\d{2}/.test(value) || /\d{2}\/\d{2}\/\d{4}/.test(value);
-    }
-    
-    function parseDate(value) {
-        if (!value) return null;
+    async function fetchRemoteData() {
+        const statusDiv = document.getElementById('statusMsg');
+        statusDiv.innerText = '⏳ Fetching data ...';
         try {
-            let date = new Date(value);
-            return isNaN(date.getTime()) ? null : date;
-        } catch(e) {
-            return null;
+            const resp = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors', cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            if (!Array.isArray(data) || !data.length) throw new Error('Empty dataset');
+            fullDataset = data;
+            headersList = fullDataset[0] || [];
+            buildUniqueFilters();
+            initDateSliders();
+            applyAllFilters();
+            statusDiv.innerText = `✅ Loaded ${fullDataset.length-1} rows · Buttons in stamp row`;
+        } catch(err) {
+            statusDiv.innerText = `❌ Error: ${err.message}`;
         }
     }
     
-    function exportFilteredDataOnly() {
-        if (!currentFilteredData.length) {
-            alert('⚠️ No filtered data to export!');
-            return;
-        }
-        const headers = originalData[0];
-        const formattedData = currentFilteredData.map(row => row.map(cell => isDateLike(cell) ? formatDate(cell) : cell));
-        const wsData = [headers, ...formattedData];
+    function exportFilteredOnly() {
+        if (!filteredDataRows.length) { alert('No filtered data to export'); return; }
+        const wsData = [headersList, ...filteredDataRows.map(r => r.map(c => isDateLikeString(c) ? formatDateDMY(parseDateCell(c)) : c))];
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Filtered Data');
-        XLSX.writeFile(wb, `filtered_data_${new Date().toISOString().split('T')[0]}_${currentFilteredData.length}_rows.xlsx`);
-        showStatus(`✅ Exported ${currentFilteredData.length} FILTERED rows`, 'success');
+        XLSX.utils.book_append_sheet(wb, ws, 'Filtered');
+        XLSX.writeFile(wb, `filtered_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showStatus('Filtered export done', 'success');
     }
     
-    function exportToExcel() {
-        if (!originalData.length) {
-            alert('No data to export');
-            return;
-        }
-        const headers = originalData[0];
-        const dataRows = originalData.slice(1);
-        const formattedData = dataRows.map(row => row.map(cell => isDateLike(cell) ? formatDate(cell) : cell));
-        const wsData = [headers, ...formattedData];
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'All Data');
-        XLSX.writeFile(wb, `all_data_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showStatus('✅ Exported ALL data', 'success');
+    function bindEvents() {
+        document.getElementById('refreshBtn').onclick = fetchRemoteData;
+        document.getElementById('exportFilteredBtn').onclick = exportFilteredOnly;
+        document.getElementById('resetDatesBtn').onclick = resetDateSwitches;
+        document.getElementById('resetAllBtn').onclick = resetAllFilters;
+        document.getElementById('selectAllCol1Btn').onclick = selectAllCol1;
+        document.getElementById('clearAllCol1Btn').onclick = clearAllCol1;
+        document.getElementById('selectAllCol2Btn').onclick = selectAllCol2;
+        document.getElementById('clearAllCol2Btn').onclick = clearAllCol2;
+        const toggle = (id) => {
+            const dd = document.getElementById(id);
+            document.querySelectorAll('.ms-dropdown-compact').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
+            dd.classList.toggle('show');
+        };
+        document.getElementById('col1Trigger').onclick = (e) => { e.stopPropagation(); toggle('col1Dropdown'); };
+        document.getElementById('col2Trigger').onclick = (e) => { e.stopPropagation(); toggle('col2Dropdown'); };
+        document.addEventListener('click', (e) => { if(!e.target.closest('.ms-compact')) document.querySelectorAll('.ms-dropdown-compact').forEach(d => d.classList.remove('show')); });
     }
     
-    function renderTable(data, headers) {
-        const tableContainer = document.getElementById('tableContainer');
-        if (!data || data.length === 0) {
-            tableContainer.innerHTML = '<div class="no-data">📭 No data matches your filters</div>';
-            return;
-        }
-        
-        let html = '<table><thead><tr>';
-        headers.forEach((h, idx) => {
-            const isExcluded = isExcludedFromTotals(h, idx);
-            const excludedBadge = (idx === 10) ? ' <span class="badge" style="background:#e74c3c;"></span>' : (isExcluded ? ' <span class="badge" style="background:#e74c3c;"></span>' : '');
-            html += `<th>${escapeHtml(h || `Col ${idx+1}`)}${excludedBadge}</th>`;
-        });
-        html += '</tr></thead><tbody>';
-        
-        for (let row of data) {
-            html += '<tr>';
-            for (let cell of row) {
-                let displayCell = isDateLike(cell) ? formatDate(cell) : (cell || '');
-                html += `<td>${escapeHtml(displayCell.toString())}</td>`;
-            }
-            html += '</tr>';
-        }
-        html += '</tbody>';
-        tableContainer.innerHTML = html;
-    }
-    
-    function updateDropdowns() {
-        if (!originalData.length || originalData.length <= 1) return;
-        const dataRows = originalData.slice(1);
-        
-        const col1Values = new Set();
-        dataRows.forEach(row => { if (row[0]?.toString().trim()) col1Values.add(row[0].toString().trim()); });
-        uniqueCol1Values = Array.from(col1Values).sort();
-        
-        const col2Values = new Set();
-        dataRows.forEach(row => { if (row[1]?.toString().trim()) col2Values.add(row[1].toString().trim()); });
-        uniqueCol2Values = Array.from(col2Values).sort();
-        
-        selectedCol1Values.clear();
-        selectedCol2Values.clear();
-        renderMultiSelectOptions();
-    }
-    
-    function updateDateRangeSlider() {
-        if (!originalData.length || originalData.length <= 1) {
-            document.getElementById('dateSlider').disabled = true;
-            return;
-        }
-        
-        let allDates = [];
-        originalData.slice(1).forEach(row => {
-            row.forEach(cell => {
-                if (isDateLike(cell)) {
-                    let date = parseDate(cell);
-                    if (date) allDates.push(date);
-                }
-            });
-        });
-        
-        if (allDates.length === 0) {
-            document.getElementById('dateSlider').disabled = true;
-            document.getElementById('minDateLabel').textContent = '📅 No dates found';
-            document.getElementById('maxDateLabel').textContent = '📅 No dates found';
-            return;
-        }
-        
-        let minDate = new Date(Math.min(...allDates));
-        let maxDate = new Date(Math.max(...allDates));
-        
-        document.getElementById('dateSlider').disabled = false;
-        document.getElementById('minDateLabel').innerHTML = `📅 From: ${formatDate(minDate.toISOString())}`;
-        document.getElementById('maxDateLabel').innerHTML = `📅 Up to: ${formatDate(maxDate.toISOString())}`;
-        document.getElementById('dateSlider').value = 100;
-        
-        window.dateRange = { min: minDate, max: maxDate };
-        setupSliderTooltip();
-    }
-    
-    function resetAllFilters() {
-        selectedCol1Values.clear();
-        selectedCol2Values.clear();
-        renderMultiSelectOptions();
-        document.getElementById('dateSlider').value = '100';
-        if (window.dateRange) {
-            document.getElementById('maxDateLabel').innerHTML = `📅 Up to: ${formatDate(window.dateRange.max.toISOString())}`;
-        }
-        if (originalData.length) {
-            currentFilteredData = originalData.slice(1);
-            const totals = calculateTotals(currentFilteredData, originalData[0]);
-            renderTotals(totals);
-            renderTable(currentFilteredData, originalData[0]);
-        }
-        showStatus('🔄 All filters reset', 'success');
-    }
-    
-    function clearAllSelections() {
-        selectedCol1Values.clear();
-        selectedCol2Values.clear();
-        renderMultiSelectOptions();
-        applyAllFilters();
-        showStatus('🎯 All multi-select filters cleared', 'success');
-    }
-    
-    function showStatus(message, type) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.textContent = message;
-        statusDiv.className = `status ${type}`;
-        setTimeout(() => {
-            if (statusDiv.className.includes('success')) statusDiv.className = 'status';
-        }, 2000);
-    }
-    
-    function renderEmpty() {
-        document.getElementById('tableContainer').innerHTML = '<div class="no-data">📭 No data available</div>';
-        document.getElementById('stats').innerHTML = 'Total rows: 0';
-        document.getElementById('totalsContainer').innerHTML = '<div class="total-card"><div class="total-label">No Data</div><div class="total-value">-</div></div>';
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-    
-    async function fetchData() {
-        const statusDiv = document.getElementById('status');
-        statusDiv.textContent = '⏳ Fetching data...';
-        statusDiv.className = 'status loading';
-        
-        try {
-            const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors', cache: 'no-store' });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const data = await response.json();
-            if (!Array.isArray(data) || data.length === 0) throw new Error('No data received');
-            
-            originalData = data;
-            columnHeaders = originalData[0] || [];
-            currentFilteredData = originalData.slice(1);
-            
-            updateDropdowns();
-            updateDateRangeSlider();
-            
-            const totals = calculateTotals(currentFilteredData, columnHeaders);
-            renderTotals(totals);
-            renderTable(currentFilteredData, columnHeaders);
-            
-            statusDiv.textContent = `✅ Loaded ${originalData.length - 1} rows | ❌ Column 11 (Voucher No) EXCLUDED from totals`;
-            statusDiv.className = 'status success';
-            
-            document.getElementById('stats').innerHTML = `📊 Total: ${originalData.length - 1} rows | ${columnHeaders.length} columns | ❌ Column 11 (Voucher No) EXCLUDED | ${new Date().toLocaleString()}`;
-            
-        } catch (error) {
-            statusDiv.textContent = `❌ Error: ${error.message}`;
-            statusDiv.className = 'status error';
-        }
-    }
-    
-    window.addEventListener('DOMContentLoaded', fetchData);
+    fetchRemoteData();
+    bindEvents();
 </script>
 </body>
 </html>
