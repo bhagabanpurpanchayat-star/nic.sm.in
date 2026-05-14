@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Voucher Manager · Ultra Compact (Buttons inside Stamp Row)</title>
+    <title>Voucher Manager · Colourful Stamps · Centre Aligned</title>
     <style>
         * {
             margin: 0;
@@ -18,182 +18,203 @@
             min-height: 100vh;
         }
 
-        .app-wrapper {
-            max-width: 1600px;
+        /* main container */
+        .app-container {
+            max-width: 1480px;
             margin: 0 auto;
             background: #ffffff;
             border-radius: 28px;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.18);
             overflow: hidden;
         }
 
         /* header */
-        .header-bar {
+        .app-header {
             background: #0f172a;
-            padding: 12px 24px;
+            padding: 20px 32px;
             border-bottom: 1px solid #1e293b;
         }
-        .header-bar h1 {
-            font-size: 1.4rem;
+        .app-header h1 {
+            font-size: 1.9rem;
             font-weight: 700;
             color: white;
-            letter-spacing: -0.2px;
+            letter-spacing: -0.3px;
         }
-        .header-bar p {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            margin-top: 2px;
+        .app-header p {
+            font-size: 0.85rem;
+            color: #a5b4cb;
+            margin-top: 6px;
         }
 
-        /* ========== ONE-LINE ROW: filters + date switchers + buttons inside stamp row ========== */
-        .one-line-filters {
-            padding: 10px 20px;
+        /* ========== COMPACT FILTER ZONE (fonts slightly larger) ========== */
+        .filters-compact {
+            padding: 20px 28px 16px 28px;
             background: white;
             border-bottom: 1px solid #eef2f8;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            gap: 14px;
         }
 
-        /* filter groups */
-        .filter-group-sm {
+        /* two column filters row - enhanced */
+        .dual-filter-row {
+            display: flex;
+            gap: 28px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
             flex: 1;
-            min-width: 150px;
+            min-width: 240px;
         }
         .filter-label-micro {
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
             text-transform: uppercase;
-            color: #475569;
-            letter-spacing: 0.4px;
-            margin-bottom: 4px;
+            color: #1e293b;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        /* modern multi select compact */
-        .ms-compact {
+        /* modern minimal multi-select */
+        .ms-container {
             position: relative;
         }
-        .ms-trigger-compact {
+        .ms-trigger {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 6px 10px;
-            font-size: 11px;
+            border-radius: 16px;
+            padding: 10px 16px;
+            font-size: 13px;
             font-weight: 500;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: 0.1s;
+            transition: all 0.15s;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.02);
         }
-        .ms-trigger-compact:hover {
+        .ms-trigger:hover {
             border-color: #94a3b8;
             background: #fafcff;
         }
-        .ms-dropdown-compact {
+        .ms-dropdown {
             position: absolute;
-            top: calc(100% + 4px);
+            top: calc(100% + 6px);
             left: 0;
             right: 0;
             background: white;
-            border-radius: 16px;
+            border-radius: 18px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 12px 20px -8px rgba(0,0,0,0.12);
-            z-index: 120;
+            box-shadow: 0 14px 28px -10px rgba(0,0,0,0.15);
+            z-index: 110;
             display: none;
-            max-height: 220px;
+            max-height: 260px;
             overflow-y: auto;
         }
-        .ms-dropdown-compact.show {
+        .ms-dropdown.show {
             display: block;
         }
-        .option-list-sm {
-            padding: 6px 0;
+        .option-list {
+            padding: 8px 0;
         }
-        .option-item-sm {
-            padding: 6px 12px;
+        .option-item {
+            padding: 10px 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 11px;
+            gap: 12px;
+            font-size: 13px;
             cursor: pointer;
         }
-        .option-item-sm:hover {
-            background: #f8fafc;
+        .option-item:hover {
+            background: #f1f5f9;
         }
-        .dropdown-actions-sm {
-            padding: 6px 12px;
+        .dropdown-actions {
+            padding: 10px 16px;
             border-top: 1px solid #edf2f7;
             display: flex;
-            gap: 14px;
+            gap: 20px;
             background: #fefefe;
         }
-        .dd-btn-sm {
+        .dd-action {
             background: none;
             border: none;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 600;
             color: #2563eb;
             cursor: pointer;
         }
 
-        /* ===== COMPACT DATE SWITCHERS ===== */
-        .date-switch-row {
-            display: flex;
-            gap: 12px;
-            flex: 2;
-            min-width: 340px;
+        /* ===== SIDE-BY-SIDE DATE SWITCHES — more vibrant & readable ===== */
+        .date-switch-compact {
             background: #f8fafd;
-            border-radius: 20px;
-            padding: 6px 12px;
-            border: 1px solid #ecf3fa;
+            border-radius: 24px;
+            padding: 12px 16px;
+            margin-top: 4px;
+            border: 1px solid #e9f0f8;
         }
-        .date-card-micro {
+        .side-switch-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .switch-card-mini {
             flex: 1;
             background: white;
-            border-radius: 16px;
-            padding: 6px 10px;
+            border-radius: 22px;
+            padding: 14px 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
             border: 1px solid #eef2fa;
+            transition: all 0.1s;
         }
-        .date-card-header {
+        .switch-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: 12px;
         }
-        .stamp-start-micro {
-            background: #dbeafe;
+        .switch-title-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .start-stamp {
+            background: #eef4ff;
             color: #1e40af;
-            padding: 2px 10px;
+            padding: 4px 14px;
             border-radius: 40px;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
+            letter-spacing: -0.2px;
         }
-        .stamp-end-micro {
-            background: #ffedd5;
+        .end-stamp {
+            background: #fff0e4;
             color: #c2410c;
-            padding: 2px 10px;
+            padding: 4px 14px;
             border-radius: 40px;
-            font-size: 10px;
-            font-weight: 700;
+            font-size: 12px;
         }
-        .date-preview-micro {
+        .date-preview-mini {
             font-family: monospace;
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 700;
             background: #f1f5f9;
-            padding: 2px 8px;
-            border-radius: 30px;
+            padding: 5px 12px;
+            border-radius: 32px;
+            color: #0f172a;
         }
-        .slider-micro-row {
+        .slider-micro {
             width: 100%;
-            height: 3px;
+            height: 5px;
             border-radius: 10px;
             -webkit-appearance: none;
             background: #e2e8f0;
-            margin: 6px 0 2px;
+            margin: 12px 0 6px 0;
             cursor: pointer;
+        }
+        .slider-micro:focus {
+            outline: none;
         }
         .slider-start-micro {
             background: linear-gradient(90deg, #3b82f6, #3b82f6 var(--fill, 0%), #e2e8f0 var(--fill, 0%));
@@ -201,13 +222,13 @@
         .slider-end-micro {
             background: linear-gradient(90deg, #f97316, #f97316 var(--fill, 0%), #e2e8f0 var(--fill, 0%));
         }
-        .slider-micro-row::-webkit-slider-thumb {
-            width: 12px;
-            height: 12px;
-            border-radius: 12px;
+        .slider-micro::-webkit-slider-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 16px;
             background: white;
             border: 2px solid;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             cursor: pointer;
         }
         .slider-start-micro::-webkit-slider-thumb {
@@ -216,311 +237,327 @@
         .slider-end-micro::-webkit-slider-thumb {
             border-color: #f97316;
         }
-        .hint-mini {
+        .range-hint-micro {
             display: flex;
             justify-content: space-between;
-            font-size: 7px;
-            color: #6c7a91;
-            margin-top: 2px;
-        }
-
-        /* ========== STAMP ROW + BUTTONS INSIDE (saves space) ========== */
-        .stamp-bar-with-buttons {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            background: #ffffffcc;
-            border-radius: 40px;
-            padding: 4px 12px;
-        }
-        .colorful-stamp {
-            background: white;
-            border-radius: 40px;
-            padding: 3px 12px;
             font-size: 9px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        }
-        .stamp-blue {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
-        .stamp-orange {
-            background: #fff4e6;
-            color: #b45309;
-        }
-        .stamp-green {
-            background: #dcfce7;
-            color: #166534;
-        }
-        .stamp-red {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-        /* action buttons inside stamp row - tiny and clean */
-        .inline-action-buttons {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            margin-left: 4px;
-        }
-        .btn-stamp {
-            background: #f1f5f9;
-            border: none;
-            border-radius: 30px;
-            padding: 4px 10px;
-            font-size: 9px;
+            color: #5b6e8c;
+            margin-top: 6px;
             font-weight: 600;
-            cursor: pointer;
-            transition: 0.1s;
+        }
+        /* MULTI‑COLOURED STAMPS SUMMARY — vivid & enhanced */
+        .stamp-summary {
+            margin-top: 16px;
+            background: #f8fafc;
+            border-radius: 48px;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .multi-stamp {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            color: #1f2937;
-        }
-        .btn-stamp-primary {
-            background: #1e3a8a;
-            color: white;
-        }
-        .btn-stamp-success {
-            background: #0e7c32;
-            color: white;
-        }
-        .btn-stamp-outline {
+            gap: 8px;
             background: white;
-            border: 1px solid #cbd5e1;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: transform 0.1s;
         }
-        .btn-stamp-secondary {
-            background: #475569;
-            color: white;
+        .stamp-start-badge {
+            background: linear-gradient(115deg, #d9efff, #b3d4ff);
+            color: #0a3f6f;
+            border-left: 4px solid #1e88e5;
         }
-        .btn-stamp:hover {
-            transform: translateY(-1px);
-            filter: brightness(0.96);
+        .stamp-end-badge {
+            background: linear-gradient(115deg, #ffe8db, #ffd9c2);
+            color: #b45116;
+            border-left: 4px solid #f97316;
         }
+        .stamp-full {
+            background: linear-gradient(115deg, #d8f3dc, #b7e4c7);
+            color: #1f6d3b;
+            border-left: 4px solid #2e8b57;
+        }
+        .stamp-custom {
+            background: linear-gradient(115deg, #fce4ec, #f8bbd0);
+            color: #ad1457;
+            border-left: 4px solid #d81b60;
+        }
+        /* action bar */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-tiny {
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-primary-tiny { background: #1e3a8a; color: white; }
+        .btn-success-tiny { background: #0e7c32; color: white; }
+        .btn-warning-tiny { background: #d97706; color: white; }
+        .btn-secondary-tiny { background: #475569; color: white; }
+        .btn-outline-tiny { background: white; border: 1px solid #cbd5e1; color: #1f2937; }
+        .btn-danger-tiny { background: #b91c1c; color: white; }
+        .btn-tiny:hover { transform: translateY(-1px); filter: brightness(0.96); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 
-        /* totals & tables */
+        /* totals area — colourful cards with gradient accents */
         .totals-area {
-            padding: 12px 20px;
             background: #fafcff;
+            padding: 18px 28px;
             border-top: 1px solid #eef2f6;
             border-bottom: 1px solid #eef2f6;
         }
-        .totals-header-sm {
+        .totals-header-mini {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: baseline;
             flex-wrap: wrap;
-            align-items: center;
+            margin-bottom: 18px;
         }
-        .excluded-badge-sm {
-            background: #fee2e2;
-            color: #b91c1c;
-            font-size: 9px;
-            padding: 2px 8px;
-            border-radius: 30px;
-            font-weight: 600;
+        .badge-exclude {
+            background: linear-gradient(115deg, #ffe0e0, #ffc9c9);
+            color: #ab2b2b;
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-weight: 700;
         }
-        .totals-grid-sm {
+        .totals-grid-mini {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 14px;
         }
-        .total-card-sm {
+        .total-item {
             background: white;
-            border-radius: 16px;
-            padding: 6px 10px;
-            border: 1px solid #eef2fa;
+            border-radius: 24px;
+            padding: 12px 16px;
+            border-left: 5px solid;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.03);
+            transition: all 0.1s;
         }
-        .total-label-sm {
+        /* dynamic per-item colour (js will assign random/ class but we set elegant defaults) */
+        .total-label-mini {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            background: linear-gradient(135deg, #334155, #1e293b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .total-value-mini {
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: 6px;
+            color: #0f172a;
+        }
+        /* colourful stamps for total cards per column */
+        .total-item[data-cat="numeric"] { border-left-color: #2c7da0; background: linear-gradient(145deg, #ffffff, #f9feff); }
+        .total-item[data-cat="text"] { border-left-color: #9c6e3e; background: #fffef8; }
+        .total-item .sum-tag {
             font-size: 9px;
             font-weight: 700;
-            text-transform: uppercase;
-            color: #5b6e8c;
+            display: inline-block;
+            background: #e9ecef;
+            padding: 2px 10px;
+            border-radius: 24px;
+            margin-top: 6px;
         }
-        .total-value-sm {
-            font-size: 16px;
-            font-weight: 800;
-            margin-top: 2px;
-        }
-        .status-line {
-            padding: 6px 20px;
-            font-size: 10px;
+        /* status / tables */
+        .status-bar {
+            padding: 10px 28px;
+            font-size: 12px;
             background: #fef9e3;
             color: #b45309;
+            font-weight: 600;
         }
         .table-wrapper {
             overflow-x: auto;
-            max-height: 420px;
+            max-height: 460px;
             overflow-y: auto;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 13px;
         }
         th {
             background: #1e293b;
             color: white;
-            padding: 8px 6px;
+            padding: 12px 8px;
             position: sticky;
             top: 0;
             white-space: nowrap;
+            font-weight: 700;
+            text-align: center;
         }
         td {
-            padding: 7px 6px;
+            padding: 10px 8px;
             border-bottom: 1px solid #f0f2f5;
             white-space: nowrap;
+            text-align: center;
         }
-        .footer-stats-sm {
-            padding: 8px 20px;
+        /* center alignment for all table cells */
+        th, td {
+            text-align: center;
+        }
+        /* left-align first column optionally? but keep design balanced: everything centered */
+        .footer-stats-mini {
+            padding: 12px 28px;
             background: #f9fbfd;
-            font-size: 10px;
-            color: #334155;
-        }
-        @media (max-width: 1050px) {
-            .one-line-filters { flex-direction: column; align-items: stretch; }
-            .date-switch-row { flex-wrap: wrap; }
-            .stamp-bar-with-buttons { justify-content: space-between; }
+            font-size: 12px;
+            color: #2c3e66;
+            font-weight: 500;
+            border-top: 1px solid #eef2f8;
         }
     </style>
 </head>
 <body>
-<div class="app-wrapper">
-    <div class="header-bar">
-        <h1>📊 Voucher Manager · One‑Row + Buttons inside Stamp Bar</h1>
-        <p>Column 11 excluded | Colourful stamps | Maximum space saving</p>
+<div class="app-container">
+    <div class="app-header">
+        <h1>📋 Voucher Manager</h1>
+        <p>Larger fonts | Colourful sum stamps | Centered data & headers</p>
     </div>
 
-    <!-- 🔥 ALL FILTERS + DATE SWITCHERS + BUTTONS INSIDE STAMP ROW 🔥 -->
-    <div class="one-line-filters">
-        <!-- COLUMN 1 FILTER -->
-        <div class="filter-group-sm">
-            <div class="filter-label-micro">🔽 COLUMN 1</div>
-            <div class="ms-compact" id="col1Wrapper">
-                <div class="ms-trigger-compact" id="col1Trigger">
-                    <span id="col1SelectedText">ALL VALUES</span>
-                    <span>▼</span>
-                </div>
-                <div class="ms-dropdown-compact" id="col1Dropdown">
-                    <div class="dropdown-actions-sm">
-                        <button class="dd-btn-sm" id="selectAllCol1Btn">✓ Select All</button>
-                        <button class="dd-btn-sm" id="clearAllCol1Btn">✗ Clear</button>
+    <!-- COMPACT FILTER SECTION (enhanced) -->
+    <div class="filters-compact">
+        <div class="dual-filter-row">
+            <div class="filter-chip">
+                <div class="filter-label-micro"><span>🔽 COLUMN 1</span></div>
+                <div class="ms-container" id="col1Container">
+                    <div class="ms-trigger" id="col1Trigger">
+                        <span id="col1SelectedText">ALL VALUES</span>
+                        <span>▼</span>
                     </div>
-                    <div class="option-list-sm" id="col1OptionsList"></div>
+                    <div class="ms-dropdown" id="col1Dropdown">
+                        <div class="dropdown-actions">
+                            <button class="dd-action" id="selectAllCol1Btn">✓ Select All</button>
+                            <button class="dd-action" id="clearAllCol1Btn">✗ Clear</button>
+                        </div>
+                        <div class="option-list" id="col1OptionsList"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-chip">
+                <div class="filter-label-micro"><span>🔽 COLUMN 2</span></div>
+                <div class="ms-container" id="col2Container">
+                    <div class="ms-trigger" id="col2Trigger">
+                        <span id="col2SelectedText">ALL VALUES</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="ms-dropdown" id="col2Dropdown">
+                        <div class="dropdown-actions">
+                            <button class="dd-action" id="selectAllCol2Btn">✓ Select All</button>
+                            <button class="dd-action" id="clearAllCol2Btn">✗ Clear</button>
+                        </div>
+                        <div class="option-list" id="col2OptionsList"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- COLUMN 2 FILTER -->
-        <div class="filter-group-sm">
-            <div class="filter-label-micro">🔽 COLUMN 2</div>
-            <div class="ms-compact" id="col2Wrapper">
-                <div class="ms-trigger-compact" id="col2Trigger">
-                    <span id="col2SelectedText">ALL VALUES</span>
-                    <span>▼</span>
-                </div>
-                <div class="ms-dropdown-compact" id="col2Dropdown">
-                    <div class="dropdown-actions-sm">
-                        <button class="dd-btn-sm" id="selectAllCol2Btn">✓ Select All</button>
-                        <button class="dd-btn-sm" id="clearAllCol2Btn">✗ Clear</button>
+        <!-- DATE SWITCHES -->
+        <div class="date-switch-compact">
+            <div class="side-switch-row">
+                <div class="switch-card-mini">
+                    <div class="switch-head">
+                        <div class="switch-title-mini">
+                            <span class="start-stamp">🔵 START DATE</span>
+                        </div>
+                        <div class="date-preview-mini" id="startDatePreview">—</div>
                     </div>
-                    <div class="option-list-sm" id="col2OptionsList"></div>
+                    <input type="range" id="startSlider" class="slider-micro slider-start-micro" min="0" max="100" value="0" step="1">
+                    <div class="range-hint-micro"><span>📅 Earliest</span><span>⏺ Set start</span></div>
                 </div>
+                <div class="switch-card-mini">
+                    <div class="switch-head">
+                        <div class="switch-title-mini">
+                            <span class="end-stamp">🟠 END DATE</span>
+                        </div>
+                        <div class="date-preview-mini" id="endDatePreview">—</div>
+                    </div>
+                    <input type="range" id="endSlider" class="slider-micro slider-end-micro" min="0" max="100" value="100" step="1">
+                    <div class="range-hint-micro"><span>◀ Set end</span><span>📅 Latest</span></div>
+                </div>
+            </div>
+            <!-- VIBRANT STAMP SUMMARY -->
+            <div class="stamp-summary">
+                <div class="multi-stamp stamp-start-badge">🔵 <strong id="rangeStartLabel">—</strong></div>
+                <div class="multi-stamp stamp-end-badge">🟠 <strong id="rangeEndLabel">—</strong></div>
+                <div id="rangeModeStamp" class="multi-stamp stamp-full">📅 Full Range</div>
             </div>
         </div>
 
-        <!-- SIDE-BY-SIDE DATE SWITCHERS -->
-        <div class="date-switch-row">
-            <!-- START DATE CARD -->
-            <div class="date-card-micro">
-                <div class="date-card-header">
-                    <span class="stamp-start-micro">🔵 START</span>
-                    <span class="date-preview-micro" id="startDatePreview">—</span>
-                </div>
-                <input type="range" id="startSlider" class="slider-micro-row slider-start-micro" min="0" max="100" value="0" step="1">
-                <div class="hint-mini"><span>📅 earliest</span><span>⏺</span></div>
-            </div>
-            <!-- END DATE CARD -->
-            <div class="date-card-micro">
-                <div class="date-card-header">
-                    <span class="stamp-end-micro">🟠 END</span>
-                    <span class="date-preview-micro" id="endDatePreview">—</span>
-                </div>
-                <input type="range" id="endSlider" class="slider-micro-row slider-end-micro" min="0" max="100" value="100" step="1">
-                <div class="hint-mini"><span>◀</span><span>📅 latest</span></div>
-            </div>
-
-            <!-- MULTI-COLOURED STAMPS + BUTTONS INSIDE (space efficient) -->
-            <div class="stamp-bar-with-buttons">
-                <div class="colorful-stamp stamp-blue">🔵 <strong id="rangeStartLabel">—</strong></div>
-                <div class="colorful-stamp stamp-orange">🟠 <strong id="rangeEndLabel">—</strong></div>
-                <div id="rangeModeStamp" class="colorful-stamp stamp-green">📅 Full Range</div>
-                
-                <!-- action buttons inside stamp row — tiny & clean -->
-                <div class="inline-action-buttons">
-                    <button id="refreshBtn" class="btn-stamp btn-stamp-primary" title="Refresh data">🔄</button>
-                    <button id="exportFilteredBtn" class="btn-stamp btn-stamp-success" title="Export filtered">📊 Filtered</button>
-                    <button id="resetDatesBtn" class="btn-stamp btn-stamp-outline" title="Reset dates">🎚️ Reset Dates</button>
-                    <button id="resetAllBtn" class="btn-stamp btn-stamp-secondary" title="Reset all filters">🗑️ Reset</button>
-                </div>
-            </div>
+        <div class="action-bar">
+            <button id="refreshDataBtn" class="btn-tiny btn-primary-tiny">🔄 Refresh</button>
+            <button id="exportFilteredBtn" class="btn-tiny btn-success-tiny">📊 Export Filtered</button>
+            <button id="exportAllBtn" class="btn-tiny btn-warning-tiny">📎 Export All</button>
+            <button id="resetAllFiltersBtn" class="btn-tiny btn-secondary-tiny">🗑️ Reset All</button>
+            <button id="clearMultiBtn" class="btn-tiny btn-danger-tiny">🎯 Clear Multi</button>
+            <button id="resetDatesBtn" class="btn-tiny btn-outline-tiny">🎚️ Reset Dates</button>
         </div>
     </div>
 
-    <!-- TOTALS SECTION -->
+    <!-- TOTALS SECTION colourful stamps -->
     <div class="totals-area">
-        <div class="totals-header-sm">
-            <span><strong>💰 FILTERED TOTALS</strong> <span id="timestampTotals"></span></span>
-            <span class="excluded-badge-sm">🚫 Voucher No (Col11) excluded</span>
+        <div class="totals-header-mini">
+            <span><strong>🌈 COLOURFUL TOTALS</strong> <span id="timestampTotals"></span></span>
+            <span class="badge-exclude">🚫 Voucher No (Col11) excluded</span>
         </div>
-        <div id="totalsGrid" class="totals-grid-sm"><div class="total-card-sm">Loading data...</div></div>
+        <div id="totalsGrid" class="totals-grid-mini"><div class="total-item">Loading colourful stamps...</div></div>
     </div>
 
-    <div id="statusMsg" class="status-line">📡 Fetching from Google Sheets ...</div>
-    <div class="table-wrapper"><div id="tableContainer">Loading voucher data...</div></div>
-    <div class="footer-stats-sm" id="statsFooter"></div>
+    <div id="statusMsg" class="status-bar">✅ Connecting to data source...</div>
+    <div class="table-wrapper"><div id="tableContainer">Fetching voucher data...</div></div>
+    <div class="footer-stats-mini" id="statsFooter"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
     // ---------- CONFIG ----------
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoMe4JoLQo-JLpdJC-Iu81p_dBZdzHROGsnyO9LrlwxqxKzkljUElHtwJIqUyW0HN9/exec';
-    let fullDataset = [];
-    let headersList = [];
-    let filteredDataRows = [];
+    let fullData = [];
+    let headers = [];
+    let filteredRows = [];
     
-    // column filters
     let selectedCol1 = new Set();
     let selectedCol2 = new Set();
-    let uniqueCol1 = [];
-    let uniqueCol2 = [];
+    let uniqueCol1Values = [];
+    let uniqueCol2Values = [];
     
-    // date range
-    let globalMinDateObj = null, globalMaxDateObj = null;
-    let currentStartDate = null, currentEndDate = null;
+    let globalMinDate = null, globalMaxDate = null;
+    let currentStart = null, currentEnd = null;
     
-    const EXCLUDED_IDX = [10];
-    function isExcludedColumn(colName, idx) {
-        if (EXCLUDED_IDX.includes(idx)) return true;
+    const EXCLUDED_INDEXES = [10];
+    function isExcludedTotal(colName, idx) {
+        if (EXCLUDED_INDEXES.includes(idx)) return true;
         if (!colName) return false;
-        const lower = colName.toString().toLowerCase();
-        return ['financial year', 'name of fund', 'vendor', 'payment date'].some(k => lower.includes(k));
+        const low = colName.toString().toLowerCase();
+        return ['financial year', 'name of fund', 'vendor', 'payment date'].some(k => low.includes(k));
     }
     
-    // helpers
     function formatNumber(num) {
         if (num === undefined || num === null) return '0';
         return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
     function formatDateDMY(date) {
         if (!date || isNaN(date.getTime())) return '—';
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2,'0');
+        const m = String(date.getMonth()+1).padStart(2,'0');
         const y = date.getFullYear();
         return `${d}/${m}/${y}`;
     }
@@ -534,11 +571,12 @@
         return /^\d{4}-\d{2}-\d{2}/.test(v) || /\d{2}\/\d{2}\/\d{4}/.test(v);
     }
     
-    function collectAllDateObjects() {
+    function extractAllDates() {
         let dates = [];
-        if (!fullDataset.length) return dates;
-        for (let i = 1; i < fullDataset.length; i++) {
-            for (let cell of fullDataset[i]) {
+        if (!fullData.length) return dates;
+        for (let i = 1; i < fullData.length; i++) {
+            const row = fullData[i];
+            for (let cell of row) {
                 if (isDateLikeString(cell)) {
                     const d = parseDateCell(cell);
                     if (d) dates.push(d);
@@ -549,16 +587,16 @@
     }
     
     function initDateSliders() {
-        const allDates = collectAllDateObjects();
+        const allDates = extractAllDates();
         if (!allDates.length) {
             document.getElementById('startSlider').disabled = true;
             document.getElementById('endSlider').disabled = true;
             return;
         }
-        globalMinDateObj = new Date(Math.min(...allDates));
-        globalMaxDateObj = new Date(Math.max(...allDates));
-        currentStartDate = new Date(globalMinDateObj);
-        currentEndDate = new Date(globalMaxDateObj);
+        globalMinDate = new Date(Math.min(...allDates));
+        globalMaxDate = new Date(Math.max(...allDates));
+        currentStart = new Date(globalMinDate);
+        currentEnd = new Date(globalMaxDate);
         updateSliderUI();
         attachSliderEvents();
     }
@@ -566,120 +604,113 @@
     function attachSliderEvents() {
         const startSlider = document.getElementById('startSlider');
         const endSlider = document.getElementById('endSlider');
-        if (!startSlider) return;
-        const rangeMs = globalMaxDateObj - globalMinDateObj;
+        const rangeMs = globalMaxDate - globalMinDate;
         startSlider.oninput = (e) => {
             let percent = parseFloat(e.target.value) / 100;
-            let newStart = new Date(globalMinDateObj.getTime() + (rangeMs * percent));
-            if (newStart > currentEndDate) {
-                newStart = new Date(currentEndDate);
-                startSlider.value = ((newStart - globalMinDateObj) / rangeMs) * 100;
-            }
-            currentStartDate = newStart;
+            let newStart = new Date(globalMinDate.getTime() + (rangeMs * percent));
+            if (newStart > currentEnd) { newStart = new Date(currentEnd); startSlider.value = ((newStart - globalMinDate) / rangeMs) * 100; }
+            currentStart = newStart;
             updateSliderUI();
-            applyAllFilters();
+            applyFilters();
         };
         endSlider.oninput = (e) => {
             let percent = parseFloat(e.target.value) / 100;
-            let newEnd = new Date(globalMinDateObj.getTime() + (rangeMs * percent));
-            if (newEnd < currentStartDate) {
-                newEnd = new Date(currentStartDate);
-                endSlider.value = ((newEnd - globalMinDateObj) / rangeMs) * 100;
-            }
-            currentEndDate = newEnd;
+            let newEnd = new Date(globalMinDate.getTime() + (rangeMs * percent));
+            if (newEnd < currentStart) { newEnd = new Date(currentStart); endSlider.value = ((newEnd - globalMinDate) / rangeMs) * 100; }
+            currentEnd = newEnd;
             updateSliderUI();
-            applyAllFilters();
+            applyFilters();
         };
     }
     
     function updateSliderUI() {
-        if (!globalMinDateObj || !globalMaxDateObj) return;
-        const rangeMs = globalMaxDateObj - globalMinDateObj;
-        const startPercent = ((currentStartDate - globalMinDateObj) / rangeMs) * 100;
-        const endPercent = ((currentEndDate - globalMinDateObj) / rangeMs) * 100;
+        if (!globalMinDate || !globalMaxDate) return;
+        const rangeMs = globalMaxDate - globalMinDate;
+        const startPercent = ((currentStart - globalMinDate) / rangeMs) * 100;
+        const endPercent = ((currentEnd - globalMinDate) / rangeMs) * 100;
         const startSlider = document.getElementById('startSlider');
         const endSlider = document.getElementById('endSlider');
         if (startSlider) startSlider.value = startPercent;
         if (endSlider) endSlider.value = endPercent;
-        document.querySelector('.slider-start-micro')?.style.setProperty('--fill', startPercent + '%');
-        document.querySelector('.slider-end-micro')?.style.setProperty('--fill', endPercent + '%');
+        document.querySelector('.slider-start-micro')?.style.setProperty('--fill', startPercent+'%');
+        document.querySelector('.slider-end-micro')?.style.setProperty('--fill', endPercent+'%');
         
-        const startFmt = formatDateDMY(currentStartDate);
-        const endFmt = formatDateDMY(currentEndDate);
+        const startFmt = formatDateDMY(currentStart);
+        const endFmt = formatDateDMY(currentEnd);
         document.getElementById('startDatePreview').innerText = startFmt;
         document.getElementById('endDatePreview').innerText = endFmt;
         document.getElementById('rangeStartLabel').innerHTML = startFmt;
         document.getElementById('rangeEndLabel').innerHTML = endFmt;
         
-        const isFull = (currentStartDate.getTime() === globalMinDateObj.getTime() && currentEndDate.getTime() === globalMaxDateObj.getTime());
+        const isFull = (currentStart.getTime() === globalMinDate.getTime() && currentEnd.getTime() === globalMaxDate.getTime());
         const modeStamp = document.getElementById('rangeModeStamp');
         if (isFull) {
-            modeStamp.className = 'colorful-stamp stamp-green';
+            modeStamp.className = 'multi-stamp stamp-full';
             modeStamp.innerHTML = '📅 Full Range';
         } else {
-            modeStamp.className = 'colorful-stamp stamp-red';
+            modeStamp.className = 'multi-stamp stamp-custom';
             modeStamp.innerHTML = '🎯 Custom Range';
         }
     }
     
     function resetDateSwitches() {
-        if (!globalMinDateObj || !globalMaxDateObj) return;
-        currentStartDate = new Date(globalMinDateObj);
-        currentEndDate = new Date(globalMaxDateObj);
+        if (!globalMinDate || !globalMaxDate) return;
+        currentStart = new Date(globalMinDate);
+        currentEnd = new Date(globalMaxDate);
         updateSliderUI();
-        applyAllFilters();
-        showStatus('Date range reset to full', 'success');
+        applyFilters();
+        showStatusMessage('Date range reset to full', 'success');
     }
     
     function isRowInDateRange(row) {
-        if (!currentStartDate || !currentEndDate) return true;
+        if (!currentStart || !currentEnd) return true;
         let hasMatch = false;
-        let anyDateExists = false;
+        let anyDatePresent = false;
         for (let cell of row) {
             if (isDateLikeString(cell)) {
                 let d = parseDateCell(cell);
                 if (d) {
-                    anyDateExists = true;
-                    if (d >= currentStartDate && d <= currentEndDate) hasMatch = true;
+                    anyDatePresent = true;
+                    if (d >= currentStart && d <= currentEnd) hasMatch = true;
                 }
             }
         }
-        if (!anyDateExists) return true;
+        if (!anyDatePresent) return true;
         return hasMatch;
     }
     
-    function applyAllFilters() {
-        if (!fullDataset.length || fullDataset.length < 2) { renderEmptyState(); return; }
-        const rows = fullDataset.slice(1);
+    function applyFilters() {
+        if (!fullData.length || fullData.length < 2) { renderEmpty(); return; }
+        const rows = fullData.slice(1);
         let filtered = rows.filter(row => {
             if (selectedCol1.size > 0) {
-                let v = row[0]?.toString().trim() || '';
-                if (!selectedCol1.has(v)) return false;
+                let val = row[0]?.toString().trim() || '';
+                if (!selectedCol1.has(val)) return false;
             }
             if (selectedCol2.size > 0) {
-                let v = row[1]?.toString().trim() || '';
-                if (!selectedCol2.has(v)) return false;
+                let val = row[1]?.toString().trim() || '';
+                if (!selectedCol2.has(val)) return false;
             }
             if (!isRowInDateRange(row)) return false;
             return true;
         });
-        filteredDataRows = filtered;
-        const totals = computeTotals(filteredDataRows);
-        renderTotals(totals);
-        renderTable(filteredDataRows);
-        document.getElementById('statsFooter').innerHTML = `📊 Showing ${filtered.length} of ${rows.length} rows | ${formatDateDMY(currentStartDate)} → ${formatDateDMY(currentEndDate)} | ${new Date().toLocaleTimeString()}`;
+        filteredRows = filtered;
+        const totals = computeTotals(filteredRows);
+        renderTotalsColourful(totals);
+        renderTable(filteredRows);
+        document.getElementById('statsFooter').innerHTML = `📊 Showing ${filtered.length} of ${rows.length} rows | ${formatDateDMY(currentStart)} → ${formatDateDMY(currentEnd)} | ${new Date().toLocaleTimeString()}`;
     }
     
     function computeTotals(data) {
         if (!data.length) return {};
         let totalsMap = {};
-        headersList.forEach((h, idx) => {
-            if (!isExcludedColumn(h, idx)) {
+        headers.forEach((h, idx) => {
+            if (!isExcludedTotal(h, idx)) {
                 totalsMap[idx] = { label: h || `Col${idx+1}`, sum: 0, nonEmpty: 0, numericCount: 0 };
             }
         });
         data.forEach(row => {
-            headersList.forEach((_, idx) => {
+            headers.forEach((_, idx) => {
                 if (totalsMap[idx]) {
                     let val = row[idx];
                     if (val !== undefined && val !== null && val !== '') {
@@ -696,28 +727,39 @@
         return totalsMap;
     }
     
-    function renderTotals(totals) {
+    // colourful totals with dynamic icons and background stamps
+    function renderTotalsColourful(totals) {
         const container = document.getElementById('totalsGrid');
         document.getElementById('timestampTotals').innerHTML = `🕐 ${new Date().toLocaleString()}`;
         if (Object.keys(totals).length === 0) {
-            container.innerHTML = '<div class="total-card-sm">No numeric data</div>';
+            container.innerHTML = '<div class="total-item" style="border-left-color:#f97316;">✨ No totals available</div>';
             return;
         }
         let html = '';
-        for (let [idx, t] of Object.entries(totals)) {
-            let displayVal = t.numericCount > 0 ? formatNumber(t.sum) : t.nonEmpty.toLocaleString();
-            let typeIcon = t.numericCount > 0 ? '💰 Sum' : '📊 Count';
-            html += `<div class="total-card-sm"><div class="total-label-sm">${escapeHtml(t.label.length > 20 ? t.label.slice(0,18)+'…' : t.label)}</div><div class="total-value-sm">${displayVal}</div><div style="font-size:7px; margin-top:2px;">${typeIcon} · ${t.nonEmpty} rows</div></div>`;
+        const colorPalette = ['#2c7da0', '#5f9c6b', '#b9770e', '#9c6e9e', '#d45d5d', '#4f8bc9', '#e29578', '#6d597a'];
+        let idxColor = 0;
+        for (let [colIdx, t] of Object.entries(totals)) {
+            let isNumeric = t.numericCount > 0;
+            let displayVal = isNumeric ? formatNumber(t.sum) : t.nonEmpty.toLocaleString();
+            let typeIcon = isNumeric ? '💰 Total Sum' : '📄 Record Count';
+            let borderClr = colorPalette[idxColor % colorPalette.length];
+            idxColor++;
+            html += `<div class="total-item" style="border-left: 5px solid ${borderClr}; background: linear-gradient(135deg, #ffffff 0%, #fefcf5 100%);">
+                        <div class="total-label-mini">✨ ${escapeHtml(t.label.length > 25 ? t.label.slice(0,22)+'…' : t.label)}</div>
+                        <div class="total-value-mini">${displayVal}</div>
+                        <div class="sum-tag" style="background: ${borderClr}20; color: ${borderClr}; border-radius: 40px;">${typeIcon} · ${t.nonEmpty} entries</div>
+                    </div>`;
         }
         container.innerHTML = html;
     }
     
     function renderTable(data) {
         const cont = document.getElementById('tableContainer');
-        if (!data.length) { cont.innerHTML = '<div style="padding:24px; text-align:center;">📭 No matching records</div>'; return; }
-        let html = '<table><thead><tr>';
-        headersList.forEach((h, idx) => {
-            let excl = (idx === 10 || isExcludedColumn(h, idx)) ? ' ⛔' : '';
+        if (!data.length) { cont.innerHTML = '<div style="padding:28px; text-align:center; font-size:14px;">📭 No matching records</div>'; return; }
+        let html = '<table><thead>';
+        html += '<tr>';
+        headers.forEach((h, idx) => {
+            let excl = (idx === 10 || isExcludedTotal(h, idx)) ? ' ⛔' : '';
             html += `<th>${escapeHtml(h || `Col${idx+1}`)}${excl}</th>`;
         });
         html += `</tr></thead><tbody>`;
@@ -725,7 +767,7 @@
             html += '<tr>';
             row.forEach((cell, ci) => {
                 let display = isDateLikeString(cell) ? formatDateDMY(parseDateCell(cell)) : (cell ?? '');
-                html += `<td title="${escapeHtml(display.toString().slice(0,80))}">${escapeHtml(display.toString().slice(0, 50))}${display.toString().length > 50 ? '…' : ''}</td>`;
+                html += `<td style="text-align:center;">${escapeHtml(display.toString())}</td>`;
             });
             html += '</tr>';
         });
@@ -733,45 +775,35 @@
         cont.innerHTML = html;
     }
     
-    function renderEmptyState() {
-        document.getElementById('tableContainer').innerHTML = '<div>No data loaded</div>';
-        document.getElementById('statsFooter').innerHTML = '';
-    }
+    function renderEmpty() { document.getElementById('tableContainer').innerHTML = '<div style="padding:28px; text-align:center;">No data</div>'; document.getElementById('statsFooter').innerHTML = ''; }
     function escapeHtml(s) { if(!s) return ''; return String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
     
-    // Multi-select
     function buildUniqueFilters() {
-        if (!fullDataset.length) return;
-        const rows = fullDataset.slice(1);
+        if (!fullData.length) return;
+        const rows = fullData.slice(1);
         const c1Set = new Set(); rows.forEach(r => { if(r[0]?.toString().trim()) c1Set.add(r[0].toString().trim()); });
         const c2Set = new Set(); rows.forEach(r => { if(r[1]?.toString().trim()) c2Set.add(r[1].toString().trim()); });
-        uniqueCol1 = Array.from(c1Set).sort();
-        uniqueCol2 = Array.from(c2Set).sort();
+        uniqueCol1Values = Array.from(c1Set).sort();
+        uniqueCol2Values = Array.from(c2Set).sort();
         renderMultiSelect();
     }
     
     function renderMultiSelect() {
         const col1Div = document.getElementById('col1OptionsList');
         col1Div.innerHTML = '';
-        uniqueCol1.forEach(val => {
-            const div = document.createElement('div'); div.className = 'option-item-sm';
+        uniqueCol1Values.forEach(val => {
+            const div = document.createElement('div'); div.className = 'option-item';
             const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = val; cb.checked = selectedCol1.has(val);
-            cb.addEventListener('change', (e) => {
-                if(e.target.checked) selectedCol1.add(val); else selectedCol1.delete(val);
-                updateSelectedText(); applyAllFilters();
-            });
+            cb.addEventListener('change', (e) => { if(e.target.checked) selectedCol1.add(val); else selectedCol1.delete(val); updateSelectedText(); applyFilters(); });
             const lbl = document.createElement('label'); lbl.innerText = val;
             div.appendChild(cb); div.appendChild(lbl); col1Div.appendChild(div);
         });
         const col2Div = document.getElementById('col2OptionsList');
         col2Div.innerHTML = '';
-        uniqueCol2.forEach(val => {
-            const div = document.createElement('div'); div.className = 'option-item-sm';
+        uniqueCol2Values.forEach(val => {
+            const div = document.createElement('div'); div.className = 'option-item';
             const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = val; cb.checked = selectedCol2.has(val);
-            cb.addEventListener('change', (e) => {
-                if(e.target.checked) selectedCol2.add(val); else selectedCol2.delete(val);
-                updateSelectedText(); applyAllFilters();
-            });
+            cb.addEventListener('change', (e) => { if(e.target.checked) selectedCol2.add(val); else selectedCol2.delete(val); updateSelectedText(); applyFilters(); });
             const lbl = document.createElement('label'); lbl.innerText = val;
             div.appendChild(cb); div.appendChild(lbl); col2Div.appendChild(div);
         });
@@ -785,62 +817,74 @@
         document.getElementById('col2SelectedText').innerText = t2;
     }
     
-    function selectAllCol1() { uniqueCol1.forEach(v => selectedCol1.add(v)); renderMultiSelect(); applyAllFilters(); }
-    function clearAllCol1() { selectedCol1.clear(); renderMultiSelect(); applyAllFilters(); }
-    function selectAllCol2() { uniqueCol2.forEach(v => selectedCol2.add(v)); renderMultiSelect(); applyAllFilters(); }
-    function clearAllCol2() { selectedCol2.clear(); renderMultiSelect(); applyAllFilters(); }
-    function resetAllFilters() { selectedCol1.clear(); selectedCol2.clear(); renderMultiSelect(); resetDateSwitches(); applyAllFilters(); showStatus('All filters & dates reset', 'success'); }
-    function showStatus(msg, type) { const el = document.getElementById('statusMsg'); el.innerText = msg; setTimeout(() => { if(el.innerText === msg) el.innerText = '✅ Ready'; }, 1800); }
+    function selectAllCol1() { uniqueCol1Values.forEach(v => selectedCol1.add(v)); renderMultiSelect(); applyFilters(); }
+    function clearAllCol1() { selectedCol1.clear(); renderMultiSelect(); applyFilters(); }
+    function selectAllCol2() { uniqueCol2Values.forEach(v => selectedCol2.add(v)); renderMultiSelect(); applyFilters(); }
+    function clearAllCol2() { selectedCol2.clear(); renderMultiSelect(); applyFilters(); }
+    function resetAll() { selectedCol1.clear(); selectedCol2.clear(); renderMultiSelect(); resetDateSwitches(); applyFilters(); showStatusMessage('All filters reset', 'success'); }
+    function clearMulti() { selectedCol1.clear(); selectedCol2.clear(); renderMultiSelect(); applyFilters(); showStatusMessage('Multi selections cleared', 'success'); }
+    function showStatusMessage(msg) { const el = document.getElementById('statusMsg'); el.innerText = msg; setTimeout(() => { if(el.innerText === msg) el.innerText = '✅ Ready — colourful totals active'; }, 1800); }
     
-    async function fetchRemoteData() {
+    async function fetchData() {
         const statusDiv = document.getElementById('statusMsg');
-        statusDiv.innerText = '⏳ Fetching data ...';
+        statusDiv.innerText = '⏳ Fetching from Google Sheets...';
         try {
             const resp = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors', cache: 'no-store' });
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const data = await resp.json();
             if (!Array.isArray(data) || !data.length) throw new Error('Empty dataset');
-            fullDataset = data;
-            headersList = fullDataset[0] || [];
+            fullData = data;
+            headers = fullData[0] || [];
             buildUniqueFilters();
             initDateSliders();
-            applyAllFilters();
-            statusDiv.innerText = `✅ Loaded ${fullDataset.length-1} rows · Buttons in stamp row`;
+            applyFilters();
+            statusDiv.innerText = `✅ Loaded ${fullData.length-1} rows | larger fonts + centred 🎨`;
         } catch(err) {
             statusDiv.innerText = `❌ Error: ${err.message}`;
         }
     }
     
     function exportFilteredOnly() {
-        if (!filteredDataRows.length) { alert('No filtered data to export'); return; }
-        const wsData = [headersList, ...filteredDataRows.map(r => r.map(c => isDateLikeString(c) ? formatDateDMY(parseDateCell(c)) : c))];
+        if (!filteredRows.length) { alert('No filtered data'); return; }
+        const wsData = [headers, ...filteredRows.map(r => r.map(c => isDateLikeString(c) ? formatDateDMY(parseDateCell(c)) : c))];
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Filtered');
         XLSX.writeFile(wb, `filtered_${new Date().toISOString().split('T')[0]}.xlsx`);
-        showStatus('Filtered export done', 'success');
+        showStatusMessage('Filtered export done');
+    }
+    function exportAllData() {
+        if (!fullData.length) return;
+        const wsData = [headers, ...fullData.slice(1).map(r => r.map(c => isDateLikeString(c) ? formatDateDMY(parseDateCell(c)) : c))];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'AllData');
+        XLSX.writeFile(wb, `vouchers_all.xlsx`);
+        showStatusMessage('All data exported');
     }
     
     function bindEvents() {
-        document.getElementById('refreshBtn').onclick = fetchRemoteData;
+        document.getElementById('refreshDataBtn').onclick = fetchData;
         document.getElementById('exportFilteredBtn').onclick = exportFilteredOnly;
+        document.getElementById('exportAllBtn').onclick = exportAllData;
+        document.getElementById('resetAllFiltersBtn').onclick = resetAll;
+        document.getElementById('clearMultiBtn').onclick = clearMulti;
         document.getElementById('resetDatesBtn').onclick = resetDateSwitches;
-        document.getElementById('resetAllBtn').onclick = resetAllFilters;
         document.getElementById('selectAllCol1Btn').onclick = selectAllCol1;
         document.getElementById('clearAllCol1Btn').onclick = clearAllCol1;
         document.getElementById('selectAllCol2Btn').onclick = selectAllCol2;
         document.getElementById('clearAllCol2Btn').onclick = clearAllCol2;
-        const toggle = (id) => {
+        const toggleDropdown = (id) => {
             const dd = document.getElementById(id);
-            document.querySelectorAll('.ms-dropdown-compact').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
+            document.querySelectorAll('.ms-dropdown').forEach(d => { if(d.id !== id) d.classList.remove('show'); });
             dd.classList.toggle('show');
         };
-        document.getElementById('col1Trigger').onclick = (e) => { e.stopPropagation(); toggle('col1Dropdown'); };
-        document.getElementById('col2Trigger').onclick = (e) => { e.stopPropagation(); toggle('col2Dropdown'); };
-        document.addEventListener('click', (e) => { if(!e.target.closest('.ms-compact')) document.querySelectorAll('.ms-dropdown-compact').forEach(d => d.classList.remove('show')); });
+        document.getElementById('col1Trigger').onclick = (e) => { e.stopPropagation(); toggleDropdown('col1Dropdown'); };
+        document.getElementById('col2Trigger').onclick = (e) => { e.stopPropagation(); toggleDropdown('col2Dropdown'); };
+        document.addEventListener('click', (e) => { if(!e.target.closest('.ms-container')) document.querySelectorAll('.ms-dropdown').forEach(d => d.classList.remove('show')); });
     }
     
-    fetchRemoteData();
+    fetchData();
     bindEvents();
 </script>
 </body>
