@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voucher Data Manager - Multi-Select Filters</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 24px;
+        }
+        .header h1 {
+            margin: 0 0 5px 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .filters {
+            padding: 20px 24px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 260px;
+        }
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #5f6368;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .multi-select-container {
+            position: relative;
+            width: 100%;
+        }
+        .multi-select-btn {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+        }
+        .multi-select-btn span:first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #333;
+        }
+        .multi-select-btn .arrow {
+            font-size: 12px;
+            color: #888;
+        }
+        .multi-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            margin-top: 2px;
+        }
+        .multi-select-dropdown.show {
+            display: block;
+        }
+        .multi-select-option {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .multi-select-option:hover {
+            background: #f1f3f4;
+        }
+        .multi-select-option input {
+            margin: 0;
+            cursor: pointer;
+        }
+        .multi-select-option label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: normal;
+            font-size: 13px;
+            color: #202124;
+            flex: 1;
+        }
+        .multi-select-actions {
+            padding: 8px 12px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            background: #fafafa;
+        }
+        .multi-select-actions button {
+            background: none;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+        .multi-select-actions button:hover {
+            text-decoration: underline;
+        }
+        
+        .date-range-slider {
+            flex: 2;
+            min-width: 350px;
+        }
+        .slider-container {
+            padding: 10px 0;
+            position: relative;
+        }
+        .slider-wrapper {
+            position: relative;
+            padding: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, 
+                #ff6b6b 0%, 
+                #ffa502 20%, 
+                #7bed9f 40%, 
+                #70a1ff 60%, 
+                #eccc68 80%, 
+                #ff6b6b 100%);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #764ba2;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #764ba2;
+        }
+        .slider-tooltip {
+            position: absolute;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .slider-tooltip.active { opacity: 1; }
+        .date-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .btn-secondary { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+        .btn:hover { transform: translateY(-2px); }
+        
+        .totals-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px 24px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .totals-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .excluded-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .total-card {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .total-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .total-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        .total-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .total-stamp {
+            font-size: 10px;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+        
+        .status {
+            padding: 8px 24px;
+            font-size: 13px;
+            background: #fff3e0;
+            border-bottom: 1px solid #ffe0b2;
+            color: #e65100;
+        }
+        .status.success { background: #e8f5e9; color: #2e7d32; }
+        .status.error { background: #ffebee; color: #c62828; }
+        .status.loading { background: #e3f2fd; color: #1565c0; }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 6px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+        }
+        tr:hover { background: #f8f9fa; }
+        .no-data { text-align: center; padding: 40px; color: #5f6368; }
+        .stats { padding: 12px 24px; background: #f8f9fa; border-top: 1px solid #e0e0e0; font-size: 13px; color: #5f6368; }
+        .badge { display: inline-block; background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 8px; }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            th, td { font-size: 10px; padding: 4px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 Voucher Data Manager</h1>
+        <p>✅ Column 11 (Voucher No) EXCLUDED from totals | Multi-Select Dropdowns | Date filter with tooltip</p>
+    </div>
+    
+    <div class="filters">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>📌 COLUMN 1 FILTER (MULTI-SELECT)</label>
+                <div class="multi-select-container" id="col1Container">
+                    <div class="multi-select-btn" onclick="toggleDropdown('col1')">
+                        <span id="col1SelectedText">ALL VALUES</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown" id="col1Dropdown">
+                        <div class="multi-select-actions">
+                            <button type="button" onclick="selectAllCol1()">✓ Select All</button>
+                            <button type="button" onclick="clearAllCol1()">✗ Clear All</button>
+                        </div>
+                        <div id="col1Options"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>📌 COLUMN 2 FILTER (MULTI-SELECT)</label>
+                <div class="multi-select-container" id="col2Container">
+                    <div class="multi-select-btn" onclick="toggleDropdown('col2')">
+                        <span id="col2SelectedText">ALL VALUES</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown" id="col2Dropdown">
+                        <div class="multi-select-actions">
+                            <button type="button" onclick="selectAllCol2()">✓ Select All</button>
+                            <button type="button" onclick="clearAllCol2()">✗ Clear All</button>
+                        </div>
+                        <div id="col2Options"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-group date-range-slider">
+                <label>📅 DATE RANGE FILTER</label>
+                <div class="slider-container">
+                    <div class="slider-wrapper">
+                        <input type="range" id="dateSlider" min="0" max="100" value="100" oninput="updateDateRangeWithTooltip(event)">
+                        <div id="sliderTooltip" class="slider-tooltip">Date</div>
+                    </div>
+                    <div class="date-labels">
+                        <span id="minDateLabel">📅 Start Date</span>
+                        <span id="maxDateLabel">📅 End Date</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button onclick="fetchData()" class="btn btn-primary">🔄 Refresh Data</button>
+            <button onclick="exportFilteredDataOnly()" class="btn btn-success">📊 EXPORT FILTERED DATA ONLY</button>
+            <button onclick="exportToExcel()" class="btn btn-warning">📎 Export All Data</button>
+            <button onclick="resetAllFilters()" class="btn btn-secondary">🗑️ Reset All Filters</button>
+            <button onclick="clearAllSelections()" class="btn btn-danger">🎯 Clear Multi-Select</button>
+        </div>
+    </div>
+    
+    <div class="totals-section">
+        <div class="totals-title">
+            💰 REAL-TIME TOTALS (Filtered Data Only)
+            <span id="timestamp"></span>
+            <span class="excluded-badge">🚫 EXCLUDED: Column 11 (Voucher No) | Financial Year | Name of Fund | Vendor | Payment Date</span>
+        </div>
+        <div id="totalsContainer" class="totals-grid">
+            <div class="total-card"><div class="total-label">Loading...</div><div class="total-value">-</div></div>
+        </div>
+    </div>
+    
+    <div id="status" class="status">Loading data...</div>
+    <div class="table-wrapper"><div id="tableContainer"><div class="no-data">Fetching data...</div></div></div>
+    <div class="stats" id="stats"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoMe4JoLQo-JLpdJC-Iu81p_dBZdzHROGsnyO9LrlwxqxKzkljUElHtwJIqUyW0HN9/exec';
+    
+    let originalData = [];
+    let columnHeaders = [];
+    let currentFilteredData = [];
+    let uniqueCol1Values = [];
+    let uniqueCol2Values = [];
+    let selectedCol1Values = new Set(); // empty set means ALL (no filter)
+    let selectedCol2Values = new Set(); // empty set means ALL
+    
+    // FORCE EXCLUDE Column 11 (index 10, zero-based) - VOUCHER NO
+    const FORCE_EXCLUDED_COLUMN_INDICES = [10];
+    
+    function isExcludedFromTotals(columnName, columnIndex) {
+        if (FORCE_EXCLUDED_COLUMN_INDICES.includes(columnIndex)) return true;
+        if (!columnName) return false;
+        const lowerName = columnName.toString().toLowerCase().trim();
+        const excludedNames = ['financial year', 'name of fund', 'vendor', 'payment date'];
+        return excludedNames.some(excluded => lowerName.includes(excluded));
+    }
+    
+    function formatNumber(num) {
+        if (num === 0 || !num) return '0';
+        return num.toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        try {
+            let date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        } catch(e) {
+            return dateString;
+        }
+    }
+    
+    function formatDateForTooltip(date) {
+        if (!date) return 'No date';
+        try {
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        } catch(e) {
+            return 'Invalid date';
+        }
+    }
+    
+    function updateDateRangeWithTooltip(event) {
+        let sliderValue = parseInt(event.target.value) / 100;
+        if (!window.dateRange) return;
+        
+        let rangeMs = window.dateRange.max - window.dateRange.min;
+        let currentDate = new Date(window.dateRange.min.getTime() + (rangeMs * sliderValue));
+        
+        const tooltip = document.getElementById('sliderTooltip');
+        const slider = event.target;
+        const rect = slider.getBoundingClientRect();
+        const percent = sliderValue * 100;
+        const tooltipX = rect.left + (percent / 100) * rect.width;
+        
+        tooltip.style.left = `${tooltipX}px`;
+        tooltip.textContent = `📅 ${formatDateForTooltip(currentDate)}`;
+        tooltip.classList.add('active');
+        
+        clearTimeout(window.tooltipTimeout);
+        window.tooltipTimeout = setTimeout(() => tooltip.classList.remove('active'), 2000);
+        
+        document.getElementById('maxDateLabel').innerHTML = `📅 Up to: ${formatDate(currentDate.toISOString())}`;
+        applyAllFilters();
+    }
+    
+    function setupSliderTooltip() {
+        const slider = document.getElementById('dateSlider');
+        const tooltip = document.getElementById('sliderTooltip');
+        
+        slider.addEventListener('mousemove', function(e) {
+            if (!window.dateRange) return;
+            const rect = slider.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            const clampedPercent = Math.max(0, Math.min(1, percent));
+            const rangeMs = window.dateRange.max - window.dateRange.min;
+            const dateAtCursor = new Date(window.dateRange.min.getTime() + (rangeMs * clampedPercent));
+            
+            tooltip.style.left = `${e.clientX}px`;
+            tooltip.textContent = `📅 ${formatDateForTooltip(dateAtCursor)}`;
+            tooltip.classList.add('active');
+        });
+        
+        slider.addEventListener('mouseleave', () => tooltip.classList.remove('active'));
+    }
+    
+    function isNumeric(value) {
+        if (!value) return false;
+        const cleanValue = value.toString().replace(/,/g, '');
+        const num = parseFloat(cleanValue);
+        return !isNaN(num) && isFinite(num);
+    }
+    
+    function calculateTotals(data, headers) {
+        if (!data || data.length === 0) return {};
+        
+        const totals = {};
+        headers.forEach((header, idx) => {
+            if (!isExcludedFromTotals(header, idx)) {
+                totals[idx] = {
+                    label: header || `Column ${idx + 1}`,
+                    sum: 0,
+                    nonEmptyCount: 0,
+                    numericCount: 0
+                };
+            }
+        });
+        
+        data.forEach(row => {
+            headers.forEach((header, idx) => {
+                if (!isExcludedFromTotals(header, idx)) {
+                    const value = row[idx];
+                    if (value !== undefined && value !== null && value !== '') {
+                        totals[idx].nonEmptyCount++;
+                        if (isNumeric(value)) {
+                            const cleanValue = value.toString().replace(/,/g, '');
+                            totals[idx].sum += parseFloat(cleanValue);
+                            totals[idx].numericCount++;
+                        }
+                    }
+                }
+            });
+        });
+        
+        return totals;
+    }
+    
+    function renderTotals(totals) {
+        const container = document.getElementById('totalsContainer');
+        document.getElementById('timestamp').innerHTML = `🕐 ${new Date().toLocaleString()}`;
+        
+        if (Object.keys(totals).length === 0) {
+            container.innerHTML = '<div class="total-card"><div class="total-label">No Data</div><div class="total-value">-</div><div class="total-stamp">All columns excluded</div></div>';
+            return;
+        }
+        
+        const colors = [
+            { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: 'white' },
+            { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', text: 'white' },
+            { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', text: 'white' },
+            { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', text: '#2c3e50' },
+            { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', text: '#2c3e50' }
+        ];
+        
+        let html = '';
+        let cardIndex = 0;
+        
+        Object.entries(totals).forEach(([idx, data]) => {
+            const color = colors[cardIndex % colors.length];
+            let displayValue = data.numericCount > 0 ? formatNumber(data.sum) : data.nonEmptyCount.toLocaleString();
+            let displayType = data.numericCount > 0 ? '💰 Sum (₹)' : '📊 Count';
+            let label = data.label.length > 20 ? data.label.substring(0, 17) + '...' : data.label;
+            
+            html += `
+                <div class="total-card" style="background: ${color.bg}; color: ${color.text};">
+                    <div class="total-label" style="color: ${color.text === 'white' ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.7)'}">
+                        ${escapeHtml(label)}
+                    </div>
+                    <div class="total-value" style="color: ${color.text};">${displayValue}</div>
+                    <div class="total-stamp" style="color: ${color.text === 'white' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'}">
+                        ${displayType} | ${data.nonEmptyCount} rows
+                    </div>
+                </div>
+            `;
+            cardIndex++;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    function updateSelectedText() {
+        const col1Text = selectedCol1Values.size === 0 ? 'ALL VALUES' : Array.from(selectedCol1Values).slice(0, 2).join(', ') + (selectedCol1Values.size > 2 ? ` +${selectedCol1Values.size-2}` : '');
+        document.getElementById('col1SelectedText').innerText = col1Text;
+        const col2Text = selectedCol2Values.size === 0 ? 'ALL VALUES' : Array.from(selectedCol2Values).slice(0, 2).join(', ') + (selectedCol2Values.size > 2 ? ` +${selectedCol2Values.size-2}` : '');
+        document.getElementById('col2SelectedText').innerText = col2Text;
+    }
+    
+    function toggleDropdown(col) {
+        const dropdown = document.getElementById(`${col}Dropdown`);
+        const isOpen = dropdown.classList.contains('show');
+        document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('show'));
+        if (!isOpen) dropdown.classList.add('show');
+        document.addEventListener('click', function closeClick(e) {
+            if (!e.target.closest(`.multi-select-container`)) {
+                document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('show'));
+                document.removeEventListener('click', closeClick);
+            }
+        });
+    }
+    
+    function renderMultiSelectOptions() {
+        const col1OptionsDiv = document.getElementById('col1Options');
+        col1OptionsDiv.innerHTML = '';
+        uniqueCol1Values.forEach(val => {
+            const div = document.createElement('div');
+            div.className = 'multi-select-option';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = val;
+            cb.checked = selectedCol1Values.has(val);
+            cb.onchange = (e) => {
+                if (e.target.checked) selectedCol1Values.add(val);
+                else selectedCol1Values.delete(val);
+                updateSelectedText();
+                applyAllFilters();
+            };
+            const label = document.createElement('label');
+            label.textContent = val;
+            div.appendChild(cb);
+            div.appendChild(label);
+            col1OptionsDiv.appendChild(div);
+        });
+        
+        const col2OptionsDiv = document.getElementById('col2Options');
+        col2OptionsDiv.innerHTML = '';
+        uniqueCol2Values.forEach(val => {
+            const div = document.createElement('div');
+            div.className = 'multi-select-option';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = val;
+            cb.checked = selectedCol2Values.has(val);
+            cb.onchange = (e) => {
+                if (e.target.checked) selectedCol2Values.add(val);
+                else selectedCol2Values.delete(val);
+                updateSelectedText();
+                applyAllFilters();
+            };
+            const label = document.createElement('label');
+            label.textContent = val;
+            div.appendChild(cb);
+            div.appendChild(label);
+            col2OptionsDiv.appendChild(div);
+        });
+        updateSelectedText();
+    }
+    
+    function selectAllCol1() {
+        uniqueCol1Values.forEach(v => selectedCol1Values.add(v));
+        renderMultiSelectOptions();
+        applyAllFilters();
+    }
+    function clearAllCol1() {
+        selectedCol1Values.clear();
+        renderMultiSelectOptions();
+        applyAllFilters();
+    }
+    function selectAllCol2() {
+        uniqueCol2Values.forEach(v => selectedCol2Values.add(v));
+        renderMultiSelectOptions();
+        applyAllFilters();
+    }
+    function clearAllCol2() {
+        selectedCol2Values.clear();
+        renderMultiSelectOptions();
+        applyAllFilters();
+    }
+    
+    function applyAllFilters() {
+        if (!originalData.length || originalData.length <= 1) {
+            renderEmpty();
+            return;
+        }
+        
+        const headers = originalData[0];
+        let dataRows = originalData.slice(1);
+        const sliderValue = parseInt(document.getElementById('dateSlider').value) / 100;
+        
+        let filtered = dataRows.filter(row => {
+            if (selectedCol1Values.size > 0) {
+                const rowVal = row[0] ? row[0].toString().trim() : '';
+                if (!selectedCol1Values.has(rowVal)) return false;
+            }
+            if (selectedCol2Values.size > 0) {
+                const rowVal = row[1] ? row[1].toString().trim() : '';
+                if (!selectedCol2Values.has(rowVal)) return false;
+            }
+            if (window.dateRange && sliderValue < 1) {
+                let rangeMs = window.dateRange.max - window.dateRange.min;
+                let currentMaxDate = new Date(window.dateRange.min.getTime() + (rangeMs * sliderValue));
+                let hasDateInRange = false;
+                for (let cell of row) {
+                    if (isDateLike(cell)) {
+                        let cellDate = parseDate(cell);
+                        if (cellDate && cellDate <= currentMaxDate) {
+                            hasDateInRange = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasDateInRange) return false;
+            }
+            return true;
+        });
+        
+        currentFilteredData = filtered;
+        const totals = calculateTotals(currentFilteredData, headers);
+        renderTotals(totals);
+        renderTable(currentFilteredData, headers);
+        document.getElementById('stats').innerHTML = `📊 Showing: ${filtered.length} of ${dataRows.length} rows | ❌ Column 11 (Voucher No) EXCLUDED | ${new Date().toLocaleTimeString()}`;
+    }
+    
+    function isDateLike(value) {
+        if (!value || typeof value !== 'string') return false;
+        return /^\d{4}-\d{2}-\d{2}/.test(value) || /\d{2}\/\d{2}\/\d{4}/.test(value);
+    }
+    
+    function parseDate(value) {
+        if (!value) return null;
+        try {
+            let date = new Date(value);
+            return isNaN(date.getTime()) ? null : date;
+        } catch(e) {
+            return null;
+        }
+    }
+    
+    function exportFilteredDataOnly() {
+        if (!currentFilteredData.length) {
+            alert('⚠️ No filtered data to export!');
+            return;
+        }
+        const headers = originalData[0];
+        const formattedData = currentFilteredData.map(row => row.map(cell => isDateLike(cell) ? formatDate(cell) : cell));
+        const wsData = [headers, ...formattedData];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Filtered Data');
+        XLSX.writeFile(wb, `filtered_data_${new Date().toISOString().split('T')[0]}_${currentFilteredData.length}_rows.xlsx`);
+        showStatus(`✅ Exported ${currentFilteredData.length} FILTERED rows`, 'success');
+    }
+    
+    function exportToExcel() {
+        if (!originalData.length) {
+            alert('No data to export');
+            return;
+        }
+        const headers = originalData[0];
+        const dataRows = originalData.slice(1);
+        const formattedData = dataRows.map(row => row.map(cell => isDateLike(cell) ? formatDate(cell) : cell));
+        const wsData = [headers, ...formattedData];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'All Data');
+        XLSX.writeFile(wb, `all_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showStatus('✅ Exported ALL data', 'success');
+    }
+    
+    function renderTable(data, headers) {
+        const tableContainer = document.getElementById('tableContainer');
+        if (!data || data.length === 0) {
+            tableContainer.innerHTML = '<div class="no-data">📭 No data matches your filters</div>';
+            return;
+        }
+        
+        let html = '<table><thead><tr>';
+        headers.forEach((h, idx) => {
+            const isExcluded = isExcludedFromTotals(h, idx);
+            const excludedBadge = (idx === 10) ? ' <span class="badge" style="background:#e74c3c;"></span>' : (isExcluded ? ' <span class="badge" style="background:#e74c3c;"></span>' : '');
+            html += `<th>${escapeHtml(h || `Col ${idx+1}`)}${excludedBadge}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        
+        for (let row of data) {
+            html += '<tr>';
+            for (let cell of row) {
+                let displayCell = isDateLike(cell) ? formatDate(cell) : (cell || '');
+                html += `<td>${escapeHtml(displayCell.toString())}</td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody>';
+        tableContainer.innerHTML = html;
+    }
+    
+    function updateDropdowns() {
+        if (!originalData.length || originalData.length <= 1) return;
+        const dataRows = originalData.slice(1);
+        
+        const col1Values = new Set();
+        dataRows.forEach(row => { if (row[0]?.toString().trim()) col1Values.add(row[0].toString().trim()); });
+        uniqueCol1Values = Array.from(col1Values).sort();
+        
+        const col2Values = new Set();
+        dataRows.forEach(row => { if (row[1]?.toString().trim()) col2Values.add(row[1].toString().trim()); });
+        uniqueCol2Values = Array.from(col2Values).sort();
+        
+        selectedCol1Values.clear();
+        selectedCol2Values.clear();
+        renderMultiSelectOptions();
+    }
+    
+    function updateDateRangeSlider() {
+        if (!originalData.length || originalData.length <= 1) {
+            document.getElementById('dateSlider').disabled = true;
+            return;
+        }
+        
+        let allDates = [];
+        originalData.slice(1).forEach(row => {
+            row.forEach(cell => {
+                if (isDateLike(cell)) {
+                    let date = parseDate(cell);
+                    if (date) allDates.push(date);
+                }
+            });
+        });
+        
+        if (allDates.length === 0) {
+            document.getElementById('dateSlider').disabled = true;
+            document.getElementById('minDateLabel').textContent = '📅 No dates found';
+            document.getElementById('maxDateLabel').textContent = '📅 No dates found';
+            return;
+        }
+        
+        let minDate = new Date(Math.min(...allDates));
+        let maxDate = new Date(Math.max(...allDates));
+        
+        document.getElementById('dateSlider').disabled = false;
+        document.getElementById('minDateLabel').innerHTML = `📅 From: ${formatDate(minDate.toISOString())}`;
+        document.getElementById('maxDateLabel').innerHTML = `📅 Up to: ${formatDate(maxDate.toISOString())}`;
+        document.getElementById('dateSlider').value = 100;
+        
+        window.dateRange = { min: minDate, max: maxDate };
+        setupSliderTooltip();
+    }
+    
+    function resetAllFilters() {
+        selectedCol1Values.clear();
+        selectedCol2Values.clear();
+        renderMultiSelectOptions();
+        document.getElementById('dateSlider').value = '100';
+        if (window.dateRange) {
+            document.getElementById('maxDateLabel').innerHTML = `📅 Up to: ${formatDate(window.dateRange.max.toISOString())}`;
+        }
+        if (originalData.length) {
+            currentFilteredData = originalData.slice(1);
+            const totals = calculateTotals(currentFilteredData, originalData[0]);
+            renderTotals(totals);
+            renderTable(currentFilteredData, originalData[0]);
+        }
+        showStatus('🔄 All filters reset', 'success');
+    }
+    
+    function clearAllSelections() {
+        selectedCol1Values.clear();
+        selectedCol2Values.clear();
+        renderMultiSelectOptions();
+        applyAllFilters();
+        showStatus('🎯 All multi-select filters cleared', 'success');
+    }
+    
+    function showStatus(message, type) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.textContent = message;
+        statusDiv.className = `status ${type}`;
+        setTimeout(() => {
+            if (statusDiv.className.includes('success')) statusDiv.className = 'status';
+        }, 2000);
+    }
+    
+    function renderEmpty() {
+        document.getElementById('tableContainer').innerHTML = '<div class="no-data">📭 No data available</div>';
+        document.getElementById('stats').innerHTML = 'Total rows: 0';
+        document.getElementById('totalsContainer').innerHTML = '<div class="total-card"><div class="total-label">No Data</div><div class="total-value">-</div></div>';
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    
+    async function fetchData() {
+        const statusDiv = document.getElementById('status');
+        statusDiv.textContent = '⏳ Fetching data...';
+        statusDiv.className = 'status loading';
+        
+        try {
+            const response = await fetch(SCRIPT_URL, { method: 'GET', mode: 'cors', cache: 'no-store' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const data = await response.json();
+            if (!Array.isArray(data) || data.length === 0) throw new Error('No data received');
+            
+            originalData = data;
+            columnHeaders = originalData[0] || [];
+            currentFilteredData = originalData.slice(1);
+            
+            updateDropdowns();
+            updateDateRangeSlider();
+            
+            const totals = calculateTotals(currentFilteredData, columnHeaders);
+            renderTotals(totals);
+            renderTable(currentFilteredData, columnHeaders);
+            
+            statusDiv.textContent = `✅ Loaded ${originalData.length - 1} rows | ❌ Column 11 (Voucher No) EXCLUDED from totals`;
+            statusDiv.className = 'status success';
+            
+            document.getElementById('stats').innerHTML = `📊 Total: ${originalData.length - 1} rows | ${columnHeaders.length} columns | ❌ Column 11 (Voucher No) EXCLUDED | ${new Date().toLocaleString()}`;
+            
+        } catch (error) {
+            statusDiv.textContent = `❌ Error: ${error.message}`;
+            statusDiv.className = 'status error';
+        }
+    }
+    
+    window.addEventListener('DOMContentLoaded', fetchData);
+</script>
+</body>
+</html>

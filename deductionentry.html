@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Deduction Management System | Fund-wise Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  .app-container {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .notification-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    min-width: 320px;
+    max-width: 90%;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 60px;
+    z-index: 2000;
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s ease;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .notification-banner.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    animation: slideDownBanner 0.5s ease;
+  }
+
+  @keyframes slideDownBanner {
+    0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+    100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+  }
+
+  .notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 20px 14px 24px;
+    flex-wrap: wrap;
+  }
+
+  .notification-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .notification-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #059669, #047857);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    animation: pulseIcon 1s infinite;
+  }
+
+  @keyframes pulseIcon {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(5,150,105,0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(5,150,105,0); }
+  }
+
+  .notification-text {
+    color: white;
+  }
+
+  .notification-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a7f3d0;
+    margin-bottom: 4px;
+  }
+
+  .notification-message {
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .record-detail {
+    background: rgba(255,255,255,0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: monospace;
+  }
+
+  .close-banner {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-banner:hover {
+    background: rgba(239,68,68,0.8);
+    transform: scale(1.1);
+  }
+
+  .form-section {
+    background: rgba(255,255,255,0.98);
+    border-radius: 24px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  }
+
+  .form-header {
+    background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 50%, #16213e 100%);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .form-header h2 {
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, #a5f3fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .mode-badge {
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+    padding: 6px 16px;
+    border-radius: 40px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #a7f3d0;
+  }
+
+  .mode-badge.update-mode {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    animation: pulse-glow 1.5s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(245,158,11,0.5); }
+    50% { box-shadow: 0 0 20px rgba(245,158,11,0.8); }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px 20px;
+    padding: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .form-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 550px) {
+    .form-grid { grid-template-columns: 1fr; }
+  }
+
+  .input-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .input-field label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #5a6e8a;
+    margin-bottom: 6px;
+  }
+
+  .input-field input,
+  .input-field select {
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 13px;
+    font-family: 'Inter', monospace;
+    font-weight: 500;
+    background: white;
+    transition: all 0.25s ease;
+  }
+
+  .input-field input:focus,
+  .input-field select:focus {
+    outline: none;
+    border-color: #0f3460;
+    box-shadow: 0 0 0 3px rgba(15,52,96,0.15);
+  }
+
+  .input-field input[readonly] {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    font-weight: 700;
+  }
+
+  .input-field input[name="net"] {
+    background: #fffbe6;
+    border-color: #f59e0b;
+    font-weight: 700;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    grid-column: span 4;
+  }
+
+  @media (max-width: 900px) { .button-group { grid-column: span 2; } }
+  @media (max-width: 550px) { .button-group { grid-column: span 1; } }
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #0f3460, #1a1a2e);
+    color: white;
+    flex: 1;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15,52,96,0.5);
+  }
+
+  .btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    color: white;
+    flex: 1;
+  }
+
+  .btn-warning:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    color: #334155;
+    flex: 0.5;
+  }
+
+  .stats-section {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .fy-filter-bar {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 12px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .fy-filter-bar label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f3460;
+  }
+
+  .fy-select {
+    padding: 6px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: white;
+    cursor: pointer;
+  }
+
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .summary-item {
+    padding: 12px 8px;
+    text-align: center;
+    border-right: 1px solid #e2e8f0;
+  }
+
+  .summary-item:last-child { border-right: none; }
+
+  .summary-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #5a6e8a;
+    letter-spacing: 1px;
+  }
+
+  .summary-value {
+    font-size: 18px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #0f3460, #1a1a2e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 4px;
+  }
+
+  .charts-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #ffffff, #fefefe);
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .chart-mini-box {
+    background: white;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .chart-mini-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  canvas {
+    max-height: 180px;
+    width: 100%;
+  }
+
+  .fundwise-section {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .fundwise-header {
+    background: linear-gradient(135deg, #1e1b4b, #2e1a5e);
+    padding: 12px 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .fundwise-stats {
+    padding: 16px;
+    background: white;
+  }
+
+  .fund-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    margin: 4px;
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    color: #3730a3;
+  }
+
+  .fund-table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+
+  .fund-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .fund-table th {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 10px;
+    color: #0f3460;
+    border: 1px solid #e2e8f0;
+  }
+
+  .fund-table td {
+    padding: 8px 8px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+  }
+
+  .fund-table tr:hover {
+    background: #f8fafc;
+  }
+
+  .fund-charts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .fund-chart-box {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  .fund-chart-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #1e293b;
+  }
+
+  .text-right {
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .badge-remark, .fy-badge, .fund-badge-sm {
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 8px;
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .badge-remark {
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+  }
+
+  .fy-badge {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+  }
+
+  .fund-badge-sm {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+  }
+
+  .data-section {
+    background: rgba(255,255,255,0.97);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+  }
+
+  .data-toolbar {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .data-toolbar h3 {
+    font-size: 14px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0f3460, #1a1a2e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .toolbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-box {
+    padding: 6px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 40px;
+    font-size: 11px;
+    width: 200px;
+  }
+
+  .icon-btn {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 40px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .icon-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .btn-excel {
+    background: linear-gradient(135deg, #1e6f3f, #0d5a32);
+    color: white;
+    border-color: #1e6f3f;
+  }
+
+  .excel-table-container {
+    overflow-x: auto;
+    max-height: 380px;
+    overflow-y: auto;
+  }
+
+  .excel-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .excel-table th {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #0f3460;
+    border-bottom: 2px solid #cbd5e1;
+    position: sticky;
+    top: 0;
+  }
+
+  .excel-table td {
+    padding: 8px 8px;
+    border-bottom: 1px solid #f1f5f0;
+    color: #1e293b;
+  }
+
+  .excel-table tr:hover {
+    background: linear-gradient(90deg, #fef9e6, #fff9ef);
+    cursor: pointer;
+  }
+
+  .excel-table tr.selected-row {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  }
+
+  .toast-message {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 12px;
+    z-index: 1100;
+    opacity: 0;
+    transition: all 0.4s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toast-message.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .toast-message.error { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+  .toast-message.success { background: linear-gradient(135deg, #059669, #047857); }
+
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(12px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .loading-card {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 24px;
+    text-align: center;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #0f3460;
+    border-radius: 50%;
+    animation: spin 0.8s infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #0f3460, #1a1a2e); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div class="notification-banner" id="notificationBanner">
+  <div class="notification-content">
+    <div class="notification-info">
+      <div class="notification-icon" id="notifIcon">💾</div>
+      <div class="notification-text">
+        <div class="notification-title" id="notifTitle">LAST RECORD SAVED</div>
+        <div class="notification-message" id="notifMessage">
+          <span id="notifPartyName">-</span>
+          <span class="record-detail" id="notifAmount">₹0</span>
+          <span class="record-detail" id="notifDate">-</span>
+        </div>
+      </div>
+    </div>
+    <button class="close-banner" id="closeBannerBtn">✕</button>
+  </div>
+</div>
+
+<div class="app-container">
+  <div class="form-section">
+    <div class="form-header">
+      <h2>💰 DEDUCTION ENTRY SYSTEM</h2>
+      <div id="modeBadge" class="mode-badge">● CREATE MODE</div>
+    </div>
+    <form id="deductionForm">
+      <div class="form-grid">
+        <div class="input-field"><label>🏢 PARTY *</label><select id="party" name="party" required><option value="">-- Select --</option><option>ABDUS SATTAR</option><option>ABU MD PARVEZ NUR</option><option>ALKAYES HOQUE</option><option>ANIKA AND AYESHA ENTERPRISE</option><option>ASHANUL HOQUE</option><option>BARSHA CONSTRUCTION</option><option>CD ENTERPRISE</option><option>CHHOBI CONSTRUCTION</option><option>DINAR CONSTRUCTION</option><option>DRISTI WELFARE TRUST</option><option>FANCY CONSTRUCTION</option><option>FARZ ENTERPRISE</option><option>FIROJA CONSTRUCTION</option><option>HB ENTERPRISE</option><option>HENA CONSTRUCTION</option><option>HOSSAIN CONSTRUCTION</option><option>JAHANGIR ALI</option><option>JK CONSTRUCTION</option><option>LATIFA ENTERPRISE</option><option>LITON CONSTRUCTION</option><option>MAJED ALI CONSTRUCTION</option><option>MAJEDUR</option><option>MAZAMMEL CONSTRUCTION</option><option>MD MUSTAFA</option><option>MK AZAD CONSTRUCTION</option><option>MONWARA CONSTRUCTION</option><option>MR CONSTRUCTION</option><option>MS HASAN ENTERPRISE</option><option>MS J K CONSTRUCTION</option><option>MS MONWARA CONSTRUCTION</option><option>MS MUKHERJEE CONSTRUCTION</option><option>MS ROHIMUL HOQUE</option><option>MUKTAR ALAM</option><option>MUNNA CONSTRUCTION</option><option>ROFIK HOSEN</option><option>SAHANA CONSTRUCTION</option><option>SAHANAJ CONSTRUCTION</option><option>SAIEM ENTERPRISE</option><option>SATTAR</option><option>SMART CONSTRUCTION</option><option>SR CONSTRUCTION</option><option>SULTAN ALI</option><option>SYED ASHIQUE ALI</option></select></div>
+        <div class="input-field"><label>📅 DATE *</label><input type="text" id="date" name="date" placeholder="DD/MM/YYYY" maxlength="10" required></div>
+        <div class="input-field"><label>📆 FINANCIAL YEAR</label><input type="text" id="financialYear" name="financialYear" readonly placeholder="Auto-calculated" style="background:#f3e8ff; font-weight:700; color:#6d28d9;"></div>
+        <div class="input-field"><label>💰 GROSS</label><input type="number" id="gross" name="gross" step="0.01" placeholder="0.00"></div>
+        <div class="input-field"><label>📉 TDS</label><input type="number" id="tds" name="tds" step="0.01" value="0"></div>
+        <div class="input-field"><label>🟢 CGST</label><input type="number" id="cgst" name="cgst" step="0.01" value="0"></div>
+        <div class="input-field"><label>🔵 SGST</label><input type="number" id="sgst" name="sgst" step="0.01" value="0"></div>
+        <div class="input-field"><label>🛠️ LABOUR</label><input type="number" id="labour" name="labour" step="0.01" value="0"></div>
+        <div class="input-field"><label>🛡️ SECURITY</label><input type="number" id="security" name="security" step="0.01" value="0"></div>
+        <div class="input-field"><label>💵 NET</label><input type="number" id="net" name="net" step="0.01" placeholder="Auto"></div>
+        <div class="input-field"><label>📝 REMARKS (FUND)</label><select id="remarks" name="remarks"><option value="">-- Select Fund --</option><option>CFC_TIED</option><option>CFC_UNTIED</option><option>5 TH SFC</option><option>3RD SFC</option><option>BEUP</option><option>PBG_IBRD</option><option>OWN FUND</option><option>SBM_OWN FUND</option></select></div>
+        <div class="input-field"><label>🔢 VOUCHER</label><input type="text" id="voucherNo" name="voucherNo" placeholder="Voucher number"></div>
+        <input type="hidden" id="rowNumber" name="rowNumber">
+        <input type="hidden" id="action" name="action" value="create">
+        <div class="button-group">
+          <button type="submit" id="submitBtn" class="btn btn-primary">✨ CREATE</button>
+          <button type="button" id="updateBtn" class="btn btn-warning" style="display:none">✏️ UPDATE</button>
+          <button type="button" id="cancelBtn" class="btn btn-secondary" style="display:none">✖ CANCEL</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="stats-section">
+    <div class="fy-filter-bar">
+      <div><label>📊 FINANCIAL YEAR WISE STATISTICS</label></div>
+      <div>
+        <label>Filter by FY: </label>
+        <select id="fyFilter" class="fy-select">
+          <option value="ALL">ALL FINANCIAL YEARS</option>
+        </select>
+      </div>
+    </div>
+    <div class="summary-strip">
+      <div class="summary-item"><div class="summary-label">🎯 TDS</div><div class="summary-value" id="sumTDS">₹0</div></div>
+      <div class="summary-item"><div class="summary-label">🟢 CGST</div><div class="summary-value" id="sumCGST">₹0</div></div>
+      <div class="summary-item"><div class="summary-label">🔵 SGST</div><div class="summary-value" id="sumSGST">₹0</div></div>
+      <div class="summary-item"><div class="summary-label">🛠️ LABOUR</div><div class="summary-value" id="sumLabour">₹0</div></div>
+      <div class="summary-item"><div class="summary-label">🛡️ SECURITY</div><div class="summary-value" id="sumSecurity">₹0</div></div>
+    </div>
+    <div class="charts-mini">
+      <div class="chart-mini-box">
+        <div class="chart-mini-title">📊 FY DEDUCTION BREAKDOWN (₹)</div>
+        <canvas id="barChart" style="max-height: 160px;"></canvas>
+      </div>
+      <div class="chart-mini-box">
+        <div class="chart-mini-title">🥧 FY DISTRIBUTION (%)</div>
+        <canvas id="pieChart" style="max-height: 160px;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="fundwise-section">
+    <div class="fundwise-header">
+      🏦 FUND-WISE DEDUCTION BREAKDOWN
+    </div>
+    <div class="fundwise-stats">
+      <div class="fund-table-container">
+        <table class="fund-table" id="fundTable">
+          <thead>
+            <tr>
+              <th>FUND NAME</th>
+              <th>📉 TDS (₹)</th>
+              <th>🟢 CGST (₹)</th>
+              <th>🔵 SGST (₹)</th>
+              <th>🛠️ LABOUR (₹)</th>
+              <th>🛡️ SECURITY (₹)</th>
+              <th>💰 TOTAL DEDUCTION (₹)</th>
+              <th>📊 % of Total</th>
+            </tr>
+          </thead>
+          <tbody id="fundTableBody">
+            <tr><td colspan="7" style="text-align:center;">Loading fund-wise data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fund-charts">
+        <div class="fund-chart-box">
+          <div class="fund-chart-title">TDS by Fund</div>
+          <canvas id="fundTDSChart" style="max-height: 200px;"></canvas>
+        </div>
+        <div class="fund-chart-box">
+          <div class="fund-chart-title">Total Deduction by Fund</div>
+          <canvas id="fundTotalChart" style="max-height: 200px;"></canvas>
+        </div>
+        <div class="fund-chart-box">
+          <div class="fund-chart-title">Fund Distribution</div>
+          <canvas id="fundDistributionChart" style="max-height: 200px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-section">
+    <div class="data-toolbar">
+      <h3>📋 DEDUCTION LEDGER <span id="fyIndicator"></span></h3>
+      <div class="toolbar-actions">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search party...">
+        <button id="refreshBtn" class="icon-btn">⟳ Refresh</button>
+        <button id="exportExcelBtn" class="icon-btn btn-excel">📎 Export</button>
+      </div>
+    </div>
+    <div class="excel-table-container">
+      <table class="excel-table">
+        <thead>
+          <tr><th>#</th><th>PARTY</th><th>FY</th><th>DATE</th><th>GROSS</th><th>TDS</th><th>CGST</th><th>SGST</th><th>LABOUR</th><th>SECURITY</th><th>NET</th><th>FUND</th><th>VOUCHER</th>
+        </thead>
+        <tbody id="tableBody"><tr><td colspan="13" style="text-align:center; padding:30px;">Loading...<div class="spinner" style="width:25px;height:25px;"></div></td></tr>
+        </tbody>
+      8
+        
+      </div>
+      <div id="recordInfo" style="padding: 10px 16px; font-size: 10px; color: #5a6e8a; background:#fafcff; border-top:1px solid #edf2f7;"></div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay"><div class="loading-card"><div class="spinner"></div><div id="loadingMsg">Processing...</div></div></div>
+  <div class="toast-message" id="toastMsg"><span id="toastIcon">✓</span><span id="toastText">Done</span></div>
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNsGBpHb_DG5gFDJ45nCZhNFNl9B8cHXI57ARiopM9JU5aQSJTSFQnXd2ojg4_TKBDxg/exec';
+    let allRecords = [];
+    let currentEditRow = null;
+    let barChart, pieChart, fundTDSChart, fundTotalChart, fundDistributionChart;
+    let isManualNetEdit = false;
+
+    // DOM Elements
+    const form = document.getElementById('deductionForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const updateBtn = document.getElementById('updateBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const modeBadge = document.getElementById('modeBadge');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const toastMsg = document.getElementById('toastMsg');
+    const toastIcon = document.getElementById('toastIcon');
+    const toastText = document.getElementById('toastText');
+    const netInput = document.getElementById('net');
+    const grossInput = document.getElementById('gross');
+    const tdsInput = document.getElementById('tds');
+    const cgstInput = document.getElementById('cgst');
+    const sgstInput = document.getElementById('sgst');
+    const labourInput = document.getElementById('labour');
+    const securityInput = document.getElementById('security');
+    const dateInput = document.getElementById('date');
+    const financialYearInput = document.getElementById('financialYear');
+    const fyFilter = document.getElementById('fyFilter');
+    const fyIndicator = document.getElementById('fyIndicator');
+    const searchInput = document.getElementById('searchInput');
+    const notificationBanner = document.getElementById('notificationBanner');
+    const closeBannerBtn = document.getElementById('closeBannerBtn');
+    const notifPartyName = document.getElementById('notifPartyName');
+    const notifAmount = document.getElementById('notifAmount');
+    const notifDate = document.getElementById('notifDate');
+    const notifIcon = document.getElementById('notifIcon');
+    const notifTitle = document.getElementById('notifTitle');
+
+    function showNotificationBanner(record, isUpdate = false) {
+      if (!record) return;
+      notifPartyName.innerHTML = `🏢 ${record.party || '-'}`;
+      notifAmount.innerHTML = `₹${formatMoney(record.net)}`;
+      notifDate.innerHTML = `📅 ${record.date || '-'}`;
+      notifIcon.innerHTML = isUpdate ? '✏️' : '💾';
+      notifTitle.innerHTML = isUpdate ? 'LAST RECORD UPDATED' : 'LAST RECORD SAVED';
+      notifIcon.style.background = isUpdate ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #059669, #047857)';
+      notificationBanner.classList.add('show');
+      setTimeout(() => notificationBanner.classList.remove('show'), 5000);
+    }
+
+    closeBannerBtn.addEventListener('click', () => notificationBanner.classList.remove('show'));
+
+    function calculateFinancialYear(dateStr) {
+      if (!dateStr) return '';
+      let parts = dateStr.split('/');
+      if (parts.length !== 3) return '';
+      let day = parseInt(parts[0]), month = parseInt(parts[1]), year = parseInt(parts[2]);
+      if (isNaN(day) || isNaN(month) || isNaN(year)) return '';
+      if (month >= 4) return `${year}-${(year + 1).toString().slice(-2)}`;
+      else if (month >= 1 && month <= 3) return `${year - 1}-${year.toString().slice(-2)}`;
+      return '';
+    }
+
+    function updateFinancialYear() {
+      const dateValue = dateInput.value;
+      financialYearInput.value = dateValue && dateValue.length === 10 ? calculateFinancialYear(dateValue) : '';
+    }
+    dateInput.addEventListener('blur', updateFinancialYear);
+
+    function formatDateInput(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length >= 2 && value.length < 4) value = value.slice(0, 2) + '/' + value.slice(2);
+      else if (value.length >= 4 && value.length < 6) value = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4);
+      else if (value.length >= 6) value = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4, 8);
+      e.target.value = value;
+      if (value.length === 10) updateFinancialYear();
+    }
+    dateInput.addEventListener('input', formatDateInput);
+
+    function showToast(message, isError = false) {
+      toastText.textContent = message;
+      toastMsg.classList.remove('success', 'error');
+      toastMsg.classList.add(isError ? 'error' : 'success');
+      toastIcon.innerHTML = isError ? '❌' : '✅';
+      toastMsg.classList.add('show');
+      setTimeout(() => toastMsg.classList.remove('show'), 3000);
+    }
+
+    function showLoading(show, text = 'Processing...') {
+      if (show) { document.getElementById('loadingMsg').innerText = text; loadingOverlay.style.display = 'flex'; }
+      else { loadingOverlay.style.display = 'none'; }
+    }
+
+    function calculateNet() {
+      if (isManualNetEdit) return;
+      const gross = parseFloat(grossInput.value) || 0;
+      const tds = parseFloat(tdsInput.value) || 0;
+      const cgst = parseFloat(cgstInput.value) || 0;
+      const sgst = parseFloat(sgstInput.value) || 0;
+      const labour = parseFloat(labourInput.value) || 0;
+      const security = parseFloat(securityInput.value) || 0;
+      netInput.value = (gross - tds - cgst - sgst - labour - security).toFixed(2);
+    }
+
+    function resetToCreate() {
+      document.getElementById('party').value = '';
+      dateInput.value = '';
+      financialYearInput.value = '';
+      grossInput.value = '';
+      tdsInput.value = '0';
+      cgstInput.value = '0';
+      sgstInput.value = '0';
+      labourInput.value = '0';
+      securityInput.value = '0';
+      document.getElementById('remarks').value = '';
+      document.getElementById('voucherNo').value = '';
+      document.getElementById('rowNumber').value = '';
+      document.getElementById('action').value = 'create';
+      isManualNetEdit = false;
+      calculateNet();
+      currentEditRow = null;
+      submitBtn.style.display = 'block';
+      updateBtn.style.display = 'none';
+      cancelBtn.style.display = 'none';
+      modeBadge.innerHTML = '● CREATE MODE';
+      modeBadge.classList.remove('update-mode');
+      document.querySelectorAll('#tableBody tr').forEach(r => r.classList.remove('selected-row'));
+    }
+
+    function switchToUpdate(record) {
+      currentEditRow = record.rowNumber;
+      document.getElementById('party').value = record.party || '';
+      dateInput.value = record.date || '';
+      financialYearInput.value = record.financialYear || '';
+      grossInput.value = record.gross || 0;
+      tdsInput.value = record.tds || 0;
+      cgstInput.value = record.cgst || 0;
+      sgstInput.value = record.sgst || 0;
+      labourInput.value = record.labour || 0;
+      securityInput.value = record.security || 0;
+      document.getElementById('remarks').value = record.remarks || '';
+      document.getElementById('voucherNo').value = record.voucherNo || '';
+      document.getElementById('rowNumber').value = record.rowNumber;
+      document.getElementById('action').value = 'update';
+      netInput.value = record.net || 0;
+      isManualNetEdit = true;
+      submitBtn.style.display = 'none';
+      updateBtn.style.display = 'block';
+      cancelBtn.style.display = 'block';
+      modeBadge.innerHTML = '✏️ UPDATE MODE';
+      modeBadge.classList.add('update-mode');
+      document.querySelectorAll('#tableBody tr').forEach(tr => tr.classList.remove('selected-row'));
+      const row = document.querySelector(`#tableBody tr[data-rowid='${record.rowNumber}']`);
+      if (row) row.classList.add('selected-row');
+    }
+
+    function fetchData() {
+      return new Promise((resolve, reject) => {
+        const cb = 'jsonp_cb_' + Date.now();
+        window[cb] = (data) => { delete window[cb]; document.body.removeChild(script); resolve(data); };
+        const script = document.createElement('script');
+        script.onerror = () => { delete window[cb]; reject(new Error('Network error')); };
+        script.src = `${SCRIPT_URL}?action=getData&callback=${cb}&_=${Date.now()}`;
+        document.body.appendChild(script);
+        setTimeout(() => reject(new Error('Timeout')), 15000);
+      });
+    }
+
+    async function postData(formData) {
+      const params = new URLSearchParams();
+      for (let [key, value] of formData.entries()) {
+        params.append(key, value);
+      }
+      
+      // Use fetch with CORS mode and handle response properly
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString()
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result;
+    }
+
+    async function loadAllData() {
+      try {
+        const data = await fetchData();
+        if (data.success) {
+          allRecords = data.records || [];
+          allRecords.sort((a, b) => (parseInt(a.slNo) || 0) - (parseInt(b.slNo) || 0));
+          populateFYFilter();
+          refreshDisplay();
+        } else {
+          throw new Error(data.message || 'Invalid response');
+        }
+      } catch (err) {
+        showToast('Failed to load: ' + err.message, true);
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="13" style="text-align:center;">⚠️ Error loading data</td></tr>';
+      }
+    }
+
+    function populateFYFilter() {
+      const fys = [...new Set(allRecords.map(r => r.financialYear).filter(fy => fy))].sort().reverse();
+      fyFilter.innerHTML = '<option value="ALL">ALL FINANCIAL YEARS</option>' + fys.map(fy => `<option value="${fy}">${fy}</option>`).join('');
+    }
+
+    function getFilteredRecords() {
+      const selectedFY = fyFilter.value;
+      if (selectedFY === 'ALL') return allRecords;
+      return allRecords.filter(r => r.financialYear === selectedFY);
+    }
+
+    function updateFundWiseStats() {
+      const filtered = getFilteredRecords();
+      const funds = [...new Set(filtered.map(r => r.remarks).filter(f => f))];
+      
+      const fundData = {};
+      funds.forEach(fund => {
+        fundData[fund] = { tds: 0, cgst: 0, sgst: 0, labour: 0, security: 0, total: 0 };
+      });
+      
+      filtered.forEach(record => {
+        const fund = record.remarks;
+        if (fund && fundData[fund]) {
+          fundData[fund].tds += record.tds || 0;
+          fundData[fund].cgst += record.cgst || 0;
+          fundData[fund].sgst += record.sgst || 0;
+          fundData[fund].labour += record.labour || 0;
+          fundData[fund].security += record.security || 0;
+          fundData[fund].total = fundData[fund].tds + fundData[fund].cgst + fundData[fund].sgst + 
+                                 fundData[fund].labour + fundData[fund].security;
+        }
+      });
+      
+      const grandTotal = Object.values(fundData).reduce((sum, f) => sum + f.total, 0);
+      
+      const tbody = document.getElementById('fundTableBody');
+      if (funds.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No fund data available</td></tr>';
+      } else {
+        let html = '';
+        for (let fund of funds.sort()) {
+          const data = fundData[fund];
+          const percentage = grandTotal > 0 ? ((data.total / grandTotal) * 100).toFixed(1) : 0;
+          html += `<tr>
+            <td><strong>${fund}</strong></td>
+            <td class="text-right">${formatMoney(data.tds)}</td>
+            <td class="text-right">${formatMoney(data.cgst)}</td>
+            <td class="text-right">${formatMoney(data.sgst)}</td>
+            <td class="text-right">${formatMoney(data.labour)}</td>
+            <td class="text-right">${formatMoney(data.security)}</td>
+            <td class="text-right"><strong>${formatMoney(data.total)}</strong></td>
+            <td class="text-right">${percentage}%</td>
+          </tr>`;
+        }
+        html += `<tr style="background:#f1f5f9; font-weight:700;">
+          <td><strong>TOTAL</strong></td>
+          <td class="text-right">${formatMoney(Object.values(fundData).reduce((s, f) => s + f.tds, 0))}</td>
+          <td class="text-right">${formatMoney(Object.values(fundData).reduce((s, f) => s + f.cgst, 0))}</td>
+          <td class="text-right">${formatMoney(Object.values(fundData).reduce((s, f) => s + f.sgst, 0))}</td>
+          <td class="text-right">${formatMoney(Object.values(fundData).reduce((s, f) => s + f.labour, 0))}</td>
+          <td class="text-right">${formatMoney(Object.values(fundData).reduce((s, f) => s + f.security, 0))}</td>
+          <td class="text-right"><strong>${formatMoney(grandTotal)}</strong></td>
+          <td class="text-right">100%</td>
+        </tr>`;
+        tbody.innerHTML = html;
+      }
+      
+      const fundNames = funds.sort();
+      const tdsData = fundNames.map(f => fundData[f].tds);
+      const totalData = fundNames.map(f => fundData[f].total);
+      const colors = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec489a', '#14b8a6', '#f97316'];
+      
+      if (fundTDSChart) fundTDSChart.destroy();
+      if (fundTotalChart) fundTotalChart.destroy();
+      if (fundDistributionChart) fundDistributionChart.destroy();
+      
+      if (fundNames.length > 0) {
+        const ctxTDS = document.getElementById('fundTDSChart').getContext('2d');
+        fundTDSChart = new Chart(ctxTDS, {
+          type: 'bar',
+          data: { labels: fundNames, datasets: [{ label: 'TDS Amount (₹)', data: tdsData, backgroundColor: colors, borderRadius: 8 }] },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { font: { size: 9 } } } } }
+        });
+        
+        const ctxTotal = document.getElementById('fundTotalChart').getContext('2d');
+        fundTotalChart = new Chart(ctxTotal, {
+          type: 'bar',
+          data: { labels: fundNames, datasets: [{ label: 'Total Deduction (₹)', data: totalData, backgroundColor: colors, borderRadius: 8 }] },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { font: { size: 9 } } } } }
+        });
+        
+        const ctxDist = document.getElementById('fundDistributionChart').getContext('2d');
+        fundDistributionChart = new Chart(ctxDist, {
+          type: 'pie',
+          data: { labels: fundNames, datasets: [{ data: totalData, backgroundColor: colors, borderWidth: 2 }] },
+          options: { responsive: true, plugins: { legend: { position: 'right', labels: { font: { size: 8 } } } } }
+        });
+      }
+    }
+
+    function refreshDisplay() {
+      const filtered = getFilteredRecords();
+      const searchTerm = searchInput.value.trim();
+      
+      let displayRecords = filtered;
+      if (searchTerm) {
+        displayRecords = filtered.filter(r => r.party && r.party.toLowerCase().includes(searchTerm.toLowerCase()));
+      }
+      
+      updateChartsAndStats(filtered);
+      renderExcelTable(displayRecords);
+      updateFundWiseStats();
+      
+      const fyText = fyFilter.value === 'ALL' ? '(All FYs)' : `(${fyFilter.value})`;
+      const searchText = searchTerm ? ` • Search: "${searchTerm}"` : '';
+      fyIndicator.innerHTML = ` ${fyText}`;
+      document.getElementById('recordInfo').innerHTML = `📊 Showing ${displayRecords.length} of ${filtered.length} records ${fyText}${searchText}`;
+    }
+
+    function updateChartsAndStats(filteredRecords) {
+      const summary = {
+        tds: filteredRecords.reduce((s, r) => s + (r.tds || 0), 0),
+        cgst: filteredRecords.reduce((s, r) => s + (r.cgst || 0), 0),
+        sgst: filteredRecords.reduce((s, r) => s + (r.sgst || 0), 0),
+        labour: filteredRecords.reduce((s, r) => s + (r.labour || 0), 0),
+        security: filteredRecords.reduce((s, r) => s + (r.security || 0), 0)
+      };
+      
+      document.getElementById('sumTDS').innerHTML = `₹${summary.tds.toLocaleString('en-IN')}`;
+      document.getElementById('sumCGST').innerHTML = `₹${summary.cgst.toLocaleString('en-IN')}`;
+      document.getElementById('sumSGST').innerHTML = `₹${summary.sgst.toLocaleString('en-IN')}`;
+      document.getElementById('sumLabour').innerHTML = `₹${summary.labour.toLocaleString('en-IN')}`;
+      document.getElementById('sumSecurity').innerHTML = `₹${summary.security.toLocaleString('en-IN')}`;
+      
+      const vals = [summary.tds, summary.cgst, summary.sgst, summary.labour, summary.security];
+      const colors = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'];
+      const labels = ['TDS', 'CGST', 'SGST', 'Labour', 'Security'];
+      
+      if (barChart) barChart.destroy();
+      if (pieChart) pieChart.destroy();
+      
+      const ctxBar = document.getElementById('barChart').getContext('2d');
+      barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ label: 'Amount (₹)', data: vals, backgroundColor: colors, borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { font: { size: 9 } } } } }
+      });
+      
+      const ctxPie = document.getElementById('pieChart').getContext('2d');
+      pieChart = new Chart(ctxPie, {
+        type: 'pie',
+        data: { labels: labels, datasets: [{ data: vals, backgroundColor: colors, borderWidth: 2 }] },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 9 } } } } }
+      });
+    }
+
+    function renderExcelTable(records) {
+      const tbody = document.getElementById('tableBody');
+      if (!records || records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center; padding:30px;">📭 No matching entries</td></tr>';
+        return;
+      }
+      let html = '';
+      for (let rec of records) {
+        html += `<tr data-rowid="${rec.rowNumber}" onclick='selectRowForEdit(${JSON.stringify(rec)})' style="cursor:pointer;">
+          <td style="font-weight:700;">${rec.slNo || ''}</td>
+          <td><strong>${escapeHtml(rec.party)}</strong></td>
+          <td>${rec.financialYear ? `<span class="fy-badge">${escapeHtml(rec.financialYear)}</span>` : '-'}</td>
+          <td>${rec.date || ''}</td>
+          <td class="text-right">${formatMoney(rec.gross)}</td>
+          <td class="text-right">${formatMoney(rec.tds)}</td>
+          <td class="text-right">${formatMoney(rec.cgst)}</td>
+          <td class="text-right">${formatMoney(rec.sgst)}</td>
+          <td class="text-right">${formatMoney(rec.labour)}</td>
+          <td class="text-right">${formatMoney(rec.security)}</td>
+          <td class="text-right"><b>${formatMoney(rec.net)}</b></td>
+          <td>${rec.remarks ? `<span class="fund-badge-sm">${escapeHtml(rec.remarks)}</span>` : '-'}</td>
+          <td>${rec.voucherNo ? escapeHtml(rec.voucherNo) : '-'}</td>
+        </tr>`;
+      }
+      tbody.innerHTML = html;
+    }
+
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    function formatMoney(val) { const num = parseFloat(val) || 0; return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+    function exportToExcel() {
+      const filtered = getFilteredRecords();
+      if (!filtered.length) { showToast('No data to export', true); return; }
+      const exportData = filtered.map(rec => ({
+        'SL NO': rec.slNo || '', 'PARTY NAME': rec.party || '', 'FINANCIAL YEAR': rec.financialYear || '',
+        'DATE': rec.date || '', 'GROSS (₹)': rec.gross || 0, 'TDS (₹)': rec.tds || 0,
+        'CGST (₹)': rec.cgst || 0, 'SGST (₹)': rec.sgst || 0, 'LABOUR (₹)': rec.labour || 0,
+        'SECURITY (₹)': rec.security || 0, 'NET (₹)': rec.net || 0, 'FUND': rec.remarks || '', 'VOUCHER NO': rec.voucherNo || ''
+      }));
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Deduction_Records');
+      XLSX.writeFile(wb, `Deduction_${fyFilter.value}_${new Date().toISOString().slice(0,10)}.xlsx`);
+      showToast(`Exported ${filtered.length} records`);
+    }
+
+    window.selectRowForEdit = (record) => switchToUpdate(record);
+
+    // Event Listeners
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!document.getElementById('party').value) { showToast('Select Party', true); return; }
+      if (!dateInput.value) { showToast('Enter Date', true); return; }
+      if (!financialYearInput.value) { updateFinancialYear(); }
+      
+      showLoading(true, 'Creating record...');
+      const formData = new FormData(form);
+      formData.set('net', netInput.value);
+      formData.set('action', 'create');
+      formData.set('date', dateInput.value);
+      formData.set('financialYear', financialYearInput.value);
+      formData.set('voucherNo', document.getElementById('voucherNo').value);
+      
+      try {
+        const result = await postData(formData);
+        showLoading(false);
+        if (result.success) {
+          showToast('✅ Record created successfully!');
+          showNotificationBanner({
+            party: document.getElementById('party').value,
+            net: netInput.value,
+            date: dateInput.value,
+            voucherNo: document.getElementById('voucherNo').value
+          }, false);
+          resetToCreate();
+          setTimeout(loadAllData, 1000);
+        } else {
+          showToast('❌ Error: ' + result.message, true);
+        }
+      } catch (err) {
+        showLoading(false);
+        showToast('❌ Network Error: ' + err.message, true);
+      }
+    });
+
+    updateBtn.onclick = async () => {
+      if (!currentEditRow) return;
+      if (!financialYearInput.value) { updateFinancialYear(); }
+      
+      showLoading(true, 'Updating record...');
+      const formData = new FormData(form);
+      formData.set('net', netInput.value);
+      formData.set('action', 'update');
+      formData.set('rowNumber', currentEditRow);
+      formData.set('date', dateInput.value);
+      formData.set('financialYear', financialYearInput.value);
+      formData.set('voucherNo', document.getElementById('voucherNo').value);
+      
+      try {
+        const result = await postData(formData);
+        showLoading(false);
+        if (result.success) {
+          showToast('✏️ Record updated successfully!');
+          showNotificationBanner({
+            party: document.getElementById('party').value,
+            net: netInput.value,
+            date: dateInput.value,
+            voucherNo: document.getElementById('voucherNo').value
+          }, true);
+          resetToCreate();
+          setTimeout(loadAllData, 1000);
+        } else {
+          showToast('❌ Error: ' + result.message, true);
+        }
+      } catch (err) {
+        showLoading(false);
+        showToast('❌ Network Error: ' + err.message, true);
+      }
+    };
+
+    cancelBtn.onclick = () => { resetToCreate(); showToast('Cancelled', false, 'warning'); };
+    document.getElementById('refreshBtn').onclick = () => loadAllData();
+    document.getElementById('exportExcelBtn').onclick = () => exportToExcel();
+    searchInput.addEventListener('input', () => refreshDisplay());
+    fyFilter.addEventListener('change', () => refreshDisplay());
+    
+    [grossInput, tdsInput, cgstInput, sgstInput, labourInput, securityInput].forEach(field => {
+      field.addEventListener('input', () => { if (!isManualNetEdit) calculateNet(); });
+      field.addEventListener('blur', function() { if (parseFloat(this.value) < 0) this.value = 0; if (!isManualNetEdit) calculateNet(); });
+    });
+    
+    netInput.addEventListener('focus', () => { isManualNetEdit = true; });
+    netInput.addEventListener('blur', () => { if (netInput.value === '' || isNaN(parseFloat(netInput.value))) { isManualNetEdit = false; calculateNet(); } });
+    
+    calculateNet();
+    loadAllData();
+  </script>
+</body>
+</html>
