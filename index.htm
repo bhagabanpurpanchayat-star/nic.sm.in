@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bhagabanpur Gram Panchayat | Role Portal | Malda</title>
+<title>Bhagabanpur Gram Panchayat | Live User Counter | Malda</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
@@ -15,7 +15,6 @@
   --white: #FFFFFF;
   --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.2);
   
   --role-public-start: #1B4A5E;
   --role-public-end: #0F3A4A;
@@ -113,6 +112,46 @@ header {
   align-items: center;
   gap: 1rem;
   flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Live User Counter Style */
+.live-counter {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  padding: 5px 16px;
+  border-radius: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #FFF5E6;
+  border: 1px solid rgba(230, 177, 126, 0.5);
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.live-counter i {
+  color: var(--highlight-gold);
+  font-size: 0.9rem;
+}
+
+.live-counter .count-number {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FF4444;
+  min-width: 28px;
+  text-align: center;
+  text-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+.live-counter .count-label {
+  font-size: 0.7rem;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+  color: #4CAF50;
+  font-weight: 600;
 }
 
 .user-profile-badge {
@@ -354,7 +393,7 @@ input:checked + .slider:before { transform: translateX(26px); }
 .search-box input { flex: 1; background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; padding: 0.6rem 1rem; border-radius: 2rem; color: white; }
 .empty-state { text-align: center; padding: 2rem; color: #8AA0BC; }
 
-@media (max-width: 768px) { .iframe-container { height: calc(100vh - 180px); } }
+@media (max-width: 768px) { .iframe-container { height: calc(100vh - 180px); } .live-counter .count-label { display: none; } .live-counter { padding: 5px 12px; } }
 </style>
 </head>
 <body>
@@ -369,10 +408,10 @@ input:checked + .slider:before { transform: translateX(26px); }
 </header>
 
 <div class="iframe-container"><iframe id="frameContent" src="home1.htm"></iframe></div>
-<footer><p>© 2025 Bhagabanpur Gram Panchayat, Malda | Real-time Role Sync | e-Governance Initiative</p></footer>
+<footer><p>© 2025 Bhagabanpur Gram Panchayat, Malda | <i class="fas fa-chart-line"></i> Live User Counter | e-Governance Initiative</p></footer>
 <div id="signoutToast" class="toast-notification"><i class="fas fa-check-circle"></i><span>Signed out. Redirecting...</span></div>
 
-<!-- LOGIN MODAL (Enhanced from your original) -->
+<!-- LOGIN MODAL -->
 <div id="signinModal" class="modal-overlay">
   <div class="auth-modal-card">
     <div class="modal-header"><h3><i class="fas fa-id-card"></i> Official Login</h3><button id="closeModalBtn"><i class="fas fa-times"></i></button></div>
@@ -402,7 +441,7 @@ input:checked + .slider:before { transform: translateX(26px); }
   </div>
 </div>
 
-<!-- CONTROL MANAGER MODAL (Enhanced from your original with full functionality) -->
+<!-- CONTROL MANAGER MODAL - FULLY ENHANCED with toggle and role management -->
 <div id="controlManagerModal" class="control-manager-modal">
   <div class="control-modal-card">
     <div class="control-modal-header"><h3><i class="fas fa-users-cog"></i> Control Manager</h3><button id="closeControlModal"><i class="fas fa-times"></i></button></div>
@@ -410,7 +449,7 @@ input:checked + .slider:before { transform: translateX(26px); }
       <button class="tab-btn" data-tab="add"><i class="fas fa-user-plus"></i> Add User</button>
       <button class="tab-btn" data-tab="view"><i class="fas fa-eye"></i> View Users</button>
       <button class="tab-btn" data-tab="delete"><i class="fas fa-trash-alt"></i> Delete User</button>
-      <button class="tab-btn" data-tab="permission"><i class="fas fa-shield-alt"></i> Permission</button>
+      <button class="tab-btn" data-tab="permission"><i class="fas fa-shield-alt"></i> Permission & Role</button>
     </div>
     <div id="addPanel" class="tab-panel">
       <form id="addUserForm">
@@ -441,11 +480,13 @@ input:checked + .slider:before { transform: translateX(26px); }
 </div>
 
 <script>
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8TuO2JCiZVMkTBt5I7aFoab7HlRxFqXYTFtBotBJglVy-zKYVZ7QWsbmkYchHqpHptg/exec';
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyI7Hrnbz2ecwFPzRX3a1k6E-LFs1s4kynSDNQecdEbGQAVj1STxZK80nUq2EhVQ8-C/exec';
   let validationInterval = null;
   let permissionWatcherInterval = null;
-  let sessionExpiryTime = null;
-  const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes session timeout
+  let heartbeatInterval = null;
+  let activeCountInterval = null;
+  let sessionId = null;
+  const SESSION_DURATION = 30 * 60 * 1000;
 
   // Menu Labels
   const menuLabels = {
@@ -458,7 +499,6 @@ input:checked + .slider:before { transform: translateX(26px); }
     'tender':'Tender','meeting':'Meeting','googlemap':'Google Map','bbg':'Banglar Bari','secc':'SECC-2011','sirfinalroll2026':'SIR FINAL ROLL 2026'
   };
 
-  // Role-based menus
   const PUBLIC_MENU = [{name:"GP Info", items:["basicdetails","memberdetails","villages","mouja"]},{name:"Services", items:["deathbirth","variousletter","secc","sirfinalroll2026"]},{name:"Forms", items:["samabyathi","income","domicile"]}];
   const USER_MENU = [{name:"Profile", items:["basicdetails","memberdetails","villages","mouja","school","polling","clubs","playgrounds","waterbodies"]},{name:"Services", items:["deathbirth","variousletter","laxmirbhandar","secc","sirfinalroll2026"]},{name:"Forms", items:["samabyathi","income","domicile"]}];
   const OFFICE_MENU = [
@@ -490,19 +530,13 @@ input:checked + .slider:before { transform: translateX(26px); }
       const s=localStorage.getItem('gp_user_session')||sessionStorage.getItem('gp_user_session'); 
       if(!s) return null;
       const session = JSON.parse(s);
-      if(session.expiry && Date.now() > session.expiry) {
-        clearSession();
-        return null;
-      }
+      if(session.expiry && Date.now() > session.expiry) { clearSession(); return null; }
       return session;
     }catch(e){ return null; } 
   }
   
   function setSession(data,remember){ 
-    const sessionData = {
-      ...data,
-      expiry: Date.now() + SESSION_DURATION
-    };
+    const sessionData = {...data, expiry: Date.now() + SESSION_DURATION};
     if(remember) localStorage.setItem('gp_user_session',JSON.stringify(sessionData)); 
     else sessionStorage.setItem('gp_user_session',JSON.stringify(sessionData)); 
   }
@@ -510,16 +544,12 @@ input:checked + .slider:before { transform: translateX(26px); }
   function clearSession(){ 
     localStorage.removeItem('gp_user_session'); 
     sessionStorage.removeItem('gp_user_session'); 
-    sessionExpiryTime = null;
-    if(validationInterval) clearInterval(validationInterval);
     if(permissionWatcherInterval) clearInterval(permissionWatcherInterval);
   }
 
   function isPageAllowed(pageName, session) {
     if (!session) {
-      const publicPages = ['home1', 'basicdetails', 'memberdetails', 'villages', 'mouja', 
-                          'deathbirth', 'variousletter', 'secc', 'sirfinalroll2026', 
-                          'samabyathi', 'income', 'domicile'];
+      const publicPages = ['home1', 'basicdetails', 'memberdetails', 'villages', 'mouja', 'deathbirth', 'variousletter', 'secc', 'sirfinalroll2026', 'samabyathi', 'income', 'domicile'];
       return publicPages.includes(pageName);
     }
     return true;
@@ -538,14 +568,97 @@ input:checked + .slider:before { transform: translateX(26px); }
       if (stored) {
         const sessionData = JSON.parse(stored);
         sessionData.expiry = Date.now() + SESSION_DURATION;
-        if (localStorage.getItem('gp_user_session')) {
-          localStorage.setItem('gp_user_session', JSON.stringify(sessionData));
-        } else {
-          sessionStorage.setItem('gp_user_session', JSON.stringify(sessionData));
-        }
+        if (localStorage.getItem('gp_user_session')) localStorage.setItem('gp_user_session', JSON.stringify(sessionData));
+        else sessionStorage.setItem('gp_user_session', JSON.stringify(sessionData));
       }
     }
   };
+  
+  // ==================== LIVE USER COUNTER FUNCTIONS ====================
+  function generateSessionId() { return 'sid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 10); }
+  async function registerActiveUser() {
+    const session = getSession();
+    if (!sessionId) sessionId = generateSessionId();
+    try {
+      const formData = new URLSearchParams();
+      formData.append('action', 'registerView');
+      formData.append('sessionId', sessionId);
+      formData.append('username', session ? session.username : 'Guest');
+      formData.append('role', session ? session.role : 'Public');
+      formData.append('userAgent', navigator.userAgent);
+      const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData });
+      const data = await res.json();
+      if (data.success && data.data && data.data.activeCount !== undefined) updateActiveCounterDisplay(data.data.activeCount);
+    } catch(e) { console.warn("Heartbeat error", e); }
+  }
+  async function fetchActiveUserCount() {
+    try {
+      const formData = new URLSearchParams();
+      formData.append('action', 'getActiveCount');
+      const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData });
+      const data = await res.json();
+      if (data.success && data.data && data.data.count !== undefined) updateActiveCounterDisplay(data.data.count);
+    } catch(e) { console.warn("Fetch count error", e); }
+  }
+  function updateActiveCounterDisplay(count) {
+    let counterContainer = document.getElementById('liveCounterContainer');
+    const rightControls = document.getElementById('rightControls');
+    if (!counterContainer && rightControls) {
+      const counterHtml = `<div class="live-counter" id="liveCounterContainer"><i class="fas fa-users"></i><span class="count-number" id="activeUserCount">${count || 0}</span><span class="count-label">Online</span></div>`;
+      const clock = rightControls.querySelector('.digital-clock');
+      if (clock) clock.insertAdjacentHTML('beforebegin', counterHtml);
+      else rightControls.insertAdjacentHTML('afterbegin', counterHtml);
+      counterContainer = document.getElementById('liveCounterContainer');
+    }
+    const countSpan = document.getElementById('activeUserCount');
+    if (countSpan && count !== undefined) countSpan.innerText = count;
+  }
+  function startHeartbeat() { if (heartbeatInterval) clearInterval(heartbeatInterval); registerActiveUser(); heartbeatInterval = setInterval(() => registerActiveUser(), 30000); }
+  function startActiveCountFetcher() { if (activeCountInterval) clearInterval(activeCountInterval); fetchActiveUserCount(); activeCountInterval = setInterval(() => fetchActiveUserCount(), 15000); }
+  function stopUserTracking() { if (heartbeatInterval) clearInterval(heartbeatInterval); if (activeCountInterval) clearInterval(activeCountInterval); }
+  // ==================== END LIVE USER COUNTER ====================
+
+  async function syncUserPermissionsInBackground() {
+    const localSession = getSession();
+    if (!localSession || !localSession.username) return false;
+    try {
+      const formData = new URLSearchParams();
+      formData.append('action', 'validateSession');
+      formData.append('username', localSession.username);
+      const res = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData });
+      const data = await res.json();
+      if (data.success && data.data) {
+        const serverRole = data.data.role || 'Public';
+        const serverPermission = data.data.permission || 'Denied';
+        const currentStored = getSession();
+        if (!currentStored) return false;
+        if (serverPermission !== 'Allowed') {
+          clearSession(); renderMenu(); updateAuthUI(); document.getElementById('frameContent').src = 'home1.htm';
+          showToast('⚠️ Your account access has been revoked by admin.', true);
+          return false;
+        }
+        if (currentStored && normalizeRole(currentStored.role) !== normalizeRole(serverRole)) {
+          currentStored.role = serverRole;
+          currentStored.name = data.data.name || currentStored.name;
+          const isLocal = !!localStorage.getItem('gp_user_session');
+          if (isLocal) localStorage.setItem('gp_user_session', JSON.stringify(currentStored));
+          else sessionStorage.setItem('gp_user_session', JSON.stringify(currentStored));
+          renderMenu(); updateAuthUI();
+          showToast(`🔁 Role updated to ${getRoleDisplay(serverRole)}. Refreshing menu...`, false);
+          const iframe = document.getElementById('frameContent');
+          const currentSrc = iframe.src;
+          if (currentSrc && !currentSrc.includes('home1.htm')) iframe.src = 'home1.htm';
+        }
+        return true;
+      }
+      return false;
+    } catch(err) { return false; }
+  }
+  
+  function startPermissionWatcher() {
+    if(permissionWatcherInterval) clearInterval(permissionWatcherInterval);
+    permissionWatcherInterval = setInterval(async () => { const session = getSession(); if(session) await syncUserPermissionsInBackground(); }, 20000);
+  }
   
   function updateAuthUI() {
     const session = getSession();
@@ -559,142 +672,38 @@ input:checked + .slider:before { transform: translateX(26px); }
       const roleDisplay = getRoleDisplay(session.role);
       const displayName = session.name || session.username.split('@')[0];
       const emailDisplay = session.username || 'user@domain.com';
-      container.innerHTML = `
-        <div class="user-profile-badge">
-          <div class="user-avatar">${displayName.substring(0,2).toUpperCase()}</div>
-          <div class="user-info">
-            <div class="user-email">${emailDisplay}</div>
-            <div class="user-role-badge">${roleDisplay}</div>
-          </div>
-        </div>
-        <div class="digital-clock"><div id="liveTime">--:--:--</div><div id="liveDate" class="clock-date">---</div></div>
-        <button class="signout-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
-      `;
+      container.innerHTML = `<div class="user-profile-badge"><div class="user-avatar">${displayName.substring(0,2).toUpperCase()}</div><div class="user-info"><div class="user-email">${emailDisplay}</div><div class="user-role-badge">${roleDisplay}</div></div></div><div class="digital-clock"><div id="liveTime">--:--:--</div><div id="liveDate" class="clock-date">---</div></div><button class="signout-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>`;
       document.getElementById('signOutBtn')?.addEventListener('click', handleSignOut);
     }
     updateClock();
     setInterval(updateClock, 1000);
+    setTimeout(() => { if(getSession()) fetchActiveUserCount(); }, 100);
   }
   
   function updateClock(){ const now=new Date(); let h=now.getHours(),m=now.getMinutes(),s=now.getSeconds(),ap=h>=12?'PM':'AM'; h=h%12||12; const t=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')} ${ap}`; const d=now.toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'short',day:'numeric'}); const tel=document.getElementById('liveTime'), del=document.getElementById('liveDate'); if(tel) tel.innerText=t; if(del) del.innerText=d; }
   
-  async function handleSignOut(){ 
-    clearSession(); 
-    renderMenu(); 
-    updateAuthUI(); 
-    loadPage('home1'); 
-    const t=document.getElementById('signoutToast'); 
-    t.classList.add('show'); 
-    setTimeout(()=>t.classList.remove('show'),2000); 
-  }
+  async function handleSignOut(){ clearSession(); renderMenu(); updateAuthUI(); loadPage('home1'); const t=document.getElementById('signoutToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
   
-  function showToast(msg,err=false){ 
-    const t=document.createElement('div'); 
-    t.className='session-toast'; 
-    t.innerHTML=`<i class="fas ${err?'fa-exclamation-triangle':'fa-check-circle'}"></i> ${msg}`; 
-    document.body.appendChild(t); 
-    setTimeout(()=>t.remove(),4000); 
-  }
+  function showToast(msg,err=false){ const t=document.createElement('div'); t.className='session-toast'; t.innerHTML=`<i class="fas ${err?'fa-exclamation-triangle':'fa-check-circle'}"></i> ${msg}`; document.body.appendChild(t); setTimeout(()=>t.remove(),4000); }
   
   async function callGoogleScript(action,data={}){ 
-    try{ 
-      const res=await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({action,...data})}); 
-      return await res.json(); 
-    }catch(e){ 
-      return {success:false,message:'Network error'}; 
-    } 
+    try{ const formData = new URLSearchParams({action, ...data}); const res=await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:formData}); return await res.json(); }catch(e){ return {success:false,message:'Network error'}; } 
   }
   
   async function authenticateUser(u,p){ return await callGoogleScript('login',{username:u,password:p}); }
   async function registerUser(n,e,p){ return await callGoogleScript('signup',{name:n,email:e,password:p}); }
   
-  // REAL-TIME ROLE & PERMISSION SYNC (every 20 seconds)
-  async function syncUserPermissionsInBackground() {
-    const localSession = getSession();
-    if (!localSession || !localSession.username) return false;
-    
-    try {
-      const res = await callGoogleScript('validateSession', { username: localSession.username });
-      
-      if (res.success && res.data) {
-        const serverRole = res.data.role || 'Public';
-        const serverPermission = res.data.permission || 'Denied';
-        const currentStored = getSession();
-        if (!currentStored) return false;
-        
-        let needsMenuReload = false;
-        
-        if (serverPermission !== 'Allowed') {
-          if (currentStored) {
-            clearSession();
-            renderMenu();
-            updateAuthUI();
-            document.getElementById('frameContent').src = 'home1.htm';
-            showToast('⚠️ Your account access has been revoked by admin.', true);
-            return false;
-          }
-        }
-        
-        if (currentStored && normalizeRole(currentStored.role) !== normalizeRole(serverRole)) {
-          currentStored.role = serverRole;
-          currentStored.name = res.data.name || currentStored.name;
-          const isLocal = !!localStorage.getItem('gp_user_session');
-          if (isLocal) localStorage.setItem('gp_user_session', JSON.stringify(currentStored));
-          else sessionStorage.setItem('gp_user_session', JSON.stringify(currentStored));
-          needsMenuReload = true;
-          showToast(`🔁 Role updated to ${getRoleDisplay(serverRole)}. Refreshing menu...`, false);
-        }
-        
-        if (needsMenuReload) {
-          renderMenu();
-          updateAuthUI();
-          const iframe = document.getElementById('frameContent');
-          const currentSrc = iframe.src;
-          let currentPage = 'home1';
-          if (currentSrc) {
-            const match = currentSrc.match(/\/([^\/]+)\.htm/);
-            if (match) currentPage = match[1];
-          }
-          if (currentPage !== 'home1') {
-            iframe.src = 'home1.htm';
-            showToast(`Role changed. Redirected to home page.`, false);
-          }
-        }
-        return true;
-      }
-      return false;
-    } catch(err) {
-      console.warn("Background sync error", err);
-      return false;
-    }
-  }
-  
-  function startPermissionWatcher() {
-    if(permissionWatcherInterval) clearInterval(permissionWatcherInterval);
-    permissionWatcherInterval = setInterval(async () => {
-      const session = getSession();
-      if(session) {
-        await syncUserPermissionsInBackground();
-      }
-    }, 20000);
-  }
-  
-  // Control Manager Functions (from your original)
+  // ==================== ENHANCED CONTROL MANAGER FUNCTIONS ====================
   async function loadUsersFromSheet(){ 
     const session = getSession();
-    if (!session || normalizeRole(session.role) !== 'Admin') {
-      showToast('Access Denied: Admin privileges required', true);
-      return;
-    }
+    if (!session || normalizeRole(session.role) !== 'Admin') { showToast('Access Denied: Admin privileges required', true); return; }
     const container=document.getElementById('usersListContainer'); 
     if(!container) return; 
     container.innerHTML='<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>'; 
     const res=await callGoogleScript('getUsers'); 
     if(res.success && res.data?.users){ 
       displayViewWithToggle(res.data.users, container); 
-    }else{ 
-      container.innerHTML='<div class="empty-state">Failed to load</div>'; 
-    } 
+    }else{ container.innerHTML='<div class="empty-state">Failed to load</div>'; } 
   }
   
   function displayViewWithToggle(users, container){ 
@@ -704,19 +713,9 @@ input:checked + .slider:before { transform: translateX(26px); }
     html+='</tbody></table>'; 
     container.innerHTML=html; 
     document.querySelectorAll('.perm-slider').forEach(slider=>{ slider.addEventListener('change',async(e)=>{ 
-      const userId=slider.dataset.id; 
-      const username=slider.dataset.username; 
-      const newPerm=slider.checked?'Allowed':'Denied'; 
+      const userId=slider.dataset.id; const username=slider.dataset.username; const newPerm=slider.checked?'Allowed':'Denied'; 
       const result=await callGoogleScript('updatePermission',{userId,permission:newPerm}); 
-      if(result.success){ 
-        showToast(`Permission for "${username}" → ${newPerm}`); 
-        await loadUsersFromSheet(); 
-        await loadPermissionPanel(); 
-        await syncUserPermissionsInBackground();
-      }else{ 
-        slider.checked=!slider.checked; 
-        showToast('Error: '+result.message,true); 
-      } 
+      if(result.success){ showToast(`Permission for "${username}" → ${newPerm}`); await loadUsersFromSheet(); await loadPermissionPanel(); await syncUserPermissionsInBackground(); }else{ slider.checked=!slider.checked; showToast('Error: '+result.message,true); } 
     }); }); 
   }
   
@@ -731,9 +730,7 @@ input:checked + .slider:before { transform: translateX(26px); }
       const searchTerm=document.getElementById('permSearch')?.value.toLowerCase()||''; 
       const filtered=res.data.users.filter(u=>u.username.toLowerCase().includes(searchTerm)); 
       displayPermissionPanel(filtered, container); 
-    }else{ 
-      container.innerHTML='<div class="empty-state">Failed to load</div>'; 
-    } 
+    }else{ container.innerHTML='<div class="empty-state">Failed to load</div>'; } 
   }
   
   function displayPermissionPanel(users, container){ 
@@ -748,44 +745,19 @@ input:checked + .slider:before { transform: translateX(26px); }
   function attachPermEvents(){ 
     document.querySelectorAll('.perm-toggle-main').forEach(toggle=>{ 
       toggle.addEventListener('change',async(e)=>{ 
-        const userId=toggle.dataset.id; 
-        const username=toggle.dataset.username; 
-        const newPerm=toggle.checked?'Allowed':'Denied'; 
+        const userId=toggle.dataset.id; const username=toggle.dataset.username; const newPerm=toggle.checked?'Allowed':'Denied'; 
         const result=await callGoogleScript('updatePermission',{userId,permission:newPerm}); 
         const msgDiv=document.getElementById('permMsg'); 
-        if(result.success){ 
-          msgDiv.innerHTML=`✅ Permission for ${username} updated to ${newPerm}`; 
-          msgDiv.style.color='#a5d6a5'; 
-          loadPermissionPanel(); 
-          loadUsersFromSheet(); 
-          await syncUserPermissionsInBackground();
-        }else{ 
-          toggle.checked=!toggle.checked; 
-          msgDiv.innerHTML='❌ '+result.message; 
-          msgDiv.style.color='#ffaa88'; 
-        } 
+        if(result.success){ msgDiv.innerHTML=`✅ Permission for ${username} updated to ${newPerm}`; msgDiv.style.color='#a5d6a5'; loadPermissionPanel(); loadUsersFromSheet(); await syncUserPermissionsInBackground(); }else{ toggle.checked=!toggle.checked; msgDiv.innerHTML='❌ '+result.message; msgDiv.style.color='#ffaa88'; } 
         setTimeout(()=>msgDiv.innerHTML='',2500); 
       }); 
     }); 
     document.querySelectorAll('.update-role-btn').forEach(btn=>{ 
       btn.addEventListener('click',async()=>{ 
-        const userId=btn.dataset.id; 
-        const username=btn.dataset.username; 
-        const select=document.querySelector(`.role-select[data-id="${userId}"]`); 
-        const newRole=select.value; 
+        const userId=btn.dataset.id; const username=btn.dataset.username; const select=document.querySelector(`.role-select[data-id="${userId}"]`); const newRole=select.value; 
         const res=await callGoogleScript('updatePermission',{userId,role:newRole}); 
         const msgDiv=document.getElementById('permMsg'); 
-        if(res.success){ 
-          msgDiv.innerHTML=`✅ Role for ${username} → ${newRole}`; 
-          msgDiv.style.color='#a5d6a5'; 
-          loadPermissionPanel(); 
-          loadUsersFromSheet(); 
-          await syncUserPermissionsInBackground();
-          showToast(`Role changed to ${newRole} for ${username}. User will see update within 20 seconds.`); 
-        }else{ 
-          msgDiv.innerHTML='❌ '+res.message; 
-          msgDiv.style.color='#ffaa88'; 
-        } 
+        if(res.success){ msgDiv.innerHTML=`✅ Role for ${username} → ${newRole}`; msgDiv.style.color='#a5d6a5'; loadPermissionPanel(); loadUsersFromSheet(); await syncUserPermissionsInBackground(); showToast(`Role changed to ${newRole} for ${username}. User will see update within 20 seconds.`); }else{ msgDiv.innerHTML='❌ '+res.message; msgDiv.style.color='#ffaa88'; } 
         setTimeout(()=>msgDiv.innerHTML='',2500); 
       }); 
     }); 
@@ -800,9 +772,7 @@ input:checked + .slider:before { transform: translateX(26px); }
       const search=document.getElementById('deleteSearch')?.value.toLowerCase()||''; 
       const filtered=res.data.users.filter(u=>u.username.toLowerCase().includes(search)); 
       displayDeleteList(filtered,container); 
-    }else{ 
-      container.innerHTML='<div class="empty-state">Failed</div>'; 
-    } 
+    }else{ container.innerHTML='<div class="empty-state">Failed</div>'; } 
   }
   
   function displayDeleteList(users,container){ 
@@ -816,17 +786,7 @@ input:checked + .slider:before { transform: translateX(26px); }
         if(confirm(`Delete "${btn.dataset.username}" permanently?`)){ 
           const res=await callGoogleScript('deleteUser',{userId:btn.dataset.id}); 
           const msgDiv=document.getElementById('deleteMsg'); 
-          if(res.success){ 
-            msgDiv.innerHTML=`✅ Deleted ${btn.dataset.username}`; 
-            msgDiv.style.color='#a5d6a5'; 
-            loadDeletePanel(); 
-            loadUsersFromSheet(); 
-            loadPermissionPanel(); 
-            await syncUserPermissionsInBackground();
-            showToast(`User ${btn.dataset.username} deleted`); 
-          }else{ 
-            msgDiv.innerHTML='❌ '+res.message; 
-          } 
+          if(res.success){ msgDiv.innerHTML=`✅ Deleted ${btn.dataset.username}`; msgDiv.style.color='#a5d6a5'; loadDeletePanel(); loadUsersFromSheet(); loadPermissionPanel(); await syncUserPermissionsInBackground(); showToast(`User ${btn.dataset.username} deleted`); }else{ msgDiv.innerHTML='❌ '+res.message; } 
           setTimeout(()=>msgDiv.innerHTML='',3000); 
         } 
       }); 
@@ -842,42 +802,24 @@ input:checked + .slider:before { transform: translateX(26px); }
     const perm=document.getElementById('addPermission').value; 
     const msgDiv=document.getElementById('addUserMsg'); 
     if(!name||!email||!pwd){ msgDiv.innerHTML='❌ All required'; setTimeout(()=>msgDiv.innerHTML='',3000); return; } 
-    const btn=e.target.querySelector('button'); 
-    const orig=btn.innerHTML; 
-    btn.innerHTML='<div class="loading-spinner"></div> Creating...'; 
-    btn.disabled=true; 
+    const btn=e.target.querySelector('button'); const orig=btn.innerHTML; 
+    btn.innerHTML='<div class="loading-spinner"></div> Creating...'; btn.disabled=true; 
     const result=await callGoogleScript('addUser',{name,email,password:pwd,role,permission:perm}); 
-    if(result.success){ 
-      msgDiv.innerHTML='✅ User created'; 
-      document.getElementById('addUserForm').reset(); 
-      loadUsersFromSheet(); 
-      loadPermissionPanel(); 
-    }else{ 
-      msgDiv.innerHTML='❌ '+result.message; 
-    } 
-    setTimeout(()=>msgDiv.innerHTML='',3000); 
-    btn.innerHTML=orig; 
-    btn.disabled=false; 
+    if(result.success){ msgDiv.innerHTML='✅ User created'; document.getElementById('addUserForm').reset(); loadUsersFromSheet(); loadPermissionPanel(); }else{ msgDiv.innerHTML='❌ '+result.message; } 
+    setTimeout(()=>msgDiv.innerHTML='',3000); btn.innerHTML=orig; btn.disabled=false; 
   });
   
   function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g,function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
   
   const controlModal=document.getElementById('controlManagerModal'), closeControlBtn=document.getElementById('closeControlModal');
   window.openControlManager=(tab='add')=>{ 
-    const s=getSession(); 
-    if(!s||normalizeRole(s.role)!=='Admin'){ 
-      showToast('Access Denied. Admin only.',true); 
-      return; 
-    } 
-    controlModal.classList.add('active'); 
-    document.body.style.overflow='hidden'; 
+    const s=getSession(); if(!s||normalizeRole(s.role)!=='Admin'){ showToast('Access Denied. Admin only.',true); return; } 
+    controlModal.classList.add('active'); document.body.style.overflow='hidden'; 
     document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active-panel')); 
     document.getElementById(`${tab}Panel`).classList.add('active-panel'); 
     document.querySelectorAll('.tab-btn').forEach(btn=>btn.classList.remove('active')); 
     document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active'); 
-    if(tab==='view') loadUsersFromSheet(); 
-    if(tab==='permission') loadPermissionPanel(); 
-    if(tab==='delete') loadDeletePanel(); 
+    if(tab==='view') loadUsersFromSheet(); if(tab==='permission') loadPermissionPanel(); if(tab==='delete') loadDeletePanel(); 
   };
   
   function closeControlManager(){ controlModal.classList.remove('active'); document.body.style.overflow=''; }
@@ -888,22 +830,12 @@ input:checked + .slider:before { transform: translateX(26px); }
   document.getElementById('permSearch')?.addEventListener('input',()=>loadPermissionPanel()); 
   document.getElementById('searchUsers')?.addEventListener('input',()=>loadUsersFromSheet());
 
-  // Modal handlers (from your original)
+  // Modal handlers
   const loginModal=document.getElementById('signinModal');
   document.getElementById('closeModalBtn')?.addEventListener('click',()=>loginModal.classList.remove('active'));
   loginModal?.addEventListener('click',(e)=>{ if(e.target===loginModal) loginModal.classList.remove('active'); });
-  document.getElementById('modalSigninTab')?.addEventListener('click',()=>{ 
-    document.getElementById('modalSigninTab').classList.add('active'); 
-    document.getElementById('modalSignupTab').classList.remove('active'); 
-    document.getElementById('modalSigninPanel').classList.add('active-panel-modal'); 
-    document.getElementById('modalSignupPanel').classList.remove('active-panel-modal'); 
-  });
-  document.getElementById('modalSignupTab')?.addEventListener('click',()=>{ 
-    document.getElementById('modalSignupTab').classList.add('active'); 
-    document.getElementById('modalSigninTab').classList.remove('active'); 
-    document.getElementById('modalSignupPanel').classList.add('active-panel-modal'); 
-    document.getElementById('modalSigninPanel').classList.remove('active-panel-modal'); 
-  });
+  document.getElementById('modalSigninTab')?.addEventListener('click',()=>{ document.getElementById('modalSigninTab').classList.add('active'); document.getElementById('modalSignupTab').classList.remove('active'); document.getElementById('modalSigninPanel').classList.add('active-panel-modal'); document.getElementById('modalSignupPanel').classList.remove('active-panel-modal'); });
+  document.getElementById('modalSignupTab')?.addEventListener('click',()=>{ document.getElementById('modalSignupTab').classList.add('active'); document.getElementById('modalSigninTab').classList.remove('active'); document.getElementById('modalSignupPanel').classList.add('active-panel-modal'); document.getElementById('modalSigninPanel').classList.remove('active-panel-modal'); });
   
   document.getElementById('modalLoginForm')?.addEventListener('submit',async(e)=>{ 
     e.preventDefault(); 
@@ -911,27 +843,17 @@ input:checked + .slider:before { transform: translateX(26px); }
     const pass=document.getElementById('modalLoginPass').value; 
     const remember=document.getElementById('modalRemember').checked; 
     const msgDiv=document.getElementById('modalLoginMsg'); 
-    const btn=e.target.querySelector('button'); 
-    const orig=btn.innerHTML; 
+    const btn=e.target.querySelector('button'); const orig=btn.innerHTML; 
     if(!user||!pass){ msgDiv.innerHTML='All fields required'; msgDiv.className='message-area-modal error-msg-modal'; return; } 
-    btn.innerHTML='<div class="loading-spinner"></div>'; 
-    btn.disabled=true; 
+    btn.innerHTML='<div class="loading-spinner"></div>'; btn.disabled=true; 
     const result=await authenticateUser(user,pass); 
     if(result.success){ 
       const sessionData={ username:user, role:result.data?.role||'User', name:result.data?.name||user.split('@')[0] }; 
-      setSession(sessionData,remember); 
-      renderMenu(); 
-      updateAuthUI(); 
-      loginModal.classList.remove('active'); 
+      setSession(sessionData,remember); renderMenu(); updateAuthUI(); loginModal.classList.remove('active'); 
       showToast(`Welcome ${sessionData.name}! Role: ${getRoleDisplay(sessionData.role)}`); 
-      startPermissionWatcher(); 
-      loadPage('home1'); 
-    }else{ 
-      msgDiv.innerHTML=result.message||'Invalid credentials'; 
-      msgDiv.className='message-area-modal error-msg-modal'; 
-    } 
-    btn.innerHTML=orig; 
-    btn.disabled=false; 
+      startPermissionWatcher(); startHeartbeat(); startActiveCountFetcher(); loadPage('home1'); 
+    }else{ msgDiv.innerHTML=result.message||'Invalid credentials'; msgDiv.className='message-area-modal error-msg-modal'; } 
+    btn.innerHTML=orig; btn.disabled=false; 
   });
   
   document.getElementById('modalSignupForm')?.addEventListener('submit',async(e)=>{ 
@@ -941,34 +863,17 @@ input:checked + .slider:before { transform: translateX(26px); }
     const pass=document.getElementById('modalSignupPass').value; 
     const terms=document.getElementById('modalTerms').checked; 
     const msgDiv=document.getElementById('modalSignupMsg'); 
-    const btn=e.target.querySelector('button'); 
-    const orig=btn.innerHTML; 
     if(!name||!email||!pass){ msgDiv.innerHTML='All fields required'; msgDiv.className='message-area-modal error-msg-modal'; return; } 
     if(pass.length<4){ msgDiv.innerHTML='Min 4 chars'; msgDiv.className='message-area-modal error-msg-modal'; return; } 
     if(!terms){ msgDiv.innerHTML='Accept terms'; msgDiv.className='message-area-modal error-msg-modal'; return; } 
-    btn.innerHTML='<div class="loading-spinner"></div>'; 
-    btn.disabled=true; 
     const result=await registerUser(name,email,pass); 
-    if(result.success){ 
-      msgDiv.innerHTML='✅ Account created! Awaiting admin approval.'; 
-      msgDiv.className='message-area-modal success-msg-modal'; 
-      document.getElementById('modalSignupForm').reset(); 
-      setTimeout(()=>{ document.getElementById('modalSigninTab').click(); document.getElementById('modalLoginUser').value=email; },2000); 
-    }else{ 
-      msgDiv.innerHTML=result.message||'Signup failed'; 
-      msgDiv.className='message-area-modal error-msg-modal'; 
-    } 
-    btn.innerHTML=orig; 
-    btn.disabled=false; 
+    if(result.success){ msgDiv.innerHTML='✅ Account created! Awaiting admin approval.'; msgDiv.className='message-area-modal success-msg-modal'; document.getElementById('modalSignupForm').reset(); setTimeout(()=>{ document.getElementById('modalSigninTab').click(); document.getElementById('modalLoginUser').value=email; },2000); }else{ msgDiv.innerHTML=result.message||'Signup failed'; msgDiv.className='message-area-modal error-msg-modal'; } 
   });
   
   function init(){ 
-    renderMenu(); 
-    updateAuthUI(); 
-    const session = getSession();
-    if(session) {
-      startPermissionWatcher(); 
-    }
+    renderMenu(); updateAuthUI(); sessionId = generateSessionId(); startHeartbeat(); startActiveCountFetcher(); 
+    const session = getSession(); if(session) startPermissionWatcher(); 
+    window.addEventListener('beforeunload', () => stopUserTracking()); 
   }
   init();
 </script>
