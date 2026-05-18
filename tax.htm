@@ -28,7 +28,6 @@ body {
   overflow: hidden;
 }
 
-/* Tab Navigation */
 .tab-nav {
   display: flex;
   background: #2c3e50;
@@ -85,7 +84,6 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Stats Cards */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -124,7 +122,6 @@ body {
   opacity: 0.8;
 }
 
-/* Chart Container */
 .charts-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -151,7 +148,6 @@ canvas {
   width: 100%;
 }
 
-/* Table Styles */
 .table-wrapper {
   overflow-x: auto;
   border-radius: 8px;
@@ -262,18 +258,47 @@ h2 {
   margin-left: 10px;
 }
 
-.amount-badge {
-  background: #fff0e6;
-  font-weight: 700;
-  color: #b45309;
-  padding: 4px 8px;
+.amount-cell {
+  cursor: pointer;
+  user-select: none;
+}
+
+.masked-amount {
+  background: #f0f0f0;
+  padding: 6px 12px;
   border-radius: 20px;
+  display: inline-block;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.amount-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.eye-icon {
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.2s;
   display: inline-block;
 }
 
-.mobile-num {
-  font-family: monospace;
-  font-weight: 500;
+.eye-icon:hover {
+  transform: scale(1.2);
+}
+
+.amount-badge-revealed {
+  background: #e8f5e9;
+  font-weight: 700;
+  color: #2e7d32;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
 }
 
 .loading {
@@ -342,6 +367,11 @@ h2 {
   margin-left: 5px;
 }
 
+.mobile-num {
+  font-family: monospace;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   body {
     padding: 10px;
@@ -379,10 +409,9 @@ h2 {
 <body>
 <div class="container">
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('Tax')">🏠 Land Tax Register(18.05.2026)</button>
+    <button class="tab-btn active" onclick="switchTab('Tax')">🏠 Land Tax Register (18.05.2026)</button>
   </div>
   
-  <!-- Land Tax Tab -->
   <div id="Tax" class="tab-content active">
     <h2>🏡 Land & Property Tax Register</h2>
     <div class="subtitle">Bhagabanpur Gram Panchayat - Holding & Assessment Records</div>
@@ -421,7 +450,7 @@ h2 {
             <th data-col="4">Gram Sansad ⬍</th>
             <th data-col="5">Name of Owner</th>
             <th data-col="6">Father/Mother/Husband</th>
-            <th data-col="7">Arrear Amount</th>
+            <th data-col="7">Arrear Amount <span style="font-size:11px;">👁️ Click eye to reveal</span></th>
             <th data-col="8">Mobile No</th>
           </tr>
         </thead>
@@ -434,17 +463,18 @@ h2 {
 </div>
 
 <script>
-// Google Apps Script Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbyS5bTELBy3uRmIZvtc7PSlT2f_gzsNExRDdUJSZ2CGg81kl13-A3T9hkvxrCkPr78G/exec";
 
 let taxData = [];
 let filteredData = [];
 let searchTerm = "";
-let currentSort = { column: 4, direction: 'asc' }; // Sort by Gram Sansad by default
+let currentSort = { column: 4, direction: 'asc' };
 let charts = {};
 let searchTimeout = null;
 
-// ======================== HELPER FUNCTIONS ========================
+// Store visibility state for Arrear Amount (column 7) for each row
+let amountVisibility = {};
+
 function escapeHtml(str) {
   if (str === undefined || str === null) return "—";
   let s = String(str);
@@ -469,13 +499,50 @@ function extractNumericAmount(value) {
   return isNaN(num) ? 0 : num;
 }
 
+// Mask amount: show only "₹ XX,XXX" style with stars
+function maskAmount(amount) {
+  return "₹ •••••••";
+}
+
+// Format amount with toggle functionality
+function formatAmountWithToggle(amount, rowId, isVisible) {
+  const formattedAmount = formatAmount(amount);
+  const eyeIcon = isVisible ? '🙈' : '👁️';
+  const titleText = isVisible ? 'Click to hide amount' : 'Click to reveal amount';
+  
+  if (isVisible) {
+    return `
+      <div class="amount-wrapper">
+        <span class="amount-badge-revealed">${escapeHtml(formattedAmount)}</span>
+        <span class="eye-icon" onclick="event.stopPropagation(); toggleAmountVisibility('${rowId}')" title="${titleText}">
+          ${eyeIcon}
+        </span>
+      </div>
+    `;
+  } else {
+    return `
+      <div class="amount-wrapper">
+        <span class="masked-amount">${maskAmount(amount)}</span>
+        <span class="eye-icon" onclick="event.stopPropagation(); toggleAmountVisibility('${rowId}')" title="${titleText}">
+          ${eyeIcon}
+        </span>
+      </div>
+    `;
+  }
+}
+
+// Toggle amount visibility for a specific row
+function toggleAmountVisibility(rowId) {
+  amountVisibility[rowId] = !amountVisibility[rowId];
+  renderTable();
+}
+
 function formatMobile(value) {
   if (value === undefined || value === null || value === "") return "—";
   let m = String(value).trim();
   return m === "" ? "—" : m;
 }
 
-// ======================== SEARCH FUNCTION ========================
 function applySearch() {
   if (!searchTerm.trim()) {
     filteredData = [...taxData];
@@ -491,7 +558,6 @@ function applySearch() {
   }
 }
 
-// ======================== SORT FUNCTION ========================
 function sortData() {
   const col = currentSort.column;
   const dir = currentSort.direction;
@@ -499,7 +565,6 @@ function sortData() {
     let valA = (a[col] !== undefined && a[col] !== null) ? String(a[col]) : "";
     let valB = (b[col] !== undefined && b[col] !== null) ? String(b[col]) : "";
     
-    // Numeric sort for Arrear Amount (col 7) and Sl No (col 0)
     if (col === 7) {
       let numA = extractNumericAmount(valA);
       let numB = extractNumericAmount(valB);
@@ -510,13 +575,17 @@ function sortData() {
       let numB = parseFloat(valB) || 0;
       return dir === 'asc' ? numA - numB : numB - numA;
     }
-    // String comparison for others
     if (dir === 'asc') return valA.localeCompare(valB, 'en');
     else return valB.localeCompare(valA, 'en');
   });
 }
 
-// ======================== RENDER TABLE ========================
+function getRowId(row, index) {
+  const slNo = (row[0] !== undefined && row[0] !== null && row[0] !== "") ? row[0] : index;
+  const assesseNo = row[1] || "unknown";
+  return `row_${slNo}_${assesseNo}_${index}`;
+}
+
 function renderTable() {
   const tbody = document.getElementById('tbody-Tax');
   if (!tbody) return;
@@ -530,6 +599,12 @@ function renderTable() {
   let html = '';
   for (let i = 0; i < filteredData.length; i++) {
     const row = filteredData[i];
+    const rowId = getRowId(row, i);
+    
+    if (amountVisibility[rowId] === undefined) {
+      amountVisibility[rowId] = false;
+    }
+    
     const slNo = (row[0] !== undefined && row[0] !== null && row[0] !== "") ? row[0] : (i+1);
     const assesseNo = row[1] || "—";
     const holdingNo = row[2] || "—";
@@ -548,14 +623,13 @@ function renderTable() {
       <td><strong>${escapeHtml(gramSansad)}</strong></td>
       <td style="color:#1f4f2b; font-weight:500;">${escapeHtml(ownerName)}</td>
       <td>${escapeHtml(relative)}</td>
-      <td><span class="amount-badge">${formatAmount(arrearRaw)}</span></td>
+      <td class="amount-cell">${formatAmountWithToggle(arrearRaw, rowId, amountVisibility[rowId])}</td>
       <td class="mobile-num">${escapeHtml(formatMobile(mobileRaw))}</td>
     </tr>`;
   }
   tbody.innerHTML = html;
   document.getElementById('count-Tax').innerText = filteredData.length;
   
-  // Update search stats
   const searchStats = document.getElementById('search-stats-Tax');
   if (searchStats) {
     if (searchTerm.trim()) {
@@ -566,11 +640,9 @@ function renderTable() {
   }
 }
 
-// ======================== UPDATE STATISTICS ========================
 function updateStatistics() {
   const totalRecords = filteredData.length;
   
-  // Get unique Gram Sansad (column index 4)
   const sansadSet = new Set();
   let totalArrearSum = 0;
   let mobilePresentCount = 0;
@@ -587,7 +659,6 @@ function updateStatistics() {
     if (mobileVal !== "" && mobileVal !== "-") mobilePresentCount++;
   });
   
-  // Find top Gram Sansad
   let topSansad = "";
   let topCount = 0;
   for (let [sansad, count] of Object.entries(sansadCounts)) {
@@ -624,7 +695,6 @@ function updateStatistics() {
   `;
 }
 
-// ======================== RENDER CHARTS ========================
 function getChartColors(count) {
   const colors = [
     'rgba(255, 99, 132, 0.8)',
@@ -642,7 +712,6 @@ function getChartColors(count) {
 }
 
 function renderCharts() {
-  // Aggregate Arrear Amount by Gram Sansad (col 4)
   const sansadMap = new Map();
   filteredData.forEach(row => {
     let gram = row[4] ? String(row[4]).trim() : "Unassigned";
@@ -656,7 +725,6 @@ function renderCharts() {
   const amounts = sortedEntries.map(entry => entry[1]);
   const colors = getChartColors(labels.length);
   
-  // Bar Chart
   const barCtx = document.getElementById('chart-Tax-bar');
   if (barCtx) {
     if (charts.bar) charts.bar.destroy();
@@ -688,7 +756,6 @@ function renderCharts() {
     });
   }
   
-  // Doughnut Chart
   const doughnutCtx = document.getElementById('chart-Tax-doughnut');
   if (doughnutCtx) {
     if (charts.doughnut) charts.doughnut.destroy();
@@ -714,7 +781,6 @@ function renderCharts() {
   }
 }
 
-// ======================== REFRESH ALL ========================
 function refreshAll() {
   applySearch();
   sortData();
@@ -739,7 +805,6 @@ function updateSortIndicators() {
   });
 }
 
-// ======================== SEARCH WITH DELAY ========================
 function searchTableWithDelay(sheetName, term) {
   if (searchTimeout) clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
@@ -757,7 +822,6 @@ function clearSearch(sheetName) {
   }
 }
 
-// ======================== EXPORT TO EXCEL ========================
 function exportToExcel(sheetName) {
   if (!filteredData.length) {
     alert('No data to export!');
@@ -789,7 +853,6 @@ function exportToExcel(sheetName) {
   alert(`Exported ${filteredData.length} records`);
 }
 
-// ======================== TAB SWITCH ========================
 function switchTab(tabName) {
   const tabs = document.querySelectorAll('.tab-content');
   tabs.forEach(tab => tab.classList.remove('active'));
@@ -810,7 +873,6 @@ function switchTab(tabName) {
   }, 100);
 }
 
-// ======================== COLUMN SORTING ========================
 function attachSortListeners() {
   const headers = document.querySelectorAll('#table-Tax th');
   headers.forEach(th => {
@@ -827,7 +889,6 @@ function attachSortListeners() {
   });
 }
 
-// ======================== LOAD DATA FROM API ========================
 function loadData() {
   const tbody = document.getElementById('tbody-Tax');
   tbody.innerHTML = `<tr><td colspan="9" class="loading"><div class="spinner"></div>Loading data from server...<br>Please wait</td></tr>`;
@@ -840,15 +901,14 @@ function loadData() {
     .then(data => {
       if (!Array.isArray(data)) throw new Error("Invalid data format");
       
-      // Clean data: filter rows with at least one non-empty cell
       taxData = data.filter(row => Array.isArray(row) && row.some(cell => cell !== undefined && cell !== null && cell !== ""));
       
       if (taxData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="error">⚠️ No data available from server</td></tr>`;
+        tbody.innerHTML = `<table><td colspan="9" class="error">⚠️ No data available from server</td></tr>`;
         return;
       }
       
-      // Initial filter and sort
+      amountVisibility = {};
       filteredData = [...taxData];
       currentSort = { column: 4, direction: 'asc' };
       sortData();
@@ -864,7 +924,8 @@ function loadData() {
     });
 }
 
-// ======================== INITIALIZE ========================
+window.toggleAmountVisibility = toggleAmountVisibility;
+
 window.addEventListener('DOMContentLoaded', () => {
   loadData();
 });
