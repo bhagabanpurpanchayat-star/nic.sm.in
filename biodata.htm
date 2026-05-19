@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Professional Bio-Data | Signature at Bottom | A4 Optimized</title>
+    <!-- FileSaver & html-docx for export -->
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            padding: 30px 20px;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .biodata-container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .biodata-header {
+            background: linear-gradient(120deg, #1e293b 0%, #0f172a 100%);
+            padding: 20px 32px 18px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 3px solid #3b82f6;
+        }
+        .title-section h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 6px;
+        }
+        .title-section p {
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .photo-upload-area {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 10px 20px;
+            text-align: center;
+            min-width: 160px;
+        }
+        .photo-upload-area span {
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .photo-preview {
+            width: 105px;
+            height: 115px;
+            margin: 8px auto;
+            border: 2px solid #3b82f6;
+            border-radius: 14px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .photo-preview:hover { transform: scale(1.02); border-color: #60a5fa; }
+        .photo-placeholder-icon { text-align: center; color: #94a3b8; font-size: 12px; }
+        .photo-input-hidden { display: none; }
+        .upload-btn-sm {
+            background: #3b82f6;
+            border: none;
+            border-radius: 30px;
+            padding: 5px 12px;
+            font-size: 11px;
+            margin-top: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+        }
+        .upload-btn-sm:hover { background: #2563eb; }
+
+        .form-section {
+            padding: 24px 32px 28px 32px;
+            background: #ffffff;
+        }
+        .personal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px 24px;
+            padding: 8px 0 16px 0;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .field label {
+            font-weight: 700;
+            font-size: 12px;
+            color: #475569;
+            text-transform: uppercase;
+        }
+        .field input, .field select, .field textarea {
+            padding: 9px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 13px;
+            background: #fff;
+            font-family: inherit;
+        }
+        .field input:focus, .field select:focus, .field textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        .subsection {
+            margin-top: 24px;
+        }
+        .subsection h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            margin-bottom: 14px;
+        }
+
+        .edu-table, .exp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+        .edu-table th, .edu-table td,
+        .exp-table th, .exp-table td {
+            border: 1px solid #e9edf2;
+            padding: 8px 10px;
+            vertical-align: top;
+        }
+        .edu-table th, .exp-table th {
+            background-color: #f1f5f9 !important;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .edu-table input, .exp-table input {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 7px 9px;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        .btn {
+            border: none;
+            padding: 7px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .btn-primary { background: linear-gradient(95deg, #2563eb, #1d4ed8); color: white; }
+        .btn-primary:hover { background: linear-gradient(95deg, #1d4ed8, #1e40af); transform: translateY(-1px); }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-outline { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; }
+
+        .address-area textarea {
+            width: 100%;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 10px 14px;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .declaration {
+            background: #fefce8;
+            border-left: 4px solid #eab308;
+            padding: 14px 20px;
+            margin: 22px 0 18px 0;
+            border-radius: 16px;
+            font-size: 13px;
+        }
+
+        /* On-screen signature section */
+        .signature-section {
+            margin-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            background: #f9fafb;
+            padding: 18px 24px;
+            border-radius: 20px;
+            border: 1px solid #eef2ff;
+        }
+        .sign-item { font-size: 14px; font-weight: 500; color: #1e293b; }
+        .sign-item strong { font-weight: 700; color: #0f172a; }
+
+        .skills-section {
+            margin-top: 24px;
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px 22px;
+            border: 1px solid #eef2ff;
+        }
+        .skills-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .skills-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            border-left: 3px solid #3b82f6;
+            padding-left: 12px;
+            margin: 0;
+        }
+        .skills-tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .skill-tag {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .skill-tag button {
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+        }
+        .add-skill-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .add-skill-input input {
+            padding: 6px 12px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+            width: 150px;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+
+        .live-preview-section { display: none; }
+        .print-data-display { display: none; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .biodata-container { max-width: 100%; border-radius: 0; box-shadow: none; }
+            .personal-grid, .action-buttons, .footer-actions, .upload-btn-sm,
+            .photo-input-hidden, .btn, .field input, .field select, .edu-table input,
+            .exp-table input, .address-area textarea, .skills-section .add-skill-input,
+            .skill-tag button, #addEduRowBtn, #removeLastEduBtn, #addExpRowBtn,
+            #removeLastExpBtn, #resetBtn, #printBtn, #exportDocBtn {
+                display: none !important;
+            }
+            .print-data-display { display: block !important; }
+            .edu-table th, .exp-table th { background-color: #e0e0e0 !important; }
+            .biodata-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .form-section { padding: 0.3cm; }
+            @page { size: A4; margin: 1cm; }
+            body { font-size: 11pt; }
+            /* Signature at bottom in print */
+            .print-signature {
+                margin-top: 25px;
+                padding-top: 15px;
+                display: flex;
+                justify-content: space-between;
+                border-top: 1px dashed #ccc;
+            }
+        }
+
+        .print-data-display .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 24px;
+            margin: 12px 0;
+        }
+        .print-data-display .info-item {
+            display: flex;
+            border-bottom: 1px dotted #aaa;
+            padding: 4px 0;
+        }
+        .print-data-display .info-label {
+            font-weight: 700;
+            width: 130px;
+        }
+        .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 10.5pt;
+        }
+        .print-table th, .print-table td {
+            border: 1px solid #222;
+            padding: 6px;
+            text-align: left;
+        }
+        .print-table th {
+            background: #e9ecef;
+        }
+
+        @media (max-width: 700px) {
+            .personal-grid { grid-template-columns: 1fr; gap: 12px; }
+            .form-section { padding: 20px; }
+            .signature-section { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="biodata-container" id="biodataApp">
+    <div class="biodata-header">
+        <div class="title-section">
+            <h1>📄 BIO DATA</h1>
+            <p>Professional Resume Format</p>
+        </div>
+        <div class="photo-upload-area">
+            <span>📸 Passport Photo</span>
+            <div class="photo-preview" id="photoPreviewBox">
+                <div id="photoPlaceholderIcon" class="photo-placeholder-icon">
+                    📷<br>Click
+                </div>
+                <img id="uploadedPhotoImg" src="" style="display:none; width:100%; height:100%; object-fit:cover;">
+            </div>
+            <input type="file" id="photoInput" class="photo-input-hidden" accept="image/jpeg, image/png, image/jpg">
+            <button type="button" class="upload-btn-sm" id="removePhotoBtn">Remove</button>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="personal-grid">
+            <div class="field"><label>Full Name</label><input type="text" id="fullName" value="Rajesh Sharma"></div>
+            <div class="field"><label>Father's Name</label><input type="text" id="fatherName" value="Amit Sharma"></div>
+            <div class="field"><label>DOB</label><input type="text" id="dob" value="15/06/1995"></div>
+            <div class="field"><label>Gender</label><select id="gender"><option value="Male" selected>Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+            <div class="field"><label>Marital Status</label><select id="maritalStatus"><option value="Single" selected>Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option></select></div>
+            <div class="field"><label>Religion</label><input type="text" id="religion" value="Hindu"></div>
+            <div class="field"><label>Languages Known</label><input type="text" id="languages" value="English, Hindi"></div>
+            <div class="field"><label>Nationality</label><input type="text" id="nationality" value="Indian"></div>
+            <div class="field"><label>Email ID</label><input type="email" id="email" value="rajesh.sharma@example.com"></div>
+            <div class="field"><label>Mobile No</label><input type="tel" id="mobile" value="+91 9876543210"></div>
+        </div>
+
+        <div class="field" style="margin-bottom: 12px; max-width: 380px;">
+            <label>📍 Place (for declaration)</label>
+            <input type="text" id="placeInput" value="New Delhi - 110054">
+        </div>
+
+        <!-- Hidden print data container -->
+        <div class="print-data-display" id="printDataDisplay">
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">Name:</span><span id="printName">Rajesh Sharma</span></div>
+                <div class="info-item"><span class="info-label">Father's Name:</span><span id="printFather">Amit Sharma</span></div>
+                <div class="info-item"><span class="info-label">DOB:</span><span id="printDob">15/06/1995</span></div>
+                <div class="info-item"><span class="info-label">Gender:</span><span id="printGender">Male</span></div>
+                <div class="info-item"><span class="info-label">Marital Status:</span><span id="printMarital">Single</span></div>
+                <div class="info-item"><span class="info-label">Religion:</span><span id="printReligion">Hindu</span></div>
+                <div class="info-item"><span class="info-label">Languages:</span><span id="printLanguages">English, Hindi</span></div>
+                <div class="info-item"><span class="info-label">Nationality:</span><span id="printNationality">Indian</span></div>
+                <div class="info-item"><span class="info-label">Email:</span><span id="printEmail">rajesh.sharma@example.com</span></div>
+                <div class="info-item"><span class="info-label">Mobile:</span><span id="printMobile">+91 9876543210</span></div>
+            </div>
+            
+            <!-- Education Print Table -->
+            <h3 style="margin-top: 20px;">🎓 Educational Qualifications</h3>
+            <table class="print-table" id="printEduTable">
+                <thead><tr><th>Qualification</th><th>Institute Name</th><th>Board/University</th><th>Year of Passing</th><th>Marks (%)</th></tr></thead>
+                <tbody id="printEduTbody"></tbody>
+            </table>
+            
+            <!-- Work Experience Print Table -->
+            <div id="printExpContainer" style="display:none;">
+                <h3>💼 Work Experience</h3>
+                <table class="print-table" id="printExpTable">
+                    <thead><tr><th>S.No</th><th>Company Name</th><th>Position</th><th>Working Period</th></tr></thead>
+                    <tbody id="printExpTbody"></tbody>
+                </table>
+            </div>
+            
+            <!-- Skills Print -->
+            <div id="printSkillsDiv" style="display:none;">
+                <h3>⚡ Core Skills</h3>
+                <div id="printSkillsList"></div>
+            </div>
+            
+            <!-- Address for print -->
+            <h3>🏠 Residential Address</h3>
+            <p id="printAddress"></p>
+            
+            <!-- Declaration for print -->
+            <div class="decl" style="border-left:3px solid #eab308; padding-left:12px; margin:15px 0;">
+                <strong>Declaration:</strong> I hereby declare that all the information provided here is true to the best of my knowledge.
+            </div>
+            
+            <!-- SIGNATURE AT BOTTOM - PROPERLY PLACED FOR PRINT -->
+            <div class="print-signature">
+                <span>📌 Place: <strong id="printPlace">New Delhi - 110054</strong></span>
+                <span>📅 Date: <strong id="printDate"></strong></span>
+                <span>✍️ Signature: <span style="font-family: 'Segoe Script', cursive;">(Authorized Signature)</span></span>
+            </div>
+        </div>
+
+        <!-- Education Table -->
+        <div class="subsection">
+            <h3>🎓 Educational Qualifications</h3>
+            <table class="edu-table" id="eduTable">
+                <thead><tr><th>Qualification</th><th>Institute</th><th>Board/Univ</th><th>Year</th><th>Marks</th><th style="width:50px">Action</th></tr></thead>
+                <tbody id="eduTbody"></tbody>
+            </table>
+            <div class="action-buttons">
+                <button class="btn btn-success" id="addEduRowBtn">+ Add</button>
+                <button class="btn btn-danger" id="removeLastEduBtn">- Remove</button>
+            </div>
+        </div>
+
+        <!-- Work Experience -->
+        <div class="subsection">
+            <h3>💼 Work Experience</h3>
+            <table class="exp-table" id="expTable">
+                <thead><tr><th>SNo</th><th>Company Name</th><th>Position</th><th>Period</th><th style="width:50px">Action</th></tr></thead>
+                <tbody id="expTbody"></tbody>
+            </table>
+            <div class="action-buttons">
+                <button class="btn btn-success" id="addExpRowBtn">+ Add Exp</button>
+                <button class="btn btn-danger" id="removeLastExpBtn">- Remove</button>
+            </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="skills-section">
+            <div class="skills-header">
+                <h3>⚡ Core Skills</h3>
+                <div class="add-skill-input">
+                    <input type="text" id="newSkillInput" placeholder="e.g., Python, Leadership">
+                    <button class="btn btn-primary" id="addSkillBtn" style="padding:5px 14px;">+ Add</button>
+                </div>
+            </div>
+            <div id="skillsContainer" class="skills-tag-container"></div>
+        </div>
+
+        <!-- Address -->
+        <div class="address-area" style="margin-top: 22px;">
+            <h3>🏠 Residential Address</h3>
+            <textarea id="address" rows="2">42, Greenfield Apartments, Civil Lines, New Delhi - 110054</textarea>
+        </div>
+
+        <!-- Declaration -->
+        <div class="declaration">
+            <p><strong>📜 Declaration:</strong> I hereby declare that all the information provided here is true to the best of my knowledge.</p>
+        </div>
+
+        <!-- On-screen Signature Section -->
+        <div class="signature-section">
+            <div class="sign-item">📌 Place: <strong id="placeDisplaySpan">New Delhi - 110054</strong></div>
+            <div class="sign-item">📅 Date: <strong id="dateDisplay"></strong></div>
+            <div class="sign-item">✍️ Signature: <span style="font-family: 'Segoe Script', cursive;">(Authorized Signature)</span></div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="btn btn-warning" id="resetBtn">⟳ Reset Form</button>
+            <button class="btn btn-primary" id="printBtn">🖨️ Print Bio-Data</button>
+            <button class="btn btn-primary" id="exportDocBtn">📎 Export as DOCX</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- PHOTO ----------
+    const photoPreviewBox = document.getElementById('photoPreviewBox');
+    const photoInput = document.getElementById('photoInput');
+    const photoPreviewImg = document.getElementById('uploadedPhotoImg');
+    const photoPlaceholderIcon = document.getElementById('photoPlaceholderIcon');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    
+    photoPreviewBox.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                photoPreviewImg.src = ev.target.result;
+                photoPreviewImg.style.display = 'block';
+                photoPlaceholderIcon.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    removePhotoBtn.addEventListener('click', () => {
+        photoPreviewImg.src = '';
+        photoPreviewImg.style.display = 'none';
+        photoPlaceholderIcon.style.display = 'flex';
+        photoInput.value = '';
+    });
+    function getPhotoHTML() {
+        if (photoPreviewImg.src && photoPreviewImg.style.display === 'block') 
+            return `<img src="${photoPreviewImg.src}" style="width:95px; height:105px; object-fit:cover; border-radius:10px;">`;
+        return `<div style="width:95px; height:105px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; border-radius:10px;">📷</div>`;
+    }
+
+    // ---------- SKILLS ----------
+    let skillsArray = [];
+    function renderSkills() {
+        const container = document.getElementById('skillsContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        if (skillsArray.length === 0) {
+            container.innerHTML = '<span style="font-size:12px; color:#94a3b8;">— No skills added —</span>';
+        } else {
+            skillsArray.forEach((skill, idx) => {
+                const tag = document.createElement('div');
+                tag.className = 'skill-tag';
+                tag.innerHTML = `${escapeHtml(skill)} <button data-idx="${idx}">✖</button>`;
+                tag.querySelector('button').addEventListener('click', () => {
+                    skillsArray.splice(idx, 1);
+                    renderSkills();
+                });
+                container.appendChild(tag);
+            });
+        }
+    }
+    document.getElementById('addSkillBtn')?.addEventListener('click', () => {
+        const inp = document.getElementById('newSkillInput');
+        const val = inp.value.trim();
+        if (val) { skillsArray.push(val); renderSkills(); inp.value = ''; }
+    });
+
+    // ---------- EDUCATION ----------
+    let eduRows = [];
+    function renderEduTable() {
+        const tbody = document.getElementById('eduTbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        if (eduRows.length === 0) eduRows = [
+            { qual: "School (10th)", institute: "Delhi Public School", board: "CBSE", year: "2011", marks: "88%" },
+            { qual: "College (12th)", institute: "Ryan International", board: "CBSE", year: "2013", marks: "85%" },
+            { qual: "Graduation", institute: "Delhi University", board: "Delhi University", year: "2017", marks: "78%" }
+        ];
+        eduRows.forEach((row, idx) => {
+            const tr = document.createElement('tr');
+            ['qual','institute','board','year','marks'].forEach(f => {
+                const td = document.createElement('td');
+                const inp = document.createElement('input');
+                inp.value = row[f];
+                inp.placeholder = f;
+                inp.style.fontSize = '12px';
+                inp.addEventListener('input', (e) => { row[f] = e.target.value; });
+                td.appendChild(inp);
+                tr.appendChild(td);
+            });
+            const tdAct = document.createElement('td');
+            const rm = document.createElement('button');
+            rm.textContent = '✖'; rm.style.cssText = 'background:#fee2e2; border:none; border-radius:30px; padding:3px 10px; cursor:pointer; font-size:12px;';
+            rm.onclick = () => { if (eduRows.length > 1) { eduRows.splice(idx,1); renderEduTable(); } else alert("Keep one row"); };
+            tdAct.appendChild(rm);
+            tr.appendChild(tdAct);
+            tbody.appendChild(tr);
+        });
+    }
+    function addEduRow() { eduRows.push({ qual:"", institute:"", board:"", year:"", marks:"" }); renderEduTable(); }
+    function removeLastEduRow() { if(eduRows.length>1) { eduRows.pop(); renderEduTable(); } else alert("Minimum one required"); }
+    
+    function updatePrintEduTable() {
+        const tbody = document.getElementById('printEduTbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        eduRows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${escapeHtml(row.qual)}</td>
+                <td>${escapeHtml(row.institute)}</td>
+                <td>${escapeHtml(row.board)}</td>
+                <td>${escapeHtml(row.year)}</td>
+                <td>${escapeHtml(row.marks)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    // ---------- EXPERIENCE ----------
+    let expRows = [];
+    function renderExpTable() {
+        const tbody = document.getElementById('expTbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        if (expRows.length === 0) expRows = [
+            { company: "Tech Solutions Inc.", position: "Software Developer", period: "2020 - 2023" },
+            { company: "Digital Innovate Ltd.", position: "Senior Associate", period: "2023 - Present" }
+        ];
+        expRows.forEach((row, idx) => {
+            const tr = document.createElement('tr');
+            const sn = document.createElement('td'); sn.innerText = idx+1; sn.style.fontWeight='bold';
+            const companyTd = document.createElement('td'); const compInp = document.createElement('input'); compInp.value = row.company; compInp.style.fontSize='12px'; compInp.addEventListener('input', (e) => { row.company = e.target.value; }); companyTd.appendChild(compInp);
+            const posTd = document.createElement('td'); const posInp = document.createElement('input'); posInp.value = row.position; posInp.style.fontSize='12px'; posInp.addEventListener('input', (e) => { row.position = e.target.value; }); posTd.appendChild(posInp);
+            const periodTd = document.createElement('td'); const perInp = document.createElement('input'); perInp.value = row.period; perInp.style.fontSize='12px'; perInp.addEventListener('input', (e) => { row.period = e.target.value; }); periodTd.appendChild(perInp);
+            const actTd = document.createElement('td'); const del = document.createElement('button'); del.textContent = '✖'; del.style.cssText = 'background:#fee2e2; border:none; border-radius:30px; padding:3px 10px; cursor:pointer;'; del.onclick = () => { if(expRows.length>1) { expRows.splice(idx,1); renderExpTable(); } else alert("Keep at least one"); };
+            actTd.appendChild(del);
+            tr.appendChild(sn); tr.appendChild(companyTd); tr.appendChild(posTd); tr.appendChild(periodTd); tr.appendChild(actTd);
+            tbody.appendChild(tr);
+        });
+    }
+    function addExpRow() { expRows.push({ company: "", position: "", period: "" }); renderExpTable(); }
+    function removeLastExpRow() { if(expRows.length>1) { expRows.pop(); renderExpTable(); } else alert("Minimum one entry"); }
+    
+    function updatePrintExpTable() {
+        const container = document.getElementById('printExpContainer');
+        const tbody = document.getElementById('printExpTbody');
+        if (!container || !tbody) return;
+        tbody.innerHTML = '';
+        const hasData = expRows.some(r => r.company.trim() !== "" || r.position.trim() !== "" || r.period.trim() !== "");
+        if (hasData) {
+            container.style.display = 'block';
+            expRows.forEach((row, idx) => {
+                if (row.company.trim() || row.position.trim() || row.period.trim()) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${idx+1}</td><td>${escapeHtml(row.company)}</td><td>${escapeHtml(row.position)}</td><td>${escapeHtml(row.period)}</td>`;
+                    tbody.appendChild(tr);
+                }
+            });
+        } else {
+            container.style.display = 'none';
+        }
+    }
+    
+    function updatePrintSkills() {
+        const skillsDiv = document.getElementById('printSkillsDiv');
+        const skillsList = document.getElementById('printSkillsList');
+        if (!skillsDiv || !skillsList) return;
+        if (skillsArray.length > 0) {
+            skillsDiv.style.display = 'block';
+            skillsList.innerHTML = `<div style="display:flex; flex-wrap:wrap; gap:8px; margin:10px 0;">${skillsArray.map(s => `<span style="background:#eef2ff; padding:5px 15px; border-radius:30px;">${escapeHtml(s)}</span>`).join('')}</div>`;
+        } else {
+            skillsDiv.style.display = 'none';
+        }
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); }
+    function getCurrentDate() { const d = new Date(); return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`; }
+    
+    function updatePrintDisplay() {
+        document.getElementById('printName').innerText = document.getElementById('fullName').value || '_____';
+        document.getElementById('printFather').innerText = document.getElementById('fatherName').value || '_____';
+        document.getElementById('printDob').innerText = document.getElementById('dob').value || '_____';
+        document.getElementById('printGender').innerText = document.getElementById('gender').value;
+        document.getElementById('printMarital').innerText = document.getElementById('maritalStatus').value;
+        document.getElementById('printReligion').innerText = document.getElementById('religion').value || '_____';
+        document.getElementById('printLanguages').innerText = document.getElementById('languages').value || '_____';
+        document.getElementById('printNationality').innerText = document.getElementById('nationality').value || '_____';
+        document.getElementById('printEmail').innerText = document.getElementById('email').value || '_____';
+        document.getElementById('printMobile').innerText = document.getElementById('mobile').value || '_____';
+        document.getElementById('printAddress').innerText = document.getElementById('address').value || '_____';
+        
+        const placeVal = document.getElementById('placeInput').value.trim() || "New Delhi";
+        document.getElementById('placeDisplaySpan').innerText = placeVal;
+        document.getElementById('dateDisplay').innerText = getCurrentDate();
+        document.getElementById('printPlace').innerText = placeVal;
+        document.getElementById('printDate').innerText = getCurrentDate();
+        
+        updatePrintEduTable();
+        updatePrintExpTable();
+        updatePrintSkills();
+    }
+    
+    // SILENT PRINT - signature at bottom is already in print-data-display
+    function printDocument() {
+        updatePrintDisplay();
+        const photo = getPhotoHTML();
+        
+        // Get the print content from the hidden print-data-display
+        const printContentDiv = document.getElementById('printDataDisplay');
+        const printContentHtml = printContentDiv.innerHTML;
+        
+        const fullPrintHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head><title>BioData Print</title>
+            <style>
+                *{margin:0;padding:0;box-sizing:border-box;} 
+                body{font-family:'Segoe UI','Inter',sans-serif;margin:1cm;background:white;font-size:11pt;} 
+                .header{display:flex;justify-content:space-between;margin-bottom:15px;} 
+                .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 25px;margin:12px 0;}
+                .info-item{display:flex;border-bottom:1px dotted #aaa;padding:4px 0;} 
+                .info-label{font-weight:700;width:130px;} 
+                h3{font-size:14px;margin:14px 0 8px 0;border-left:3px solid #2563eb;padding-left:12px;} 
+                .print-table{width:100%;border-collapse:collapse;margin:8px 0;}
+                .print-table th,.print-table td{border:1px solid #222;padding:6px;text-align:left;}
+                .print-table th{background:#e9ecef;}
+                .decl{border-left:3px solid #eab308;padding-left:12px;margin:15px 0;}
+                .print-signature{display:flex;justify-content:space-between;margin-top:25px;padding-top:15px;border-top:1px dashed #aaa;}
+                @page{size:A4;margin:1cm;}
+            </style>
+            </head>
+            <body>
+            <div class="header">
+                <div><h1>BIO DATA</h1><p>Job Application</p></div>
+                <div>${photo}</div>
+            </div>
+            ${printContentHtml}
+            </body></html>
+        `;
+        
+        // Silent print using iframe
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+        const iframeDoc = iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(fullPrintHtml);
+        iframeDoc.close();
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+    }
+    
+    // Export DOCX
+    async function exportDocx() {
+        updatePrintDisplay();
+        const photo = getPhotoHTML();
+        const printContentDiv = document.getElementById('printDataDisplay');
+        const printContentHtml = printContentDiv.innerHTML;
+        
+        const fullDocxHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>BioData</title><style>
+            body{font-family:'Segoe UI',sans-serif;margin:1.2cm;} 
+            .header{display:flex;justify-content:space-between;margin-bottom:15px;}
+            .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 25px;margin:12px 0;}
+            .info-item{display:flex;border-bottom:1px dotted #aaa;padding:4px 0;} 
+            .info-label{font-weight:700;width:130px;} 
+            h3{font-size:14px;margin:14px 0 8px 0;border-left:3px solid #2563eb;padding-left:12px;} 
+            .print-table{width:100%;border-collapse:collapse;margin:8px 0;}
+            .print-table th,.print-table td{border:1px solid #000;padding:6px;text-align:left;}
+            .print-table th{background:#e9ecef;}
+            .decl{border-left:3px solid #eab308;padding-left:12px;margin:15px 0;}
+            .print-signature{display:flex;justify-content:space-between;margin-top:25px;padding-top:15px;border-top:1px dashed #aaa;}
+        </style></head><body>
+        <div class="header"><div><h1>BIO DATA</h1><p>Job Application</p></div><div>${photo}</div></div>
+        ${printContentHtml}
+        </body></html>`;
+        
+        const blob = await htmlDocx.asBlob(fullDocxHtml, { orientation: 'portrait' });
+        saveAs(blob, `BioData_${document.getElementById('fullName').value.trim()}.docx`);
+    }
+    
+    function resetAll() {
+        document.getElementById('fullName').value = "Rajesh Sharma";
+        document.getElementById('fatherName').value = "Amit Sharma";
+        document.getElementById('dob').value = "15/06/1995";
+        document.getElementById('gender').value = "Male";
+        document.getElementById('maritalStatus').value = "Single";
+        document.getElementById('religion').value = "Hindu";
+        document.getElementById('languages').value = "English, Hindi";
+        document.getElementById('nationality').value = "Indian";
+        document.getElementById('email').value = "rajesh.sharma@example.com";
+        document.getElementById('mobile').value = "+91 9876543210";
+        document.getElementById('address').value = "42, Greenfield Apartments, Civil Lines, New Delhi - 110054";
+        document.getElementById('placeInput').value = "New Delhi - 110054";
+        eduRows = [{ qual:"School (10th)", institute:"Delhi Public School", board:"CBSE", year:"2011", marks:"88%" }, { qual:"College (12th)", institute:"Ryan International", board:"CBSE", year:"2013", marks:"85%" }, { qual:"Graduation", institute:"Delhi University", board:"Delhi University", year:"2017", marks:"78%" }];
+        expRows = [{ company:"Tech Solutions Inc.", position:"Software Developer", period:"2020 - 2023" }, { company:"Digital Innovate Ltd.", position:"Senior Associate", period:"2023 - Present" }];
+        skillsArray = [];
+        renderSkills(); renderEduTable(); renderExpTable(); removePhotoBtn.click(); updatePrintDisplay();
+    }
+    
+    // Event listeners
+    document.getElementById('addEduRowBtn').addEventListener('click', addEduRow);
+    document.getElementById('removeLastEduBtn').addEventListener('click', removeLastEduRow);
+    document.getElementById('addExpRowBtn').addEventListener('click', addExpRow);
+    document.getElementById('removeLastExpBtn').addEventListener('click', removeLastExpRow);
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+    document.getElementById('printBtn').addEventListener('click', printDocument);
+    document.getElementById('exportDocBtn').addEventListener('click', exportDocx);
+    
+    const allInputs = ['fullName','fatherName','dob','gender','maritalStatus','religion','languages','nationality','email','mobile','address','placeInput'];
+    allInputs.forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', updatePrintDisplay); if(el && el.tagName==='SELECT') el.addEventListener('change', updatePrintDisplay); });
+    
+    // Initialize
+    eduRows = []; expRows = []; skillsArray = [];
+    renderEduTable(); renderExpTable(); renderSkills(); updatePrintDisplay();
+</script>
+</body>
+</html>
