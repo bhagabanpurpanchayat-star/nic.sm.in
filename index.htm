@@ -549,7 +549,7 @@ input:checked + .slider:before { transform: translateX(26px); }
 
   function isPageAllowed(pageName, session) {
     if (!session) {
-      const publicPages = ['home1', 'basicdetails', 'memberdetails', 'villages', 'mouja', 'tax', 'deathbirth', 'variousletter', 'secc', 'sirfinalroll2026', 'samabyathi', 'income', 'domicile'];
+      const publicPages = ['home1', 'basicdetails', 'memberdetails', 'villages', 'mouja', 'tax','biodata', 'deathbirth', 'variousletter', 'secc', 'sirfinalroll2026', 'samabyathi', 'income', 'domicile'];
       return publicPages.includes(pageName);
     }
     return true;
