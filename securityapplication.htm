@@ -573,12 +573,10 @@
         fullTableData = result.data || [];
         
         filteredRows = fullTableData.filter(row => {
-          let status = (row[10] || '').toLowerCase();
-          let unpaid = (status === 'unpaid' || status === '' || status === null);
-          let workOrder = row[15];
-          let hasWorkOrder = workOrder && workOrder.toString().trim() !== '';
-          return unpaid && hasWorkOrder;
-        });
+        let workOrder = row[15];
+       let hasWorkOrder = workOrder && workOrder.toString().trim() !== '';
+       return hasWorkOrder;  // Show all work orders regardless of payment status
+      });
 
         if (filteredRows.length === 0) {
           $('tableBody').innerHTML = `<tr><td colspan="8" class="empty-state">No unpaid entries with Work Order</td></tr>`;
