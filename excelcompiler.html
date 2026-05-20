@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Excel Merger · Master Sheet Compiler</title>
+    <!-- SheetJS (XLSX) core library for robust Excel parsing & writing -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #e9f0f5;
+            margin: 0;
+            padding: 32px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a4d2e, #0f3b23);
+            padding: 28px 32px;
+            color: white;
+        }
+
+        .hero h1 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            font-size: 1.9rem;
+            letter-spacing: -0.3px;
+        }
+
+        .hero p {
+            margin: 0;
+            opacity: 0.85;
+            font-size: 1rem;
+        }
+
+        .content-panel {
+            padding: 28px 32px 32px 32px;
+        }
+
+        .upload-zone {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            border: 2px dashed #b9d0e0;
+            padding: 28px 24px;
+            text-align: center;
+            transition: background 0.2s, border-color 0.2s;
+            margin-bottom: 32px;
+        }
+
+        .upload-zone.drag-over {
+            background: #eef4ff;
+            border-color: #2c7a4d;
+        }
+
+        .file-input-label {
+            background: #2c7a4d;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 60px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .file-input-label:hover {
+            background: #1e5a38;
+        }
+
+        .upload-hint {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: #4a627a;
+        }
+
+        .file-list-section {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            border: 1px solid #e2edf2;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e9edf2;
+            padding-bottom: 12px;
+        }
+
+        .section-title h3 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: #1b3b2a;
+        }
+
+        .badge {
+            background: #eef2f5;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2c5a6e;
+        }
+
+        .file-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 4px 2px;
+        }
+
+        .file-chip {
+            background: #f1f5f9;
+            border-radius: 48px;
+            padding: 6px 14px 6px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1e293b;
+            transition: all 0.1s;
+            border: 1px solid #dce5ec;
+        }
+
+        .file-chip span {
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #8b9bb0;
+            font-weight: bold;
+            padding: 0 4px;
+            border-radius: 40px;
+            transition: color 0.1s;
+        }
+
+        .remove-file:hover {
+            color: #c2412c;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: #1e5a38;
+            border: none;
+            padding: 12px 28px;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #0f4129;
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #eef2f8;
+            border: 1px solid #cbdde6;
+            padding: 12px 24px;
+            font-weight: 500;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2c5a4a;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e9f0;
+        }
+
+        .preview-area {
+            background: #fefefe;
+            border-radius: 1.25rem;
+            border: 1px solid #e2edf2;
+            overflow-x: auto;
+            margin-top: 18px;
+        }
+
+        .preview-header {
+            background: #f1f8f4;
+            padding: 12px 20px;
+            font-weight: 600;
+            border-bottom: 1px solid #dce9e2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        th {
+            background: #f9fbfd;
+            padding: 12px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #1c4e3a;
+            border-bottom: 2px solid #dde7e3;
+            position: sticky;
+            top: 0;
+            background-color: #f9fbfd;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef2f0;
+            color: #1e2f3a;
+        }
+
+        tr:hover td {
+            background-color: #fafef7;
+        }
+
+        .empty-state {
+            padding: 48px 20px;
+            text-align: center;
+            color: #7e95ab;
+            font-style: italic;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: #6f8faa;
+            text-align: center;
+            border-top: 1px solid #e6edf2;
+            padding-top: 20px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 660px) {
+            .content-panel {
+                padding: 20px;
+            }
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .file-chip span {
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="hero">
+        <h1>📎 Master Excel Compiler</h1>
+        <p>Combine multiple Excel files with identical headers into one master dataset</p>
+    </div>
+
+    <div class="content-panel">
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="dropZone">
+            <input type="file" id="fileInput" multiple accept=".xlsx, .xls, .csv, .xlsb, .xlsm" style="display: none;" />
+            <button class="file-input-label" id="uploadBtn">
+                📂  Select Excel files
+            </button>
+            <div class="upload-hint">
+                Supports .xlsx, .xls, .csv, .xlsm — each file must have the SAME header row order.
+            </div>
+            <div class="upload-hint" style="margin-top: 6px;">
+                Drag & drop files anywhere in this box
+            </div>
+        </div>
+
+        <!-- Active files list -->
+        <div class="file-list-section" id="fileListSection" style="display: none;">
+            <div class="section-title">
+                <h3>📄 Files to merge</h3>
+                <div class="badge" id="fileCountBadge">0 files</div>
+            </div>
+            <div class="file-grid" id="fileGridContainer"></div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="action-bar">
+            <button class="btn-secondary" id="clearAllBtn">🗑️ Clear all files</button>
+            <button class="btn-primary" id="mergeBtn">✨ Compile Master Excel</button>
+        </div>
+
+        <!-- Preview & Master header validation -->
+        <div class="preview-area" id="previewArea">
+            <div class="preview-header">
+                <span>📋 Master Preview (first rows after merge)</span>
+                <span style="font-size: 0.7rem;">Consistent header check performed</span>
+            </div>
+            <div id="previewTableContainer">
+                <div class="empty-state">⬆️ Upload Excel files and click "Compile Master Excel"</div>
+            </div>
+        </div>
+        <div class="footer-note">
+            ✔ All files must share the exact same header row (case-sensitive).<br>
+            The master file will contain the header once, followed by all data rows from each file.
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- GLOBALS ----------
+    let fileObjects = [];   // each entry: { file, name, dataRows: [], headerValidated, headerColumns }
+    let masterHeader = null;    // array of column names from first valid file (or null)
+    let validationError = false;
+
+    // DOM elements
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const dropZone = document.getElementById('dropZone');
+    const fileListSection = document.getElementById('fileListSection');
+    const fileGridContainer = document.getElementById('fileGridContainer');
+    const fileCountBadge = document.getElementById('fileCountBadge');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const mergeBtn = document.getElementById('mergeBtn');
+    const previewTableContainer = document.getElementById('previewTableContainer');
+
+    // Helper: show/hide file list section
+    function updateFileListUI() {
+        if (fileObjects.length === 0) {
+            fileListSection.style.display = 'none';
+            masterHeader = null;
+            validationError = false;
+            // also clear preview to empty state
+            renderPreviewEmpty("No files loaded. Add Excel files to start.");
+            return;
+        }
+        fileListSection.style.display = 'block';
+        fileCountBadge.innerText = `${fileObjects.length} file${fileObjects.length !== 1 ? 's' : ''}`;
+        
+        // render chips
+        fileGridContainer.innerHTML = '';
+        fileObjects.forEach((item, idx) => {
+            const chip = document.createElement('div');
+            chip.className = 'file-chip';
+            const fileNameSpan = document.createElement('span');
+            fileNameSpan.title = item.name;
+            fileNameSpan.innerText = item.name;
+            const removeBtn = document.createElement('button');
+            removeBtn.innerText = '✕';
+            removeBtn.className = 'remove-file';
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFileAtIndex(idx);
+            });
+            chip.appendChild(fileNameSpan);
+            chip.appendChild(removeBtn);
+            fileGridContainer.appendChild(chip);
+        });
+        
+        // If we have at least one file, attempt to revalidate header consistency without full data parsing heavy?
+        // But we already parsed each file on add. Ensure masterHeader is consistent based on first file.
+        revalidateMasterHeaderConsistency();
+        // Show preview summary (first few rows among collected data)
+        renderPreviewFromCollectedData();
+    }
+
+    // Remove file by index
+    function removeFileAtIndex(index) {
+        fileObjects.splice(index, 1);
+        if (fileObjects.length === 0) {
+            masterHeader = null;
+            validationError = false;
+        } else {
+            // re-establish master header from first file if exists
+            const firstFile = fileObjects[0];
+            if (firstFile && firstFile.headerColumns && firstFile.headerColumns.length) {
+                masterHeader = [...firstFile.headerColumns];
+            } else {
+                masterHeader = null;
+            }
+            revalidateMasterHeaderConsistency();
+        }
+        updateFileListUI();
+        // also re-render preview
+        renderPreviewFromCollectedData();
+    }
+
+    // Revalidate that ALL loaded files have identical headers (compared to masterHeader)
+    function revalidateMasterHeaderConsistency() {
+        if (fileObjects.length === 0) {
+            masterHeader = null;
+            validationError = false;
+            return true;
+        }
+        // get first valid header
+        const firstItem = fileObjects[0];
+        if (!firstItem.headerColumns || firstItem.headerColumns.length === 0) {
+            masterHeader = null;
+            validationError = true;
+            return false;
+        }
+        const baseHeader = firstItem.headerColumns;
+        masterHeader = [...baseHeader];
+        let allMatch = true;
+        for (let i = 1; i < fileObjects.length; i++) {
+            const currHeader = fileObjects[i].headerColumns;
+            if (!currHeader || currHeader.length !== baseHeader.length) {
+                allMatch = false;
+                break;
+            }
+            for (let j = 0; j < baseHeader.length; j++) {
+                if (currHeader[j] !== baseHeader[j]) {
+                    allMatch = false;
+                    break;
+                }
+            }
+            if (!allMatch) break;
+        }
+        validationError = !allMatch;
+        if (validationError) {
+            // show warning inside preview
+            renderPreviewEmpty("⚠️ Header mismatch detected! All files must have identical header columns (order & names). Please remove inconsistent files.");
+        } else {
+            // if master header ok, ensure each file stores its data rows (already stored during parse)
+            // and show normal preview.
+        }
+        return !validationError;
+    }
+
+    // Parse Excel file asynchronously using SheetJS, returns promise with { rowsData, headerRow }
+    function parseExcelToRows(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array', cellDates: false, defval: "" });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                // convert sheet to JSON with header: 1 to get rows array, then we extract header from first row.
+                const rawRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+                if (!rawRows || rawRows.length === 0) {
+                    reject(new Error("File is empty"));
+                    return;
+                }
+                const headerRow = rawRows[0].map(cell => (cell === undefined || cell === null) ? "" : String(cell).trim());
+                if (headerRow.length === 0 || headerRow.every(h => h === "")) {
+                    reject(new Error("Header row missing or empty"));
+                    return;
+                }
+                const dataRows = [];
+                for (let i = 1; i < rawRows.length; i++) {
+                    const row = rawRows[i];
+                    if (row && row.length > 0 && row.some(cell => cell !== undefined && cell !== null && String(cell).trim() !== "")) {
+                        // map row to match header length: fill missing with empty string
+                        const normalizedRow = [];
+                        for (let hIdx = 0; hIdx < headerRow.length; hIdx++) {
+                            let val = (hIdx < row.length) ? row[hIdx] : "";
+                            if (val === undefined || val === null) val = "";
+                            if (typeof val === 'object' && val instanceof Date) val = val.toLocaleString();
+                            else val = String(val).trim();
+                            normalizedRow.push(val);
+                        }
+                        dataRows.push(normalizedRow);
+                    }
+                }
+                resolve({ rowsData: dataRows, headerColumns: headerRow });
+            };
+            reader.onerror = () => reject(new Error("File read error"));
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    // Add file(s): parse and store in fileObjects
+    async function addFiles(files) {
+        const fileArray = Array.from(files);
+        if (fileArray.length === 0) return;
+        
+        // show loading indicator on merge btn? not needed, but process sequentially
+        mergeBtn.disabled = true;
+        mergeBtn.textContent = "⏳ Parsing files...";
+        
+        let addedCount = 0;
+        for (const file of fileArray) {
+            // avoid duplicate by name+size? simple approach: check if already exists by name (optional)
+            const alreadyExists = fileObjects.some(ex => ex.name === file.name && ex.file.size === file.size);
+            if (alreadyExists) {
+                console.warn(`File ${file.name} already added, skipped`);
+                continue;
+            }
+            try {
+                const { rowsData, headerColumns } = await parseExcelToRows(file);
+                if (!rowsData || rowsData.length === 0) {
+                    alert(`⚠️ "${file.name}" contains no data rows (only header or empty). File will be skipped.`);
+                    continue;
+                }
+                const newFileObj = {
+                    file: file,
+                    name: file.name,
+                    dataRows: rowsData,
+                    headerColumns: headerColumns,
+                };
+                fileObjects.push(newFileObj);
+                addedCount++;
+            } catch (err) {
+                console.error(err);
+                alert(`Failed to parse ${file.name}: ${err.message}`);
+            }
+        }
+        
+        mergeBtn.disabled = false;
+        mergeBtn.textContent = "✨ Compile Master Excel";
+        
+        if (addedCount > 0) {
+            // After adding new files, update masterHeader based on first file
+            if (fileObjects.length > 0 && !masterHeader) {
+                masterHeader = [...fileObjects[0].headerColumns];
+            }
+            revalidateMasterHeaderConsistency();
+            updateFileListUI();
+            renderPreviewFromCollectedData();
+        } else if (addedCount === 0 && fileArray.length > 0) {
+            alert("No valid files with data were added. Check format or content.");
+        }
+    }
+
+    // remove all files
+    function clearAllFiles() {
+        if (fileObjects.length > 0 && confirm("Clear all loaded files? Progress will be lost.")) {
+            fileObjects = [];
+            masterHeader = null;
+            validationError = false;
+            updateFileListUI();
+            renderPreviewEmpty("No files loaded. Add Excel files to start merging.");
+        }
+    }
+
+    // Render preview: combines all data rows from all files respecting master header, show first 12 rows
+    function renderPreviewFromCollectedData() {
+        if (fileObjects.length === 0) {
+            renderPreviewEmpty("📂 No Excel files loaded. Use 'Select Excel files' to begin.");
+            return;
+        }
+        if (validationError) {
+            renderPreviewEmpty("⚠️ Header mismatch between files. Please remove files with different column structure (order or names).");
+            return;
+        }
+        if (!masterHeader || masterHeader.length === 0) {
+            renderPreviewEmpty("❌ Invalid header state. Try re-adding files with consistent headers.");
+            return;
+        }
+        
+        // gather all data rows from all files, but only if header matches
+        let allRows = [];
+        for (const fObj of fileObjects) {
+            // safety: if header columns do not exactly match masterHeader length? but we validated earlier.
+            if (fObj.headerColumns && arraysEqual(fObj.headerColumns, masterHeader)) {
+                allRows.push(...fObj.dataRows);
+            } else {
+                // fallback: attempt to align rows? but will skip due to validation
+                console.warn(`File ${fObj.name} header mismatch, skipped from preview`);
+            }
+        }
+        
+        if (allRows.length === 0) {
+            renderPreviewEmpty("No data rows found after validation. Files might be empty or mismatched.");
+            return;
+        }
+        
+        // Build table preview (max 12 rows + indication)
+        const previewRows = allRows.slice(0, 12);
+        const hasMore = allRows.length > 12;
+        
+        let html = '<div style="overflow-x: auto;"><table><thead><tr>';
+        for (let col of masterHeader) {
+            html += `<th>${escapeHtml(col) || '—'}</th>`;
+        }
+        html += '</tr></thead><tbody>';
+        for (let row of previewRows) {
+            html += '<tr>';
+            for (let i = 0; i < masterHeader.length; i++) {
+                let cellValue = (i < row.length) ? row[i] : '';
+                if (cellValue === undefined || cellValue === null) cellValue = '';
+                html += `<td title="${escapeHtml(String(cellValue).substring(0, 80))}">${escapeHtml(truncate(String(cellValue), 45))}</td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        if (hasMore) {
+            html += `<div style="padding: 12px 16px; background: #fafcf9; font-size: 0.75rem; border-top: 1px solid #e2ede5;">+ ${allRows.length - 12} more rows (full export will include all ${allRows.length} rows)</div>`;
+        }
+        html += '</div>';
+        previewTableContainer.innerHTML = html;
+    }
+    
+    function renderPreviewEmpty(message) {
+        previewTableContainer.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+    }
+    
+    // Compile master Excel and download
+    function compileMasterExcel() {
+        if (fileObjects.length === 0) {
+            alert("No Excel files loaded. Please upload at least one file.");
+            return;
+        }
+        if (validationError) {
+            alert("Cannot compile master file: header mismatch among files. Make sure every Excel file has the same header order and column names.");
+            return;
+        }
+        if (!masterHeader || masterHeader.length === 0) {
+            alert("Header could not be determined. Please ensure files have a valid header row.");
+            return;
+        }
+        
+        // Build final dataset: first row = masterHeader, then all data rows from each file (validated)
+        const finalData = [masterHeader];
+        let totalRowsAdded = 0;
+        for (const fObj of fileObjects) {
+            if (arraysEqual(fObj.headerColumns, masterHeader)) {
+                for (const row of fObj.dataRows) {
+                    // ensure row length matches masterHeader length (fill missing with empty)
+                    const cleanRow = [];
+                    for (let i = 0; i < masterHeader.length; i++) {
+                        let val = (i < row.length) ? row[i] : "";
+                        if (val === undefined || val === null) val = "";
+                        cleanRow.push(val);
+                    }
+                    finalData.push(cleanRow);
+                    totalRowsAdded++;
+                }
+            } else {
+                console.warn(`Skipping ${fObj.name} due to header mismatch at compile time`);
+            }
+        }
+        
+        if (finalData.length <= 1) {
+            alert("No data rows found in any file after validation. Master would be empty.");
+            return;
+        }
+        
+        // Create worksheet and workbook
+        const ws = XLSX.utils.aoa_to_sheet(finalData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Master_Compiled");
+        
+        // Generate Excel file and trigger download
+        const fileName = `Master_Compiled_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        
+        // optional: small success hint
+        alert(`✅ Master file compiled! ${totalRowsAdded} rows exported from ${fileObjects.length} file(s).`);
+    }
+    
+    // helper utilities
+    function arraysEqual(a, b) {
+        if (!a || !b) return false;
+        if (a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    function truncate(str, len) {
+        if (str.length <= len) return str;
+        return str.slice(0, len) + '…';
+    }
+    
+    // Drag & Drop handlers
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', (e) => {
+        dropZone.classList.remove('drag-over');
+    });
+    dropZone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const items = e.dataTransfer.files;
+        if (items && items.length) {
+            await addFiles(items);
+        }
+    });
+    
+    uploadBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+    fileInput.addEventListener('change', async (e) => {
+        if (e.target.files.length) {
+            await addFiles(e.target.files);
+            fileInput.value = ''; // allow re-upload same files
+        }
+    });
+    clearAllBtn.addEventListener('click', clearAllFiles);
+    mergeBtn.addEventListener('click', compileMasterExcel);
+    
+    // initial empty state rendering
+    renderPreviewEmpty("⬆️ Upload Excel files and click 'Compile Master Excel'");
+</script>
+</body>
+</html>
