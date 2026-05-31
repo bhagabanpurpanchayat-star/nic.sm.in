@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Electoral Matcher Pro | Exact & Partial Match Intelligence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
+            padding: 30px 24px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3a5f, #2c7da0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-pro {
+            background: #1e466e;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+
+        .subtitle {
+            color: #2c3e66;
+            margin-top: 12px;
+            font-size: 0.95rem;
+            border-left: 4px solid #2c7da0;
+            padding-left: 18px;
+            background: rgba(44, 125, 160, 0.05);
+            border-radius: 0 12px 12px 0;
+            line-height: 1.4;
+        }
+
+        /* Template Buttons Row */
+        .template-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+            justify-content: flex-end;
+        }
+
+        .template-btn {
+            background: white;
+            border: 1px solid #cbdde9;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #1e466e;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .template-btn:hover {
+            background: #eef3fc;
+            border-color: #2c7da0;
+            transform: translateY(-1px);
+        }
+
+        /* Upload Cards */
+        .upload-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 300px;
+            padding: 24px 28px;
+            transition: transform 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0f2b3f;
+        }
+
+        .card-desc {
+            font-size: 0.75rem;
+            color: #5b7a9a;
+            margin-bottom: 18px;
+            border-bottom: 1px dashed #cbdde9;
+            padding-bottom: 12px;
+        }
+
+        .file-label {
+            background: #f9fcff;
+            border: 2px dashed #9bb7d0;
+            border-radius: 24px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin: 12px 0 8px;
+        }
+
+        .file-label:hover {
+            background: #eef4fc;
+            border-color: #2c7da0;
+            border-style: solid;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-status {
+            font-size: 0.8rem;
+            padding: 10px 0 4px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .validation-error {
+            color: #c62828;
+            background: #ffebee;
+            padding: 8px 12px;
+            border-radius: 28px;
+            font-size: 0.75rem;
+            margin-top: 10px;
+        }
+
+        /* Action Button */
+        .action-wrapper {
+            text-align: center;
+            margin: 20px 0 28px;
+        }
+
+        .btn-match {
+            background: linear-gradient(95deg, #1e466e, #1f6390);
+            border: none;
+            padding: 14px 42px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 6px 14px rgba(30, 70, 110, 0.3);
+            transition: all 0.2s;
+            min-width: 280px;
+        }
+
+        .btn-match:hover:not(:disabled) {
+            transform: scale(1.02);
+            background: linear-gradient(95deg, #123453, #175171);
+        }
+
+        .btn-match:disabled {
+            background: #b0c4de;
+            cursor: not-allowed;
+        }
+
+        /* Results Table */
+        .results-area {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            margin-top: 30px;
+        }
+
+        .results-header {
+            padding: 18px 28px;
+            background: #fafdff;
+            border-bottom: 1px solid #e9edf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .results-header h3 {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #1e3a5f;
+        }
+
+        .match-stats {
+            background: #eef2fa;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .export-btn {
+            background: #2c7da0;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 580px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 1100px;
+        }
+
+        th {
+            background: #eef3fc;
+            padding: 14px 12px;
+            font-weight: 700;
+            color: #1e3a5f;
+            border-bottom: 2px solid #cfe0ed;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #ecf3f8;
+        }
+
+        tr:hover td {
+            background-color: #f8fbfe;
+        }
+
+        /* Match Type Styles */
+        .exact-match-row {
+            background-color: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .exact-match-row td:first-child {
+            border-left: 4px solid #2e7d32;
+        }
+
+        .partial-match-row {
+            background-color: #fff8e1;
+            border-left: 4px solid #ff8f00;
+        }
+
+        .match-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-exact {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .badge-partial {
+            background: #ff8f00;
+            color: white;
+        }
+
+        .info-message {
+            background: #f1f6fd;
+            padding: 28px;
+            border-radius: 32px;
+            text-align: center;
+            color: #2b4f6e;
+            margin-top: 24px;
+        }
+
+        footer {
+            margin-top: 48px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5d7f9e;
+            padding: 12px;
+        }
+
+        @media (max-width: 780px) {
+            body { padding: 20px 16px; }
+            th, td { font-size: 0.7rem; padding: 8px 6px; }
+        }
+    </style>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 BBG VS ELECTOR MATCHING Tool <span class="badge-pro">Exact + Partial Intelligence</span></h1>
+        <div class="subtitle">
+            🔍 <strong>Exact Match:</strong> Full word match (case-insensitive) on both Voter Name ↔ Beneficiary Name AND Guardian ↔ Father/Husband.<br>
+            🟡 <strong>Partial Match (3-letter):</strong> First 3 characters match on both pairs. Results show Match Type column.<br>
+            ⚡ <strong>Header Validation:</strong> Files with incorrect headers will be rejected to prevent wrong results.
+        </div>
+    </div>
+
+    <!-- Template Download Row -->
+    <div class="template-row">
+        <button id="downloadSirTemplate" class="template-btn">📥 Download SIR Template (Excel)</button>
+        <button id="downloadBbgTemplate" class="template-btn">📥 Download BBG Template (Excel)</button>
+    </div>
+
+    <div class="upload-grid">
+        <!-- SIR CARD -->
+        <div class="card">
+            <h2>📋 1. SIR DATA</h2>
+            <div class="card-desc">Required headers: <strong>Part No., Epic No., Sl, Voter Name, Guardian, Relationship, House No., Age, Gender</strong></div>
+            <label class="file-label">
+                📂 Upload Excel / CSV
+                <input type="file" id="sirFile" accept=".xlsx, .xls, .csv">
+            </label>
+            <div id="sirStatus" class="file-status">📎 No file selected</div>
+            <div id="sirValidation" class="validation-error" style="display: none;"></div>
+        </div>
+
+        <!-- BBG CARD -->
+        <div class="card">
+            <h2>🏡 2. BBG DATA</h2>
+            <div class="card-desc">Required headers: <strong>AwaasPlus Id, Village Name, Beneficiary Name, Father's/Husband's Name</strong></div>
+            <label class="file-label">
+                📂 Upload Excel / CSV
+                <input type="file" id="bbgFile" accept=".xlsx, .xls, .csv">
+            </label>
+            <div id="bbgStatus" class="file-status">📎 No file selected</div>
+            <div id="bbgValidation" class="validation-error" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="action-wrapper">
+        <button id="matchBtn" class="btn-match" disabled>🔗 RUN MATCHING (EXACT + PARTIAL)</button>
+    </div>
+
+    <!-- RESULTS SECTION -->
+    <div class="results-area" id="resultsPanel" style="display: none;">
+        <div class="results-header">
+            <h3>📌 Matched Records <span id="matchCountSpan" class="match-stats">0 matches</span></h3>
+            <button id="exportResultsBtn" class="export-btn">⬇️ Export to Excel</button>
+        </div>
+        <div class="table-wrapper">
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Part No.</th><th>Epic No.</th><th>Sl</th><th>Voter Name</th><th>Guardian</th>
+                        <th>Probable Matching IDS</th><th>Village Name</th><th>Beneficiary Name</th><th>Father's/Husband's Name</th>
+                        <th>Match Type</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="noMatchMessage" class="info-message" style="display: none;">✨ No matching records found. Upload valid files with correct headers.</div>
+    <footer>✅ Header validation active: Only files with exact required columns can be uploaded. Exact = full word match (case-insensitive). Partial = first 3 letters match.</footer>
+</div>
+
+<script>
+    // ---------- REQUIRED HEADERS ----------
+    const SIR_REQUIRED_HEADERS = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Relationship', 'House No.', 'Age', 'Gender'];
+    const BBG_REQUIRED_HEADERS = ['AwaasPlus Id', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name"];
+
+    let sirDataRaw = [];
+    let bbgDataRaw = [];
+    let matchedCombinedRows = [];
+
+    // DOM Elements
+    const sirInput = document.getElementById('sirFile');
+    const bbgInput = document.getElementById('bbgFile');
+    const sirStatus = document.getElementById('sirStatus');
+    const bbgStatus = document.getElementById('bbgStatus');
+    const sirValidation = document.getElementById('sirValidation');
+    const bbgValidation = document.getElementById('bbgValidation');
+    const matchBtn = document.getElementById('matchBtn');
+    const resultsPanel = document.getElementById('resultsPanel');
+    const noMatchMessage = document.getElementById('noMatchMessage');
+    const resultsBody = document.getElementById('resultsBody');
+    const exportBtn = document.getElementById('exportResultsBtn');
+    const matchCountSpan = document.getElementById('matchCountSpan');
+
+    // Helper: get first 3 letters
+    function getFirstThree(str) {
+        if (!str || typeof str !== 'string') return '';
+        const cleaned = str.trim().toLowerCase();
+        return cleaned.substring(0, 3);
+    }
+
+    // Helper: full word exact match (case-insensitive, trimmed)
+    function fullWordMatch(str1, str2) {
+        if (!str1 || !str2) return false;
+        return str1.trim().toLowerCase() === str2.trim().toLowerCase();
+    }
+
+    // Matching logic: returns { matched: true, exactMatch: boolean, partialMatch: boolean, bbg: object }
+    function evaluateMatch(sirRow, bbgRow) {
+        const voterName = sirRow['Voter Name'] || '';
+        const guardian = sirRow['Guardian'] || '';
+        const benName = bbgRow['Beneficiary Name'] || '';
+        const fatherName = bbgRow["Father's/Husband's Name"] || '';
+
+        // Exact Match (full word both pairs)
+        const voterExact = fullWordMatch(voterName, benName);
+        const guardianExact = fullWordMatch(guardian, fatherName);
+        const isExact = (voterExact && guardianExact) && (voterName !== '' && guardianNameNotEmpty(guardian));
+
+        // Partial Match (first 3 letters both pairs)
+        const voterPartial = (getFirstThree(voterName) === getFirstThree(benName)) && getFirstThree(voterName) !== '';
+        const guardianPartial = (getFirstThree(guardian) === getFirstThree(fatherName)) && getFirstThree(guardian) !== '';
+        const isPartial = (voterPartial && guardianPartial) && !isExact;
+
+        function guardianNameNotEmpty(g) { return g !== undefined && g.trim() !== ''; }
+
+        if (isExact) return { matched: true, exactMatch: true, partialMatch: false, bbg: bbgRow };
+        if (isPartial) return { matched: true, exactMatch: false, partialMatch: true, bbg: bbgRow };
+        return { matched: false, exactMatch: false, partialMatch: false, bbg: null };
+    }
+
+    // Find best match from BBG list (prioritize exact, then partial)
+    function findBestMatchingBbg(sirRow, bbgList) {
+        let bestMatch = null;
+        let bestType = null; // 'exact' or 'partial'
+        
+        for (let bbg of bbgList) {
+            const result = evaluateMatch(sirRow, bbg);
+            if (result.matched) {
+                if (result.exactMatch) {
+                    return { bbg: result.bbg, exactMatch: true, partialMatch: false }; // exact is best, return immediately
+                } else if (result.partialMatch && bestType !== 'exact') {
+                    bestMatch = result.bbg;
+                    bestType = 'partial';
+                }
+            }
+        }
+        if (bestMatch) return { bbg: bestMatch, exactMatch: false, partialMatch: true };
+        return null;
+    }
+
+    // Perform matching across all SIR records
+    function performMatching() {
+        if (!sirDataRaw.length || !bbgDataRaw.length) return [];
+        const combined = [];
+        for (let sir of sirDataRaw) {
+            const matchResult = findBestMatchingBbg(sir, bbgDataRaw);
+            if (matchResult) {
+                const matchedBbg = matchResult.bbg;
+                const isExact = matchResult.exactMatch;
+                const isPartial = matchResult.partialMatch;
+                const awaasId = matchedBbg['AwaasPlus Id'] || '';
+                
+                combined.push({
+                    'Part No.': sir['Part No.'] || '',
+                    'Epic No.': sir['Epic No.'] || '',
+                    'Sl': sir['Sl'] || '',
+                    'Voter Name': sir['Voter Name'] || '',
+                    'Guardian': sir['Guardian'] || '',
+                    'Probable Matching IDS': awaasId,
+                    'Village Name': matchedBbg['Village Name'] || '',
+                    'Beneficiary Name': matchedBbg['Beneficiary Name'] || '',
+                    "Father's/Husband's Name": matchedBbg["Father's/Husband's Name"] || '',
+                    'Match Type': isExact ? '✅ Exact Match (Full Word)' : (isPartial ? '🟡 Partial Match (First 3 Letters)' : '')
+                });
+            }
+        }
+        return combined;
+    }
+
+    // Render table with row-level styling
+    function renderTable(rows) {
+        if (!rows.length) {
+            resultsPanel.style.display = 'none';
+            noMatchMessage.style.display = 'block';
+            return;
+        }
+        noMatchMessage.style.display = 'none';
+        resultsPanel.style.display = 'block';
+        matchCountSpan.innerText = `${rows.length} match${rows.length !== 1 ? 'es' : ''}`;
+        resultsBody.innerHTML = '';
+        
+        const displayCols = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Probable Matching IDS', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name", 'Match Type'];
+        
+        for (let row of rows) {
+            const tr = document.createElement('tr');
+            const matchType = row['Match Type'] || '';
+            if (matchType.includes('Exact')) {
+                tr.classList.add('exact-match-row');
+            } else if (matchType.includes('Partial')) {
+                tr.classList.add('partial-match-row');
+            }
+            
+            for (let col of displayCols) {
+                const td = document.createElement('td');
+                let val = row[col] !== undefined ? row[col] : '';
+                if (col === 'Probable Matching IDS' && val === '') val = '—';
+                td.textContent = val;
+                tr.appendChild(td);
+            }
+            resultsBody.appendChild(tr);
+        }
+    }
+
+    // Export to Excel (includes Match Type column)
+    function exportToExcel() {
+        if (!matchedCombinedRows.length) { alert("No data to export."); return; }
+        const exportColumns = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Probable Matching IDS', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name", 'Match Type'];
+        const sheetData = matchedCombinedRows.map(row => {
+            const newRow = {};
+            exportColumns.forEach(col => { newRow[col] = row[col] !== undefined ? row[col] : ''; });
+            return newRow;
+        });
+        const ws = XLSX.utils.json_to_sheet(sheetData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Matched_Data");
+        XLSX.writeFile(wb, `matched_electoral_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+    }
+
+    // ----- FILE VALIDATION & PARSING (Strict Header Check) -----
+    function readAndValidate(file, requiredHeaders, type) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array', defval: "" });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonRows = XLSX.utils.sheet_to_json(firstSheet, { defval: "", header: 1 });
+                if (!jsonRows.length) reject(new Error("File is empty"));
+                const headersRow = jsonRows[0];
+                if (!headersRow || headersRow.length === 0) reject(new Error("No headers found"));
+                const normalizedHeaders = headersRow.map(h => h ? String(h).trim() : '');
+                // check all required headers exist (case-sensitive match as per template)
+                const missing = requiredHeaders.filter(req => !normalizedHeaders.includes(req));
+                if (missing.length > 0) {
+                    reject(new Error(`Missing required columns: ${missing.join(', ')}`));
+                }
+                // convert to objects using first row as keys
+                const objects = [];
+                for (let i = 1; i < jsonRows.length; i++) {
+                    const row = jsonRows[i];
+                    if (!row || row.length === 0 || row.every(cell => cell === undefined || cell === '')) continue;
+                    const obj = {};
+                    normalizedHeaders.forEach((header, idx) => {
+                        obj[header] = (row[idx] !== undefined && row[idx] !== null) ? row[idx] : '';
+                    });
+                    objects.push(obj);
+                }
+                resolve(objects);
+            };
+            reader.onerror = (err) => reject(err);
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    async function loadSir(file) {
+        sirValidation.style.display = 'none';
+        try {
+            const rows = await readAndValidate(file, SIR_REQUIRED_HEADERS, 'sir');
+            sirDataRaw = rows;
+            sirStatus.innerHTML = `✅ Loaded ${sirDataRaw.length} SIR records (Headers valid)`;
+            sirStatus.style.color = "#166534";
+            updateMatchButton();
+        } catch(err) {
+            sirDataRaw = [];
+            sirStatus.innerHTML = `❌ Invalid file`;
+            sirStatus.style.color = "#b91c1c";
+            sirValidation.style.display = 'block';
+            sirValidation.innerHTML = `⚠️ ${err.message}. Please use template or ensure exact headers: ${SIR_REQUIRED_HEADERS.join(', ')}`;
+            updateMatchButton();
+        }
+    }
+
+    async function loadBbg(file) {
+        bbgValidation.style.display = 'none';
+        try {
+            const rows = await readAndValidate(file, BBG_REQUIRED_HEADERS, 'bbg');
+            bbgDataRaw = rows;
+            bbgStatus.innerHTML = `✅ Loaded ${bbgDataRaw.length} BBG records (Headers valid)`;
+            bbgStatus.style.color = "#166534";
+            updateMatchButton();
+        } catch(err) {
+            bbgDataRaw = [];
+            bbgStatus.innerHTML = `❌ Invalid file`;
+            bbgStatus.style.color = "#b91c1c";
+            bbgValidation.style.display = 'block';
+            bbgValidation.innerHTML = `⚠️ ${err.message}. Required headers: ${BBG_REQUIRED_HEADERS.join(', ')}`;
+            updateMatchButton();
+        }
+    }
+
+    function updateMatchButton() {
+        if (sirDataRaw.length > 0 && bbgDataRaw.length > 0) {
+            matchBtn.disabled = false;
+        } else {
+            matchBtn.disabled = true;
+        }
+    }
+
+    // ----- TEMPLATE DOWNLOAD -----
+    function downloadTemplate(headers, filename, exampleData = []) {
+        const sheetData = exampleData.length ? exampleData : [headers.reduce((obj, h) => { obj[h] = ''; return obj; }, {})];
+        const ws = XLSX.utils.json_to_sheet(sheetData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Template");
+        XLSX.writeFile(wb, filename);
+    }
+
+    function downloadSirTemplate() {
+        const example = {
+            'Part No.': '123',
+            'Epic No.': 'ABC1234567',
+            'Sl': '1',
+            'Voter Name': 'Rahul Sharma',
+            'Guardian': 'Rajesh Sharma',
+            'Relationship': 'Son',
+            'House No.': '45',
+            'Age': '32',
+            'Gender': 'Male'
+        };
+        downloadTemplate(SIR_REQUIRED_HEADERS, 'SIR_Template.xlsx', [example]);
+    }
+
+    function downloadBbgTemplate() {
+        const example = {
+            'AwaasPlus Id': 'AP2024001',
+            'Village Name': 'Sundarpur',
+            'Beneficiary Name': 'Rahul Sharma',
+            "Father's/Husband's Name": 'Rajesh Sharma'
+        };
+        downloadTemplate(BBG_REQUIRED_HEADERS, 'BBG_Template.xlsx', [example]);
+    }
+
+    // ----- EVENT LISTENERS -----
+    sirInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) loadSir(e.target.files[0]);
+        else { sirDataRaw = []; sirStatus.innerHTML = "📎 No file selected"; updateMatchButton(); }
+    });
+    bbgInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) loadBbg(e.target.files[0]);
+        else { bbgDataRaw = []; bbgStatus.innerHTML = "📎 No file selected"; updateMatchButton(); }
+    });
+    matchBtn.addEventListener('click', () => {
+        if (!sirDataRaw.length || !bbgDataRaw.length) { alert("Please upload valid SIR & BBG files."); return; }
+        matchedCombinedRows = performMatching();
+        renderTable(matchedCombinedRows);
+        if (!matchedCombinedRows.length) {
+            resultsPanel.style.display = 'none';
+            noMatchMessage.style.display = 'block';
+        } else {
+            resultsPanel.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+    exportBtn.addEventListener('click', exportToExcel);
+    document.getElementById('downloadSirTemplate').addEventListener('click', downloadSirTemplate);
+    document.getElementById('downloadBbgTemplate').addEventListener('click', downloadBbgTemplate);
+
+    function init() {
+        sirDataRaw = []; bbgDataRaw = []; matchedCombinedRows = [];
+        updateMatchButton();
+        resultsPanel.style.display = 'none';
+        noMatchMessage.style.display = 'block';
+    }
+    init();
+</script>
+</body>
+</html>
