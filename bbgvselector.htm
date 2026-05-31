@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Electoral Matcher Pro | Exact & Partial Match Intelligence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-shiba=yes">
+    <title>Electoral Matcher Pro | Dashboard + Charts</title>
     <style>
         * {
             margin: 0;
@@ -57,10 +57,9 @@
             padding-left: 18px;
             background: rgba(44, 125, 160, 0.05);
             border-radius: 0 12px 12px 0;
-            line-height: 1.4;
         }
 
-        /* Template Buttons Row */
+        /* Template Buttons */
         .template-row {
             display: flex;
             flex-wrap: wrap;
@@ -82,7 +81,6 @@
             align-items: center;
             gap: 8px;
             color: #1e466e;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .template-btn:hover {
@@ -107,7 +105,6 @@
             min-width: 300px;
             padding: 24px 28px;
             transition: transform 0.2s;
-            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .card h2 {
@@ -139,7 +136,6 @@
         .file-label:hover {
             background: #eef4fc;
             border-color: #2c7da0;
-            border-style: solid;
         }
 
         input[type="file"] {
@@ -148,12 +144,8 @@
 
         .file-status {
             font-size: 0.8rem;
-            padding: 10px 0 4px;
+            padding: 10px 0;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
         }
 
         .validation-error {
@@ -164,6 +156,95 @@
             font-size: 0.75rem;
             margin-top: 10px;
         }
+
+        /* Dashboard Section */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5b7a9a;
+            margin-bottom: 12px;
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #1e3a5f;
+        }
+
+        .stat-card.exact .stat-number { color: #2e7d32; }
+        .stat-card.partial .stat-number { color: #ff8f00; }
+        .stat-card.total .stat-number { color: #1e466e; }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 28px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .chart-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e3a5f;
+            border-left: 4px solid #2c7da0;
+            padding-left: 14px;
+        }
+
+        canvas {
+            max-height: 300px;
+            width: 100%;
+        }
+
+        .partwise-list {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .part-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 0.85rem;
+        }
+
+        .part-name {
+            font-weight: 600;
+            color: #2c3e66;
+        }
+
+        .part-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .part-exact { color: #2e7d32; font-weight: 600; }
+        .part-partial { color: #ff8f00; font-weight: 600; }
 
         /* Action Button */
         .action-wrapper {
@@ -187,7 +268,6 @@
 
         .btn-match:hover:not(:disabled) {
             transform: scale(1.02);
-            background: linear-gradient(95deg, #123453, #175171);
         }
 
         .btn-match:disabled {
@@ -215,20 +295,6 @@
             gap: 16px;
         }
 
-        .results-header h3 {
-            font-weight: 700;
-            font-size: 1.3rem;
-            color: #1e3a5f;
-        }
-
-        .match-stats {
-            background: #eef2fa;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
         .export-btn {
             background: #2c7da0;
             border: none;
@@ -237,54 +303,35 @@
             color: white;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
         }
 
         .table-wrapper {
             overflow-x: auto;
-            max-height: 580px;
+            max-height: 450px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             min-width: 1100px;
         }
 
         th {
             background: #eef3fc;
-            padding: 14px 12px;
+            padding: 12px 10px;
             font-weight: 700;
-            color: #1e3a5f;
-            border-bottom: 2px solid #cfe0ed;
             position: sticky;
             top: 0;
         }
 
         td {
-            padding: 12px 12px;
+            padding: 10px 10px;
             border-bottom: 1px solid #ecf3f8;
         }
 
-        tr:hover td {
-            background-color: #f8fbfe;
-        }
-
-        /* Match Type Styles */
-        .exact-match-row {
-            background-color: #e8f5e9;
-            border-left: 4px solid #2e7d32;
-        }
-
-        .exact-match-row td:first-child {
-            border-left: 4px solid #2e7d32;
-        }
-
-        .partial-match-row {
-            background-color: #fff8e1;
-            border-left: 4px solid #ff8f00;
-        }
+        .exact-match-row { background-color: #e8f5e9; }
+        .partial-match-row { background-color: #fff8e1; }
 
         .match-badge {
             display: inline-block;
@@ -294,22 +341,14 @@
             font-weight: 600;
         }
 
-        .badge-exact {
-            background: #2e7d32;
-            color: white;
-        }
-
-        .badge-partial {
-            background: #ff8f00;
-            color: white;
-        }
+        .badge-exact { background: #2e7d32; color: white; }
+        .badge-partial { background: #ff8f00; color: white; }
 
         .info-message {
             background: #f1f6fd;
             padding: 28px;
             border-radius: 32px;
             text-align: center;
-            color: #2b4f6e;
             margin-top: 24px;
         }
 
@@ -318,390 +357,373 @@
             text-align: center;
             font-size: 0.75rem;
             color: #5d7f9e;
-            padding: 12px;
         }
 
         @media (max-width: 780px) {
             body { padding: 20px 16px; }
-            th, td { font-size: 0.7rem; padding: 8px 6px; }
+            .chart-row { grid-template-columns: 1fr; }
         }
     </style>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>📊 BBG VS ELECTOR MATCHING Tool <span class="badge-pro">Exact + Partial Intelligence</span></h1>
-        <div class="subtitle">
-            🔍 <strong>Exact Match:</strong> Full word match (case-insensitive) on both Voter Name ↔ Beneficiary Name AND Guardian ↔ Father/Husband.<br>
-            🟡 <strong>Partial Match (3-letter):</strong> First 3 characters match on both pairs. Results show Match Type column.<br>
-            ⚡ <strong>Header Validation:</strong> Files with incorrect headers will be rejected to prevent wrong results.
-        </div>
+        <h1>📊 Electoral Matcher PRO <span class="badge-pro">Dashboard + Analytics</span></h1>
+        <div class="subtitle">🔍 Exact Match (Full Word) | 🟡 Partial Match (First 3 Letters) | 📊 Real-time Charts | Part-wise Distribution</div>
     </div>
 
-    <!-- Template Download Row -->
     <div class="template-row">
-        <button id="downloadSirTemplate" class="template-btn">📥 Download SIR Template (Excel)</button>
-        <button id="downloadBbgTemplate" class="template-btn">📥 Download BBG Template (Excel)</button>
+        <button id="downloadSirTemplate" class="template-btn">📥 SIR Template</button>
+        <button id="downloadBbgTemplate" class="template-btn">📥 BBG Template</button>
     </div>
 
     <div class="upload-grid">
-        <!-- SIR CARD -->
         <div class="card">
-            <h2>📋 1. SIR DATA</h2>
-            <div class="card-desc">Required headers: <strong>Part No., Epic No., Sl, Voter Name, Guardian, Relationship, House No., Age, Gender</strong></div>
+            <h2>📋 SIR DATA</h2>
+            <div class="card-desc">Headers: Part No., Epic No., Sl, Voter Name, Guardian, Relationship, House No., Age, Gender</div>
             <label class="file-label">
-                📂 Upload Excel / CSV
+                📂 Upload Excel
                 <input type="file" id="sirFile" accept=".xlsx, .xls, .csv">
             </label>
-            <div id="sirStatus" class="file-status">📎 No file selected</div>
-            <div id="sirValidation" class="validation-error" style="display: none;"></div>
+            <div id="sirStatus" class="file-status">📎 No file</div>
+            <div id="sirValidation" class="validation-error" style="display:none;"></div>
         </div>
-
-        <!-- BBG CARD -->
         <div class="card">
-            <h2>🏡 2. BBG DATA</h2>
-            <div class="card-desc">Required headers: <strong>AwaasPlus Id, Village Name, Beneficiary Name, Father's/Husband's Name</strong></div>
+            <h2>🏡 BBG DATA</h2>
+            <div class="card-desc">Headers: AwaasPlus Id, Village Name, Beneficiary Name, Father's/Husband's Name</div>
             <label class="file-label">
-                📂 Upload Excel / CSV
+                📂 Upload Excel
                 <input type="file" id="bbgFile" accept=".xlsx, .xls, .csv">
             </label>
-            <div id="bbgStatus" class="file-status">📎 No file selected</div>
-            <div id="bbgValidation" class="validation-error" style="display: none;"></div>
+            <div id="bbgStatus" class="file-status">📎 No file</div>
+            <div id="bbgValidation" class="validation-error" style="display:none;"></div>
         </div>
     </div>
 
     <div class="action-wrapper">
-        <button id="matchBtn" class="btn-match" disabled>🔗 RUN MATCHING (EXACT + PARTIAL)</button>
+        <button id="matchBtn" class="btn-match" disabled>🚀 RUN MATCHING & GENERATE DASHBOARD</button>
     </div>
 
-    <!-- RESULTS SECTION -->
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboardSection" style="display: none;">
+        <div class="dashboard">
+            <div class="stat-card total">
+                <h3>Total Matches</h3>
+                <div class="stat-number" id="totalMatches">0</div>
+            </div>
+            <div class="stat-card exact">
+                <h3>✅ Exact Matches (Full Word)</h3>
+                <div class="stat-number" id="exactMatches">0</div>
+            </div>
+            <div class="stat-card partial">
+                <h3>🟡 Partial Matches (3-Letter)</h3>
+                <div class="stat-number" id="partialMatches">0</div>
+            </div>
+        </div>
+
+        <div class="chart-row">
+            <div class="chart-card">
+                <h3>📈 Match Type Distribution</h3>
+                <canvas id="matchTypeChart" width="400" height="250"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📍 Part-Wise Match Count</h3>
+                <div id="partwiseList" class="partwise-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTS TABLE -->
     <div class="results-area" id="resultsPanel" style="display: none;">
         <div class="results-header">
-            <h3>📌 Matched Records <span id="matchCountSpan" class="match-stats">0 matches</span></h3>
+            <h3>📌 Detailed Matched Records</h3>
             <button id="exportResultsBtn" class="export-btn">⬇️ Export to Excel</button>
         </div>
         <div class="table-wrapper">
-            <table id="resultsTable">
-                <thead>
-                    <tr>
-                        <th>Part No.</th><th>Epic No.</th><th>Sl</th><th>Voter Name</th><th>Guardian</th>
-                        <th>Probable Matching IDS</th><th>Village Name</th><th>Beneficiary Name</th><th>Father's/Husband's Name</th>
-                        <th>Match Type</th>
-                    </tr>
-                </thead>
+            <table>
+                <thead><tr><th>Part No.</th><th>Epic No.</th><th>Sl</th><th>Voter Name</th><th>Guardian</th><th>Probable IDS</th><th>Village Name</th><th>Beneficiary Name</th><th>Father/Husband</th><th>Match Type</th></tr></thead>
                 <tbody id="resultsBody"></tbody>
             </table>
         </div>
     </div>
 
-    <div id="noMatchMessage" class="info-message" style="display: none;">✨ No matching records found. Upload valid files with correct headers.</div>
-    <footer>✅ Header validation active: Only files with exact required columns can be uploaded. Exact = full word match (case-insensitive). Partial = first 3 letters match.</footer>
+    <div id="noMatchMessage" class="info-message" style="display: none;">✨ No matches found. Upload valid files.</div>
+    <footer>📊 Dashboard updates automatically after matching. Part-wise count grouped by Part No. from SIR data.</footer>
 </div>
 
 <script>
-    // ---------- REQUIRED HEADERS ----------
-    const SIR_REQUIRED_HEADERS = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Relationship', 'House No.', 'Age', 'Gender'];
-    const BBG_REQUIRED_HEADERS = ['AwaasPlus Id', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name"];
+    const SIR_HEADERS = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Relationship', 'House No.', 'Age', 'Gender'];
+    const BBG_HEADERS = ['AwaasPlus Id', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name"];
 
-    let sirDataRaw = [];
-    let bbgDataRaw = [];
-    let matchedCombinedRows = [];
+    let sirData = [], bbgData = [], matchedRows = [];
+    let matchTypeChart = null;
 
-    // DOM Elements
-    const sirInput = document.getElementById('sirFile');
-    const bbgInput = document.getElementById('bbgFile');
-    const sirStatus = document.getElementById('sirStatus');
-    const bbgStatus = document.getElementById('bbgStatus');
-    const sirValidation = document.getElementById('sirValidation');
-    const bbgValidation = document.getElementById('bbgValidation');
-    const matchBtn = document.getElementById('matchBtn');
-    const resultsPanel = document.getElementById('resultsPanel');
-    const noMatchMessage = document.getElementById('noMatchMessage');
-    const resultsBody = document.getElementById('resultsBody');
-    const exportBtn = document.getElementById('exportResultsBtn');
-    const matchCountSpan = document.getElementById('matchCountSpan');
+    // Helper functions
+    function getFirstThree(str) { if (!str || typeof str !== 'string') return ''; return str.trim().toLowerCase().substring(0,3); }
+    function fullWordMatch(a,b) { if(!a||!b) return false; return a.trim().toLowerCase() === b.trim().toLowerCase(); }
 
-    // Helper: get first 3 letters
-    function getFirstThree(str) {
-        if (!str || typeof str !== 'string') return '';
-        const cleaned = str.trim().toLowerCase();
-        return cleaned.substring(0, 3);
+    function evaluateMatch(sir, bbg) {
+        const voter = sir['Voter Name'] || '', guardian = sir['Guardian'] || '';
+        const ben = bbg['Beneficiary Name'] || '', father = bbg["Father's/Husband's Name"] || '';
+        const exact = fullWordMatch(voter, ben) && fullWordMatch(guardian, father) && voter.trim() !== '' && guardian.trim() !== '';
+        if(exact) return { matched: true, type: 'exact', bbg };
+        const partial = (getFirstThree(voter) === getFirstThree(ben) && getFirstThree(voter) !== '') && 
+                        (getFirstThree(guardian) === getFirstThree(father) && getFirstThree(guardian) !== '');
+        if(partial) return { matched: true, type: 'partial', bbg };
+        return { matched: false };
     }
 
-    // Helper: full word exact match (case-insensitive, trimmed)
-    function fullWordMatch(str1, str2) {
-        if (!str1 || !str2) return false;
-        return str1.trim().toLowerCase() === str2.trim().toLowerCase();
-    }
-
-    // Matching logic: returns { matched: true, exactMatch: boolean, partialMatch: boolean, bbg: object }
-    function evaluateMatch(sirRow, bbgRow) {
-        const voterName = sirRow['Voter Name'] || '';
-        const guardian = sirRow['Guardian'] || '';
-        const benName = bbgRow['Beneficiary Name'] || '';
-        const fatherName = bbgRow["Father's/Husband's Name"] || '';
-
-        // Exact Match (full word both pairs)
-        const voterExact = fullWordMatch(voterName, benName);
-        const guardianExact = fullWordMatch(guardian, fatherName);
-        const isExact = (voterExact && guardianExact) && (voterName !== '' && guardianNameNotEmpty(guardian));
-
-        // Partial Match (first 3 letters both pairs)
-        const voterPartial = (getFirstThree(voterName) === getFirstThree(benName)) && getFirstThree(voterName) !== '';
-        const guardianPartial = (getFirstThree(guardian) === getFirstThree(fatherName)) && getFirstThree(guardian) !== '';
-        const isPartial = (voterPartial && guardianPartial) && !isExact;
-
-        function guardianNameNotEmpty(g) { return g !== undefined && g.trim() !== ''; }
-
-        if (isExact) return { matched: true, exactMatch: true, partialMatch: false, bbg: bbgRow };
-        if (isPartial) return { matched: true, exactMatch: false, partialMatch: true, bbg: bbgRow };
-        return { matched: false, exactMatch: false, partialMatch: false, bbg: null };
-    }
-
-    // Find best match from BBG list (prioritize exact, then partial)
-    function findBestMatchingBbg(sirRow, bbgList) {
-        let bestMatch = null;
-        let bestType = null; // 'exact' or 'partial'
-        
-        for (let bbg of bbgList) {
-            const result = evaluateMatch(sirRow, bbg);
-            if (result.matched) {
-                if (result.exactMatch) {
-                    return { bbg: result.bbg, exactMatch: true, partialMatch: false }; // exact is best, return immediately
-                } else if (result.partialMatch && bestType !== 'exact') {
-                    bestMatch = result.bbg;
-                    bestType = 'partial';
-                }
-            }
+    function findBestMatch(sir, bbgList) {
+        for(let bbg of bbgList) {
+            const result = evaluateMatch(sir, bbg);
+            if(result.matched && result.type === 'exact') return { bbg: result.bbg, type: 'exact' };
         }
-        if (bestMatch) return { bbg: bestMatch, exactMatch: false, partialMatch: true };
+        for(let bbg of bbgList) {
+            const result = evaluateMatch(sir, bbg);
+            if(result.matched && result.type === 'partial') return { bbg: result.bbg, type: 'partial' };
+        }
         return null;
     }
 
-    // Perform matching across all SIR records
     function performMatching() {
-        if (!sirDataRaw.length || !bbgDataRaw.length) return [];
-        const combined = [];
-        for (let sir of sirDataRaw) {
-            const matchResult = findBestMatchingBbg(sir, bbgDataRaw);
-            if (matchResult) {
-                const matchedBbg = matchResult.bbg;
-                const isExact = matchResult.exactMatch;
-                const isPartial = matchResult.partialMatch;
-                const awaasId = matchedBbg['AwaasPlus Id'] || '';
-                
-                combined.push({
+        const results = [];
+        for(let sir of sirData) {
+            const match = findBestMatch(sir, bbgData);
+            if(match) {
+                results.push({
                     'Part No.': sir['Part No.'] || '',
                     'Epic No.': sir['Epic No.'] || '',
                     'Sl': sir['Sl'] || '',
                     'Voter Name': sir['Voter Name'] || '',
                     'Guardian': sir['Guardian'] || '',
-                    'Probable Matching IDS': awaasId,
-                    'Village Name': matchedBbg['Village Name'] || '',
-                    'Beneficiary Name': matchedBbg['Beneficiary Name'] || '',
-                    "Father's/Husband's Name": matchedBbg["Father's/Husband's Name"] || '',
-                    'Match Type': isExact ? '✅ Exact Match (Full Word)' : (isPartial ? '🟡 Partial Match (First 3 Letters)' : '')
+                    'Probable Matching IDS': match.bbg['AwaasPlus Id'] || '',
+                    'Village Name': match.bbg['Village Name'] || '',
+                    'Beneficiary Name': match.bbg['Beneficiary Name'] || '',
+                    "Father's/Husband's Name": match.bbg["Father's/Husband's Name"] || '',
+                    'Match Type': match.type === 'exact' ? '✅ Exact Match' : '🟡 Partial Match',
+                    '_type': match.type,
+                    '_partNo': sir['Part No.'] || 'Unknown'
                 });
             }
         }
-        return combined;
+        return results;
     }
 
-    // Render table with row-level styling
-    function renderTable(rows) {
-        if (!rows.length) {
-            resultsPanel.style.display = 'none';
-            noMatchMessage.style.display = 'block';
-            return;
-        }
-        noMatchMessage.style.display = 'none';
-        resultsPanel.style.display = 'block';
-        matchCountSpan.innerText = `${rows.length} match${rows.length !== 1 ? 'es' : ''}`;
-        resultsBody.innerHTML = '';
-        
-        const displayCols = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Probable Matching IDS', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name", 'Match Type'];
-        
-        for (let row of rows) {
-            const tr = document.createElement('tr');
-            const matchType = row['Match Type'] || '';
-            if (matchType.includes('Exact')) {
-                tr.classList.add('exact-match-row');
-            } else if (matchType.includes('Partial')) {
-                tr.classList.add('partial-match-row');
+    // Dashboard & Charts
+    function updateDashboard(matches) {
+        const exactCount = matches.filter(m => m._type === 'exact').length;
+        const partialCount = matches.filter(m => m._type === 'partial').length;
+        document.getElementById('totalMatches').innerText = matches.length;
+        document.getElementById('exactMatches').innerText = exactCount;
+        document.getElementById('partialMatches').innerText = partialCount;
+
+        // Chart update
+        const ctx = document.getElementById('matchTypeChart').getContext('2d');
+        if(matchTypeChart) matchTypeChart.destroy();
+        matchTypeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Exact Matches (Full Word)', 'Partial Matches (First 3 Letters)'],
+                datasets: [{
+                    label: 'Number of Matches',
+                    data: [exactCount, partialCount],
+                    backgroundColor: ['#2e7d32', '#ff8f00'],
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'top' } }
             }
-            
-            for (let col of displayCols) {
+        });
+
+        // Part-wise count
+        const partMap = new Map();
+        for(let m of matches) {
+            const part = m._partNo || 'Unknown';
+            if(!partMap.has(part)) partMap.set(part, { exact: 0, partial: 0, total: 0 });
+            const stat = partMap.get(part);
+            if(m._type === 'exact') stat.exact++;
+            else stat.partial++;
+            stat.total++;
+            partMap.set(part, stat);
+        }
+        const partwiseDiv = document.getElementById('partwiseList');
+        partwiseDiv.innerHTML = '';
+        if(partMap.size === 0) { partwiseDiv.innerHTML = '<div class="part-item">No data</div>'; return; }
+        const sortedParts = Array.from(partMap.keys()).sort();
+        for(let part of sortedParts) {
+            const stat = partMap.get(part);
+            const div = document.createElement('div');
+            div.className = 'part-item';
+            div.innerHTML = `<span class="part-name">Part ${part}</span>
+                            <div class="part-stats">
+                                <span class="part-exact">✅ ${stat.exact}</span>
+                                <span class="part-partial">🟡 ${stat.partial}</span>
+                                <span>📊 Total: ${stat.total}</span>
+                            </div>`;
+            partwiseDiv.appendChild(div);
+        }
+    }
+
+    function renderTable(matches) {
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = '';
+        for(let row of matches) {
+            const tr = document.createElement('tr');
+            if(row._type === 'exact') tr.classList.add('exact-match-row');
+            else tr.classList.add('partial-match-row');
+            const cols = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Probable Matching IDS', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name", 'Match Type'];
+            for(let col of cols) {
                 const td = document.createElement('td');
                 let val = row[col] !== undefined ? row[col] : '';
-                if (col === 'Probable Matching IDS' && val === '') val = '—';
+                if(col === 'Probable Matching IDS' && !val) val = '—';
                 td.textContent = val;
                 tr.appendChild(td);
             }
-            resultsBody.appendChild(tr);
+            tbody.appendChild(tr);
         }
     }
 
-    // Export to Excel (includes Match Type column)
-    function exportToExcel() {
-        if (!matchedCombinedRows.length) { alert("No data to export."); return; }
-        const exportColumns = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Probable Matching IDS', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name", 'Match Type'];
-        const sheetData = matchedCombinedRows.map(row => {
-            const newRow = {};
-            exportColumns.forEach(col => { newRow[col] = row[col] !== undefined ? row[col] : ''; });
-            return newRow;
-        });
-        const ws = XLSX.utils.json_to_sheet(sheetData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Matched_Data");
-        XLSX.writeFile(wb, `matched_electoral_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
-    }
-
-    // ----- FILE VALIDATION & PARSING (Strict Header Check) -----
-    function readAndValidate(file, requiredHeaders, type) {
+    // File validation and loading
+    function readAndValidate(file, requiredHeaders) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array', defval: "" });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonRows = XLSX.utils.sheet_to_json(firstSheet, { defval: "", header: 1 });
-                if (!jsonRows.length) reject(new Error("File is empty"));
-                const headersRow = jsonRows[0];
-                if (!headersRow || headersRow.length === 0) reject(new Error("No headers found"));
-                const normalizedHeaders = headersRow.map(h => h ? String(h).trim() : '');
-                // check all required headers exist (case-sensitive match as per template)
-                const missing = requiredHeaders.filter(req => !normalizedHeaders.includes(req));
-                if (missing.length > 0) {
-                    reject(new Error(`Missing required columns: ${missing.join(', ')}`));
-                }
-                // convert to objects using first row as keys
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                if(!json.length) reject(new Error("Empty file"));
+                const headers = json[0].map(h => h ? String(h).trim() : '');
+                const missing = requiredHeaders.filter(req => !headers.includes(req));
+                if(missing.length) reject(new Error(`Missing headers: ${missing.join(', ')}`));
                 const objects = [];
-                for (let i = 1; i < jsonRows.length; i++) {
-                    const row = jsonRows[i];
-                    if (!row || row.length === 0 || row.every(cell => cell === undefined || cell === '')) continue;
+                for(let i=1; i<json.length; i++) {
+                    const row = json[i];
+                    if(!row || row.every(cell => !cell && cell !== 0)) continue;
                     const obj = {};
-                    normalizedHeaders.forEach((header, idx) => {
-                        obj[header] = (row[idx] !== undefined && row[idx] !== null) ? row[idx] : '';
-                    });
+                    headers.forEach((h, idx) => { obj[h] = (row[idx] !== undefined && row[idx] !== null) ? row[idx] : ''; });
                     objects.push(obj);
                 }
                 resolve(objects);
             };
-            reader.onerror = (err) => reject(err);
+            reader.onerror = reject;
             reader.readAsArrayBuffer(file);
         });
     }
 
     async function loadSir(file) {
-        sirValidation.style.display = 'none';
+        document.getElementById('sirValidation').style.display = 'none';
         try {
-            const rows = await readAndValidate(file, SIR_REQUIRED_HEADERS, 'sir');
-            sirDataRaw = rows;
-            sirStatus.innerHTML = `✅ Loaded ${sirDataRaw.length} SIR records (Headers valid)`;
-            sirStatus.style.color = "#166534";
-            updateMatchButton();
+            const data = await readAndValidate(file, SIR_HEADERS);
+            sirData = data;
+            document.getElementById('sirStatus').innerHTML = `✅ ${sirData.length} records loaded`;
+            document.getElementById('sirStatus').style.color = "#166534";
+            enableMatchButton();
         } catch(err) {
-            sirDataRaw = [];
-            sirStatus.innerHTML = `❌ Invalid file`;
-            sirStatus.style.color = "#b91c1c";
-            sirValidation.style.display = 'block';
-            sirValidation.innerHTML = `⚠️ ${err.message}. Please use template or ensure exact headers: ${SIR_REQUIRED_HEADERS.join(', ')}`;
-            updateMatchButton();
+            sirData = [];
+            document.getElementById('sirStatus').innerHTML = `❌ Invalid`;
+            document.getElementById('sirStatus').style.color = "#b91c1c";
+            const valDiv = document.getElementById('sirValidation');
+            valDiv.style.display = 'block';
+            valDiv.innerHTML = `⚠️ ${err.message}. Use template: ${SIR_HEADERS.join(', ')}`;
+            enableMatchButton();
         }
     }
 
     async function loadBbg(file) {
-        bbgValidation.style.display = 'none';
+        document.getElementById('bbgValidation').style.display = 'none';
         try {
-            const rows = await readAndValidate(file, BBG_REQUIRED_HEADERS, 'bbg');
-            bbgDataRaw = rows;
-            bbgStatus.innerHTML = `✅ Loaded ${bbgDataRaw.length} BBG records (Headers valid)`;
-            bbgStatus.style.color = "#166534";
-            updateMatchButton();
+            const data = await readAndValidate(file, BBG_HEADERS);
+            bbgData = data;
+            document.getElementById('bbgStatus').innerHTML = `✅ ${bbgData.length} records loaded`;
+            document.getElementById('bbgStatus').style.color = "#166534";
+            enableMatchButton();
         } catch(err) {
-            bbgDataRaw = [];
-            bbgStatus.innerHTML = `❌ Invalid file`;
-            bbgStatus.style.color = "#b91c1c";
-            bbgValidation.style.display = 'block';
-            bbgValidation.innerHTML = `⚠️ ${err.message}. Required headers: ${BBG_REQUIRED_HEADERS.join(', ')}`;
-            updateMatchButton();
+            bbgData = [];
+            document.getElementById('bbgStatus').innerHTML = `❌ Invalid`;
+            document.getElementById('bbgStatus').style.color = "#b91c1c";
+            const valDiv = document.getElementById('bbgValidation');
+            valDiv.style.display = 'block';
+            valDiv.innerHTML = `⚠️ ${err.message}. Required: ${BBG_HEADERS.join(', ')}`;
+            enableMatchButton();
         }
     }
 
-    function updateMatchButton() {
-        if (sirDataRaw.length > 0 && bbgDataRaw.length > 0) {
-            matchBtn.disabled = false;
-        } else {
-            matchBtn.disabled = true;
-        }
+    function enableMatchButton() {
+        const btn = document.getElementById('matchBtn');
+        btn.disabled = !(sirData.length && bbgData.length);
     }
 
-    // ----- TEMPLATE DOWNLOAD -----
-    function downloadTemplate(headers, filename, exampleData = []) {
-        const sheetData = exampleData.length ? exampleData : [headers.reduce((obj, h) => { obj[h] = ''; return obj; }, {})];
+    // Export
+    function exportToExcel() {
+        if(!matchedRows.length) { alert("No data to export"); return; }
+        const exportCols = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'Guardian', 'Probable Matching IDS', 'Village Name', 'Beneficiary Name', "Father's/Husband's Name", 'Match Type'];
+        const sheetData = matchedRows.map(row => {
+            const obj = {};
+            exportCols.forEach(col => { obj[col] = row[col] !== undefined ? row[col] : ''; });
+            return obj;
+        });
         const ws = XLSX.utils.json_to_sheet(sheetData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Matched_Data");
+        XLSX.writeFile(wb, `matched_dashboard_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+    }
+
+    // Templates
+    function downloadTemplate(headers, filename, example) {
+        const ws = XLSX.utils.json_to_sheet([example]);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Template");
         XLSX.writeFile(wb, filename);
     }
 
-    function downloadSirTemplate() {
-        const example = {
-            'Part No.': '123',
-            'Epic No.': 'ABC1234567',
-            'Sl': '1',
-            'Voter Name': 'Rahul Sharma',
-            'Guardian': 'Rajesh Sharma',
-            'Relationship': 'Son',
-            'House No.': '45',
-            'Age': '32',
-            'Gender': 'Male'
-        };
-        downloadTemplate(SIR_REQUIRED_HEADERS, 'SIR_Template.xlsx', [example]);
+    function downloadSir() {
+        downloadTemplate(SIR_HEADERS, 'SIR_Template.xlsx', {
+            'Part No.': '101', 'Epic No.': 'EPIC123', 'Sl': '1', 'Voter Name': 'Rajesh Kumar', 
+            'Guardian': 'Suresh Kumar', 'Relationship': 'Son', 'House No.': 'A-12', 'Age': '35', 'Gender': 'Male'
+        });
+    }
+    function downloadBbg() {
+        downloadTemplate(BBG_HEADERS, 'BBG_Template.xlsx', {
+            'AwaasPlus Id': 'AP2024001', 'Village Name': 'Kisanpur', 'Beneficiary Name': 'Rajesh Kumar', 
+            "Father's/Husband's Name": 'Suresh Kumar'
+        });
     }
 
-    function downloadBbgTemplate() {
-        const example = {
-            'AwaasPlus Id': 'AP2024001',
-            'Village Name': 'Sundarpur',
-            'Beneficiary Name': 'Rahul Sharma',
-            "Father's/Husband's Name": 'Rajesh Sharma'
-        };
-        downloadTemplate(BBG_REQUIRED_HEADERS, 'BBG_Template.xlsx', [example]);
-    }
-
-    // ----- EVENT LISTENERS -----
-    sirInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) loadSir(e.target.files[0]);
-        else { sirDataRaw = []; sirStatus.innerHTML = "📎 No file selected"; updateMatchButton(); }
-    });
-    bbgInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) loadBbg(e.target.files[0]);
-        else { bbgDataRaw = []; bbgStatus.innerHTML = "📎 No file selected"; updateMatchButton(); }
-    });
-    matchBtn.addEventListener('click', () => {
-        if (!sirDataRaw.length || !bbgDataRaw.length) { alert("Please upload valid SIR & BBG files."); return; }
-        matchedCombinedRows = performMatching();
-        renderTable(matchedCombinedRows);
-        if (!matchedCombinedRows.length) {
+    // Event Listeners
+    document.getElementById('sirFile').addEventListener('change', (e) => { if(e.target.files[0]) loadSir(e.target.files[0]); else { sirData=[]; document.getElementById('sirStatus').innerHTML='📎 No file'; enableMatchButton(); } });
+    document.getElementById('bbgFile').addEventListener('change', (e) => { if(e.target.files[0]) loadBbg(e.target.files[0]); else { bbgData=[]; document.getElementById('bbgStatus').innerHTML='📎 No file'; enableMatchButton(); } });
+    document.getElementById('matchBtn').addEventListener('click', () => {
+        if(!sirData.length || !bbgData.length) { alert("Upload both files first"); return; }
+        matchedRows = performMatching();
+        const dashboardDiv = document.getElementById('dashboardSection');
+        const resultsPanel = document.getElementById('resultsPanel');
+        const noMatchDiv = document.getElementById('noMatchMessage');
+        if(matchedRows.length === 0) {
+            dashboardDiv.style.display = 'none';
             resultsPanel.style.display = 'none';
-            noMatchMessage.style.display = 'block';
+            noMatchDiv.style.display = 'block';
         } else {
-            resultsPanel.scrollIntoView({ behavior: 'smooth' });
+            dashboardDiv.style.display = 'block';
+            resultsPanel.style.display = 'block';
+            noMatchDiv.style.display = 'none';
+            updateDashboard(matchedRows);
+            renderTable(matchedRows);
         }
     });
-    exportBtn.addEventListener('click', exportToExcel);
-    document.getElementById('downloadSirTemplate').addEventListener('click', downloadSirTemplate);
-    document.getElementById('downloadBbgTemplate').addEventListener('click', downloadBbgTemplate);
+    document.getElementById('exportResultsBtn').addEventListener('click', exportToExcel);
+    document.getElementById('downloadSirTemplate').addEventListener('click', downloadSir);
+    document.getElementById('downloadBbgTemplate').addEventListener('click', downloadBbg);
 
-    function init() {
-        sirDataRaw = []; bbgDataRaw = []; matchedCombinedRows = [];
-        updateMatchButton();
-        resultsPanel.style.display = 'none';
-        noMatchMessage.style.display = 'block';
-    }
-    init();
+    // Initial state
+    document.getElementById('dashboardSection').style.display = 'none';
+    document.getElementById('resultsPanel').style.display = 'none';
+    document.getElementById('noMatchMessage').style.display = 'block';
 </script>
 </body>
 </html>
