@@ -2,373 +2,916 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Work Order Module</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Work Order Pro | Fixed Modal All Columns</title>
   <style>
-    html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; background: #2b2b2b; color: #eee; font-size: 12px; }
-    body { display: flex; flex-direction: column; }
-    h2 { color: #fff; font-size: 16px; margin: 10px; text-align: center; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 8px; }
-    .toolbar input { padding: 3px; border-radius: 4px; border: 1px solid #555; width: 200px; font-size: 12px; background: #3a3a3a; color: #eee; }
-    .toolbar button { padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left:4px; transition: background 0.2s; }
-    .toolbar button:hover { background: #218838; }
+    body {
+      background: linear-gradient(125deg, #f0f4f8 0%, #e2e9f0 100%);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      font-size: 13px;
+      color: #1a2c3e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-    .spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #b9c7d9; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    #message { margin: 0 10px 6px; padding: 6px; display: none; border-radius: 4px; font-weight: bold; text-align: center; font-size: 12px; }
-    #message.success { background: #28a745; color: white; }
-    #message.error { background: #dc3545; color: white; }
-    #message.loading { background: #007bff; color: white; }
+    .app-header {
+      background: linear-gradient(135deg, #0a1a2f 0%, #0c1e35 100%);
+      border-bottom: 1px solid #1e3a5f;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      position: relative;
+      z-index: 2;
+    }
+    .app-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.3px;
+      margin: 0;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .badge-light {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(4px);
+      padding: 5px 14px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #e0f0ff;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+    }
 
-    .table-container { flex: 1; overflow-y: auto; border: 1px solid #555; margin: 0 10px 10px; }
-    table { border-collapse: collapse; font-size: 12px; width: 100%; table-layout: auto; }
-    th, td { border: 1px solid #555; padding: 4px 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    thead th { position: sticky; top: 0; background: #003366; color: #fff; z-index: 2; }
+    .toolbar-modern {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 28px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      flex-wrap: wrap;
+      gap: 14px;
+      position: relative;
+      z-index: 2;
+    }
+    .search-wrapper {
+      position: relative;
+      min-width: 260px;
+    }
+    .search-wrapper input {
+      width: 100%;
+      padding: 9px 14px 9px 38px;
+      border-radius: 48px;
+      border: 1px solid #cbdde6;
+      background: rgba(255,255,255,0.95);
+      color: #1f3b4c;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .search-wrapper input:focus {
+      outline: none;
+      border-color: #5f9db2;
+      box-shadow: 0 0 0 3px rgba(79, 148, 170, 0.2);
+      background: white;
+    }
+    .search-wrapper::before {
+      content: "🔍";
+      position: absolute;
+      left: 15px;
+      top: 8px;
+      font-size: 14px;
+      opacity: 0.6;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      padding: 7px 18px;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #f0f4f9;
+      color: #1e4a62;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .btn-primary {
+      background: linear-gradient(105deg, #2c7a5e, #258f6e);
+      color: white;
+      box-shadow: 0 2px 6px rgba(36, 113, 87, 0.2);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(105deg, #2f8f6e, #2aa17c);
+      box-shadow: 0 4px 10px rgba(36, 113, 87, 0.25);
+    }
+    .btn-secondary {
+      background: #eef2f8;
+      border: 1px solid #cbdde2;
+      color: #2c647b;
+    }
+    .btn-secondary:hover {
+      background: #e3eaf1;
+      transform: translateY(-1px);
+    }
+    .btn-excel {
+      background: #1f7b4d20;
+      border: 1px solid #2c7a5e80;
+      color: #1f6e4a;
+    }
+    .btn-excel:hover {
+      background: #2c7a5e30;
+      transform: translateY(-1px);
+    }
 
-    /* Column width classes (adjusted for new Bid Amount) */
-    .col-timestamp { width: 120px; }
-    .col-unique { width: 100px; }
-    .col-nit { width: 80px; cursor:pointer; }
-    .col-sl { width: 40px; }
-    .col-nitdate { width: 90px; }
-    .col-vendor { width: 120px; }
-    .col-work { width: 150px; text-align: left; white-space: normal; }
-    .col-source { width: 120px; }
-    .col-wo-no { width: 80px; }
-    .col-wo-date { width: 90px; }
-    .col-estimate { width: 80px; }
-    .col-bid { width: 80px; }        /* New column */
-    .col-action { width: 70px; }
+    .toast-message {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: white;
+      border-radius: 40px;
+      padding: 10px 20px;
+      font-weight: 500;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      border-left: 5px solid;
+      backdrop-filter: blur(8px);
+      z-index: 1200;
+      font-size: 0.8rem;
+      animation: slideInLight 0.25s ease;
+    }
+    .toast-success { border-left-color: #2c9b6e; background: #f0fbf7; color: #1b5e42; }
+    .toast-error { border-left-color: #e26d5c; background: #fff6f4; color: #ac3e2e; }
+    .toast-loading { border-left-color: #e6a017; background: #fff9ef; color: #a86903; }
+    @keyframes slideInLight { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
 
-    tbody tr { transition: background-color 0.2s, transform 0.2s; }
-    tbody tr:hover { background-color: #444; transform: scale(1.01); }
+    .table-wrapper {
+      flex: 1;
+      margin: 0 20px 18px 20px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(2px);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(200, 212, 220, 0.6);
+      position: relative;
+      z-index: 2;
+    }
+    .table-scroll {
+      flex: 1;
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      min-width: 1300px;
+    }
+    th {
+      background: linear-gradient(135deg, #0a1a2f 0%, #0c1e35 100%);
+      color: white !important;
+      font-weight: 600;
+      padding: 14px 8px;
+      border-bottom: 2px solid #1e3a5f;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      font-size: 0.75rem;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px dotted #cbdce6;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      transition: background 0.15s ease;
+    }
+    tr:hover td {
+      background-color: #fdfeff;
+      border-bottom: 1px dotted #a0bed0;
+    }
+    input, input[readonly] {
+      background: #ffffff;
+      border: 1px solid #cfe0e8;
+      border-radius: 12px;
+      padding: 6px 8px;
+      color: #1f3b48;
+      font-size: 0.7rem;
+      width: 100%;
+      text-align: center;
+      transition: 0.15s;
+      font-weight: 500;
+    }
+    input:focus {
+      outline: none;
+      border-color: #6ba5bd;
+      box-shadow: 0 0 0 2px rgba(83, 146, 170, 0.2);
+    }
+    input[readonly] {
+      background: #f3f9fe;
+      border-color: #d9e5ed;
+      color: #3a6e87;
+      font-weight: normal;
+    }
+    .nit-link {
+      color: #1c7999;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px dashed #8bc1d4;
+      transition: 0.1s;
+    }
+    .nit-link:hover { color: #0f5a75; border-bottom-color: #1c7999; }
+    .action-btn {
+      background: linear-gradient(95deg, #398f6e, #2c7b5c);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .action-btn:hover {
+      background: linear-gradient(95deg, #44a77f, #358d6a);
+      transform: scale(0.98);
+    }
 
-    button.action-btn { padding: 3px 6px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; transition: background 0.3s ease; }
+    .pagination-container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e0ecf2;
+      font-size: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .page-btn {
+      background: #eef3f8;
+      border: 1px solid #d4e2ea;
+      color: #266481;
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .page-btn.active-page {
+      background: #2c7a5e;
+      border-color: #1f6e54;
+      color: white;
+    }
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .page-select {
+      background: white;
+      border: 1px solid #cbdde6;
+      border-radius: 40px;
+      padding: 5px 10px;
+      color: #1f4c64;
+    }
 
-    td input { width: 100%; box-sizing: border-box; font-size: 12px; padding: 2px; text-align: center; background: #3a3a3a; color: #eee; border: 1px solid #555; border-radius: 2px; }
-    td input[type="date"] { padding: 2px; }
-    td input[readonly] { background-color: #555; color: #ccc; border: none; cursor: default; }
-
-    /* modal */
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:999;align-items:center;justify-content:center;transition:0.3s}
-    .modal.show{display:flex}
-    .modal-card{background:#2f2f2f;color:#eee;border-radius:8px;padding:14px;min-width:420px;max-width:760px;box-shadow:0 6px 24px rgba(0,0,0,0.6);animation:fadeIn 0.3s ease}
-    @keyframes fadeIn{0%{opacity:0;transform:translateY(-10px)}100%{opacity:1;transform:translateY(0)}}
-    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    .modal-head h3{margin:0;font-size:16px}
-    .close-btn{cursor:pointer;font-size:18px;padding:0 6px}
-    .modal-body{max-height:60vh;overflow:auto;margin-bottom:10px}
-    .modal-body table{width:100%;border-collapse:collapse}
-    .modal-body th,.modal-body td{border:1px solid #555;padding:6px;font-size:13px;background:#222}
-    .modal-footer{display:flex;justify-content:flex-end;gap:8px}
-    .btn-primary{background:#28a745;color:#fff;border:none;border-radius:4px;padding:6px 10px;cursor:pointer}
-    .btn-secondary{background:#555;color:#fff;border:none;border-radius:4px;padding:6px 10px;cursor:pointer}
-    .small-muted{font-size:12px;color:#bbb;margin-bottom:8px}
-    .tick-cell{color:#28a745;font-size:16px;font-weight:bold}
+    /* MODAL - ALL 5 COLUMNS VISIBLE */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: white;
+      border-radius: 16px;
+      width: 95%;
+      max-width: 950px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
+    }
+    .modal-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid #e0edf2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0a1a2f;
+      border-radius: 16px 16px 0 0;
+    }
+    .modal-header h3 { font-size: 1rem; font-weight: 600; color: white; margin: 0; }
+    .modal-close {
+      font-size: 22px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #a0c4e0;
+      transition: 0.2s;
+    }
+    .modal-close:hover { color: white; }
+    .modal-body {
+      flex: 1;
+      overflow: auto;
+      padding: 16px 20px;
+      background: #f9fbfd;
+    }
+    /* MODAL TABLE - ALL 5 COLUMNS FIT */
+    .modal-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.7rem;
+    }
+    .modal-body th {
+      background: #eef2f6;
+      color: #1f4c64;
+      padding: 8px 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border-bottom: 1px solid #d4e2ea;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .modal-body td {
+      padding: 8px 6px;
+      border-bottom: 1px dotted #d0dee8;
+      background: white;
+      text-align: center;
+      vertical-align: middle;
+    }
+    /* SPECIFIC COLUMN WIDTHS - ALL 5 COLUMNS TIGHT */
+    .modal-body th:first-child, .modal-body td:first-child { width: 20%; }
+    .modal-body th:nth-child(2), .modal-body td:nth-child(2) { width: 25%; }
+    .modal-body th:nth-child(3), .modal-body td:nth-child(3) { width: 22%; }
+    .modal-body th:nth-child(4), .modal-body td:nth-child(4) { width: 18%; }
+    .modal-body th:nth-child(5), .modal-body td:nth-child(5) { width: 15%; }
+    
+    .modal-body input {
+      padding: 5px 6px;
+      font-size: 0.7rem;
+      border-radius: 6px;
+      background: white;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #cfe0e8;
+    }
+    .modal-body input[type="date"] {
+      font-size: 0.65rem;
+    }
+    .modal-footer {
+      padding: 12px 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      border-top: 1px solid #e0edf2;
+      background: #ffffff;
+      border-radius: 0 0 16px 16px;
+    }
+    .small-muted { 
+      font-size: 0.62rem; 
+      background: #eef3f8; 
+      padding: 5px 12px; 
+      border-radius: 20px; 
+      display: inline-block; 
+      margin: 8px 20px 0 20px; 
+      color: #2c647b; 
+    }
+    .spinner-mini {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .info-hint { 
+      font-size: 9px; 
+      color: #628da0; 
+      margin-top: 10px; 
+      text-align: center; 
+      background: #eef3f8; 
+      padding: 5px 8px; 
+      border-radius: 14px; 
+    }
+    .modal-status-cell { 
+      font-size: 0.7rem; 
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
-<h2>Work Order Module</h2>
-<div id="message"></div>
 
-<div class="toolbar">
-  <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="filterTable()" />
-  <button id="refreshBtn" onclick="refreshData()">⟳ Refresh</button>
-  <button id="syncBtn" onclick="syncDataWithReload()">🔄 Sync</button>
+<div class="app-header">
+  <h2>📋 WORK ORDER MODULE · NAVY BLUE HEADER</h2>
+  <div class="badge-light">⚡ Auto-sync | Dotted Rows | 📎 Excel Export</div>
 </div>
 
-<div class="table-container">
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th class="col-timestamp">Timestamp</th>
-        <th class="col-unique">UNIQUE NIT</th>
-        <th class="col-nit">NIT</th>
-        <th class="col-sl">SL</th>
-        <th class="col-nitdate">NIT DATE</th>
-        <th class="col-vendor">VENDOR</th>
-        <th class="col-work">Name of the work</th>
-        <th class="col-source">Source of Fund</th>
-        <th class="col-wo-no">WORK ORDER NO</th>
-        <th class="col-wo-date">WORK ORDER DATE</th>
-        <th class="col-estimate">ESTIMATE VALUE</th>
-        <th class="col-bid">BID AMOUNT</th>      <!-- New column inserted here -->
-        <th class="col-action">Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<div class="toolbar-modern">
+  <div class="search-wrapper">
+    <input type="text" id="globalSearch" placeholder="Search NIT, Vendor, Work, WO#, Bid...">
+  </div>
+  <div class="btn-group">
+    <button class="btn btn-secondary" id="manualSyncBtn">🔄 Manual Sync</button>
+    <button class="btn btn-primary" id="refreshTableBtn">⟳ Refresh</button>
+    <button class="btn btn-excel" id="exportExcelBtn">📎 Export to Excel</button>
+  </div>
 </div>
 
-<!-- Modal -->
-<div id="nitModal" class="modal">
+<div class="table-wrapper">
+  <div class="table-scroll">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Unique NIT</th>
+          <th>NIT</th>
+          <th>SL</th>
+          <th>NIT Date</th>
+          <th>Vendor</th>
+          <th>Name of Work</th>
+          <th>Source of Fund</th>
+          <th>Work Order No</th>
+          <th>WO Date</th>
+          <th>Estimate Value</th>
+          <th>Bid Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+  <div class="pagination-container" id="paginationPanel"></div>
+</div>
+
+<div id="nitModal" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-head">
-      <h3 id="modalNitTitle">NIT</h3>
-      <span class="close-btn" onclick="closeModal()">✕</span>
-    </div>
-    <div class="small-muted">
-      Only rows with blank <strong>WORK ORDER NO</strong> are shown. Fill Work Order No & Date, then click <strong>Save All</strong>.
-    </div>
+    <div class="modal-header"><h3 id="modalNitLabel">📌 Batch Work Order</h3><button class="modal-close" id="closeModalBtn">✕</button></div>
+    <div class="small-muted">✏️ Smart sequencing: Edit first WO number → rows adjust. Date syncs across all.</div>
     <div class="modal-body">
-      <table id="modalTable">
+      <table id="compactModalTable">
         <thead>
           <tr>
             <th>Unique NIT</th>
             <th>Vendor</th>
             <th>Work Order NO</th>
-            <th>Date</th>
+            <th>WO Date</th>
             <th>Status</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="modalTableBody"></tbody>
       </table>
+      <div class="info-hint">💡 Edit any WO number — sequence continues. Change date → all rows update.</div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveModalAll()">Save All</button>
+      <button class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
+      <button class="btn btn-primary" id="confirmSaveAllBtn">💾 Save All</button>
     </div>
   </div>
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbx-YMfdhjbCJy4_Afr1moRbeXnbDDD0TGHGih1pMP7hEy93TFEAZebYQruvt47TL8Bu/exec";
-let tableData = [];
-let modalRows = [];
-// Updated widthClasses: added col-bid at index 11 (originally 0-10, now 0-11)
-const widthClasses = ["col-timestamp","col-unique","col-nit","col-sl","col-nitdate","col-vendor","col-work","col-source","col-wo-no","col-wo-date","col-estimate","col-bid"];
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-YMfdhjbCJy4_Afr1moRbeXnbDDD0TGHGih1pMP7hEy93TFEAZebYQruvt47TL8Bu/exec";
+  let masterDataset = [];
+  let currentPage = 1;
+  const rowsPerPage = 14;
+  let currentFilteredData = [];
+  let modalRowsData = [];
 
-// --- Load table data
-async function loadData(){
-  const res=await fetch(scriptURL+"?action=getBillPaymentData");
-  tableData=await res.json();
-  renderTable(tableData);
-}
-
-// --- Render table (with Bid Amount column)
-function renderTable(data){
-  const tbody=document.querySelector("#dataTable tbody");
-  tbody.innerHTML="";
-  data.forEach((row,i)=>{
-    let tr=document.createElement("tr");
-    // columns 0 to 10 (original 11 columns) + new Bid Amount column at index 11 (if exists in row)
-    // row length might be 11 originally; after adding bid amount, expected length 12. But we handle dynamically.
-    for(let j=0; j<=11; j++){   // now total 12 data columns (0..11) + action = 13 columns overall
-      let td=document.createElement("td");
-      td.className = widthClasses[j] || "col-bid"; // fallback
-
-      if(j===8){ // WORK ORDER NO (editable)
-        td.innerHTML=`<input type="text" value="${row[j]||''}" id="col_${i}_${j}" oninput="toggleButton(${i})">`;
-      } else if(j===9){ // WORK ORDER DATE (editable)
-        let dateVal="";
-        if(row[j]){ const d=new Date(row[j]); if(!isNaN(d)) dateVal=d.toISOString().split("T")[0]; }
-        td.innerHTML=`<input type="date" value="${dateVal}" id="col_${i}_${j}" oninput="toggleButton(${i})">`;
-      } else if(j===7||j===10){ // SOURCE OF FUND (index 7) and ESTIMATE VALUE (index 10) are readonly
-        td.innerHTML=`<input type="text" value="${row[j]||''}" readonly>`;
-      } else if(j===11){ // **** BID AMOUNT (new column) ****
-        // Editable only if blank? according to request: "editable if blank". We'll allow editing always for simplicity,
-        // but we can also condition: if empty or user wants to edit. We'll keep it as editable input (not readonly).
-        // We'll use oninput to enable SAVE button.
-        td.innerHTML=`<input type="text" value="${row[j]||''}" id="col_${i}_${j}" oninput="toggleButton(${i})" placeholder="Bid Amt">`;
-      } else if(j===2){ // NIT clickable
-        td.innerHTML=`<span style="color:lightblue;cursor:pointer" onclick="openNitModal('${row[j]}')">${row[j]}</span>`;
-      } else {
-        td.textContent = row[j] || "";
-      }
-      tr.appendChild(td);
-    }
-    // Action cell
-    const tdAct=document.createElement("td");
-    tdAct.className="col-action";
-    tdAct.innerHTML=`<button class="action-btn" id="btn_${i}" onclick="updateRow(${i})">SAVE</button>`;
-    tr.appendChild(tdAct);
-    tbody.appendChild(tr);
-    toggleButton(i);
-  });
-}
-
-// --- Toggle button (enable UPDATE after any edit)
-function toggleButton(i){
-  const btn=document.getElementById(`btn_${i}`);
-  if(btn) { btn.textContent="UPDATE"; btn.style.background="blue"; btn.style.color="white"; }
-}
-
-// --- Show message
-function showMessage(text,type){
-  const msg=document.getElementById("message");
-  msg.textContent=text; msg.className=type; msg.style.display="block";
-  setTimeout(()=>{msg.style.display="none";},2500);
-}
-
-// --- Update row (includes Bid Amount now)
-async function updateRow(i){
-  const btn=document.getElementById(`btn_${i}`);
-  btn.disabled=true; btn.textContent="Saving...";
-  try{
-    const rowData=tableData[i];
-    const formData=new FormData();
-    formData.append("action","updateBillPayment");
-    formData.append("uniqueNIT", rowData[1]);
-    formData.append("vendor", rowData[5]);
-    // Send columns: work order no (8), work order date (9), and bid amount (11)
-    for(let j of [8,9,11]){
-      const inputEl=document.getElementById(`col_${i}_${j}`);
-      if(inputEl) formData.append(`col${j}`,inputEl.value);
-    }
-    const res=await fetch(scriptURL,{method:"POST",body:formData});
-    const result=await res.json();
-    if(result.success){
-      btn.textContent="Saved ✔"; btn.style.background="green";
-      // update local tableData for Bid Amount as well
-      const bidInput = document.getElementById(`col_${i}_11`);
-      if(bidInput) tableData[i][11] = bidInput.value;
-      showMessage(`Row ${result.row} updated successfully ✅`,"success");
-    } else {
-      btn.textContent="Failed ✖"; btn.style.background="red";
-      showMessage("Update failed: "+(result.error||"Unknown"),"error");
-    }
-  } catch(err){
-    btn.textContent="Error ✖"; btn.style.background="red";
-    showMessage("Network error: "+err.message,"error");
-  } finally{
-    setTimeout(()=>{btn.disabled=false; toggleButton(i);},2000);
+  function showToast(text, type = "success") {
+    const existing = document.querySelector(".toast-message");
+    if(existing) existing.remove();
+    const toast = document.createElement("div");
+    toast.className = `toast-message toast-${type}`;
+    toast.innerHTML = text;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2800);
   }
-}
 
-// --- Modal functions (unchanged, they work with existing data structure)
-function openNitModal(nit){
-  document.getElementById("modalNitTitle").textContent=`NIT: ${nit}`;
-  const modal=document.getElementById("nitModal");
-  const tbody=document.querySelector("#modalTable tbody");
-  tbody.innerHTML="";
-  const group=tableData.filter(r=>r[2]==nit);
-  const blanks=group.filter(r=>!r[8]); // work order no blank
-  if(blanks.length===0){ tbody.innerHTML=`<tr><td colspan="5">All rows already filled</td></tr>`; modal.classList.add("show"); return; }
-
-  const fy=getFinancialYear();
-  let start=1;
-  const existing=group.map(r=>r[8]).filter(v=>v);
-  if(existing.length>0){
-    const nums=existing.map(v=>parseInt(v.split("/")[0])).filter(n=>!isNaN(n));
-    if(nums.length>0) start=Math.max(...nums)+1;
-  }
-  modalRows=[];
-  blanks.forEach((r,idx)=>{
-    const uniq=r[1]; const vendor=r[5]; const orderNo=(start+idx)+"/BGP/"+fy; const date=today();
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${uniq}</td>
-      <td>${vendor}</td>
-      <td><input type="text" value="${orderNo}" onchange="modalSet(${idx},'woNo',this.value)"></td>
-      <td><input type="date" value="${date}" onchange="modalSet(${idx},'woDate',this.value)"></td>
-      <td class="status"></td>`;
-    tbody.appendChild(tr);
-    modalRows.push({tableIndex:tableData.indexOf(r),woNo:orderNo,woDate:date,uniqueNIT:uniq,vendor:vendor});
-  });
-  modal.classList.add("show");
-}
-function modalSet(idx,field,val){ modalRows[idx][field]=val; }
-function closeModal(){ document.getElementById("nitModal").classList.remove("show"); }
-function today(){ return new Date().toISOString().split("T")[0]; }
-function getFinancialYear(){ const d=new Date(); const y=d.getFullYear(); return d.getMonth()>=3?y+"-"+(y+1):(y-1)+"-"+y; }
-
-// --- Save modal all (does not affect bid amount; remains as is)
-async function saveModalAll(){
-  if(modalRows.length===0) return;
-  const btn=document.querySelector("#nitModal .btn-primary");
-  btn.disabled=true; btn.innerHTML=`<span class="spinner"></span> Saving All...`;
-  let successCount=0;
-  for(let i=0;i<modalRows.length;i++){
-    const row=modalRows[i];
-    try{
-      const formData=new FormData();
-      formData.append("action","updateBillPayment");
-      formData.append("uniqueNIT", row.uniqueNIT);
-      formData.append("vendor", row.vendor);
-      formData.append("col8", row.woNo);
-      formData.append("col9", row.woDate);
-      // No bid amount sent (keeps existing)
-      const res=await fetch(scriptURL,{method:"POST",body:formData});
-      const result=await res.json();
-      if(result.success){
-        successCount++;
-        tableData[row.tableIndex][8]=row.woNo;
-        tableData[row.tableIndex][9]=row.woDate;
-        const modalRow=document.querySelector(`#modalTable tbody tr:nth-child(${i+1}) td.status`);
-        if(modalRow) modalRow.innerHTML="✅";
-        const mainRow=document.querySelector(`#dataTable tbody tr:nth-child(${row.tableIndex+1})`);
-        if(mainRow) mainRow.style.backgroundColor="#d4edda";
-      }
-    } catch(err){ console.error("Network error:",err); }
-  }
-  btn.innerHTML=`Saved ${successCount}/${modalRows.length} ✅`;
-  showMessage(`Saved ${successCount} out of ${modalRows.length} rows`,"success");
-  setTimeout(()=>{ btn.disabled=false; btn.innerHTML="Save All"; closeModal(); renderTable(tableData); },2000);
-}
-
-// --- Search filter (includes bid amount column now)
-function filterTable(){
-  const search=document.getElementById("searchInput").value.toLowerCase();
-  const filtered=tableData.filter(row=>
-    (row[1] && row[1].toString().toLowerCase().includes(search)) ||
-    (row[2] && row[2].toString().toLowerCase().includes(search)) ||
-    (row[5] && row[5].toString().toLowerCase().includes(search)) ||
-    (row[6] && row[6].toString().toLowerCase().includes(search)) ||
-    (row[7] && row[7].toString().toLowerCase().includes(search)) ||
-    (row[8] && row[8].toString().toLowerCase().includes(search)) ||
-    (row[11] && row[11].toString().toLowerCase().includes(search)) // bid amount search
-  );
-  renderTable(filtered);
-}
-
-// --- Sync functions (same)
-async function syncData(auto=false){
-  const btn = document.getElementById("syncBtn");
-  if(!auto){ btn.disabled=true; btn.innerHTML=`<span class="spinner"></span> Syncing...`; }
-  showMessage("Syncing data...","loading");
-  try{
-    const res=await fetch(scriptURL+"?action=manualSync");
-    const result=await res.json();
-    if(result.success){
-      showMessage(`Data synced successfully ✅ (${result.updatedRows} rows updated)`,"success");
-      if(auto) await loadData();
-    } else {
-      showMessage("Sync failed: "+(result.error||"Unknown"),"error");
-    }
-  } catch(err){
-    showMessage("Network error: "+err.message,"error");
-  } finally{
-    if(!auto){ btn.disabled=false; btn.innerHTML="🔄 Sync"; }
-  }
-}
-async function syncDataWithReload(){ await syncData(true); }
-
-// --- Refresh = sync+reload
-async function refreshData(){ await syncData(true); }
-
-// --- Ensure tableData rows have at least 12 elements (if not, extend for bid amount)
-async function loadDataAndExtend(){
-  const res=await fetch(scriptURL+"?action=getBillPaymentData");
-  let data=await res.json();
-  // Ensure each row has at least 12 columns (index 0..11). If less, push empty for bid amount.
-  tableData = data.map(row => {
-    if(row.length < 12) {
-      // create new array with length 12, copy existing, fill rest with empty string
-      let newRow = new Array(12).fill("");
-      for(let i=0; i<row.length; i++) newRow[i] = row[i];
+  function normalizeRow(row) {
+    if (!Array.isArray(row)) row = [];
+    if (row.length < 12) {
+      const newRow = new Array(12).fill("");
+      for (let i = 0; i < row.length; i++) newRow[i] = row[i];
       return newRow;
     }
-    return row;
-  });
-  renderTable(tableData);
-}
+    return row.slice(0,12);
+  }
 
-// Override loadData to use extended version
-loadData = loadDataAndExtend;
+  async function performBackgroundSync() {
+    try { await fetch(`${SCRIPT_URL}?action=manualSync&_=${Date.now()}`); } catch(e) { console.warn(e); }
+  }
 
-// Auto load on page load
-loadData();
+  async function fetchAndSyncData(showMsg = true) {
+    if(showMsg) showToast("Syncing fresh data...", "loading");
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=getBillPaymentData&t=${Date.now()}`);
+      if (!res.ok) throw new Error("Network");
+      let raw = await res.json();
+      if (!Array.isArray(raw)) raw = [];
+      masterDataset = raw.map(row => normalizeRow(row));
+      await performBackgroundSync();
+      if(showMsg) showToast(`✅ ${masterDataset.length} records loaded`, "success");
+      applySearchAndRender();
+    } catch(err) {
+      showToast(`Error: ${err.message}`, "error");
+      if(masterDataset.length === 0) masterDataset = [];
+      applySearchAndRender();
+    }
+  }
+
+  async function manualSyncAndReload() {
+    const btn = document.getElementById("manualSyncBtn");
+    btn.innerHTML = `<span class="spinner-mini"></span> Syncing...`;
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=manualSync&t=${Date.now()}`);
+      const result = await res.json();
+      if(result.success) showToast(`Manual sync success (${result.updatedRows || 0} updated)`, "success");
+      else showToast("Sync warning", "error");
+      await fetchAndSyncData(true);
+    } catch(err) { showToast(`Sync error: ${err.message}`, "error"); }
+    finally { btn.disabled = false; btn.innerHTML = "🔄 Manual Sync"; }
+  }
+
+  function filterDataset() {
+    const term = document.getElementById("globalSearch").value.trim().toLowerCase();
+    if (!term) return [...masterDataset];
+    return masterDataset.filter(row => 
+      (row[1] && row[1].toString().toLowerCase().includes(term)) ||
+      (row[2] && row[2].toString().toLowerCase().includes(term)) ||
+      (row[5] && row[5].toString().toLowerCase().includes(term)) ||
+      (row[6] && row[6].toString().toLowerCase().includes(term)) ||
+      (row[7] && row[7].toString().toLowerCase().includes(term)) ||
+      (row[8] && row[8].toString().toLowerCase().includes(term)) ||
+      (row[11] && row[11].toString().toLowerCase().includes(term))
+    );
+  }
+
+  function applySearchAndRender() {
+    currentFilteredData = filterDataset();
+    currentPage = 1;
+    renderTablePage();
+    renderPaginationControls();
+  }
+
+  function renderTablePage() {
+    const tbody = document.getElementById("tableBody");
+    if(!tbody) return;
+    tbody.innerHTML = "";
+    const start = (currentPage - 1) * rowsPerPage;
+    const pageRows = currentFilteredData.slice(start, start + rowsPerPage);
+    if(pageRows.length === 0 && currentFilteredData.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:32px;">✨ No records found</td></tr>`;
+      return;
+    }
+    pageRows.forEach((row, idx) => {
+      const originalIndex = masterDataset.findIndex(m => m[1] === row[1] && m[5] === row[5] && m[2] === row[2]);
+      const rowRef = originalIndex !== -1 ? originalIndex : idx;
+      const tr = document.createElement("tr");
+      for(let col = 0; col <= 11; col++) {
+        const td = document.createElement("td");
+        if(col === 8) {
+          td.innerHTML = `<input type="text" value="${escapeHtml(row[col] || '')}" data-rowidx="${rowRef}" data-col="8" class="editable-field" placeholder="WO No.">`;
+        } else if(col === 9) {
+          let dateVal = "";
+          if(row[col]) { const d = new Date(row[col]); if(!isNaN(d.getTime())) dateVal = d.toISOString().split("T")[0]; }
+          td.innerHTML = `<input type="date" value="${dateVal}" data-rowidx="${rowRef}" data-col="9" class="editable-field">`;
+        } else if(col === 11) {
+          td.innerHTML = `<input type="text" value="${escapeHtml(row[col] || '')}" readonly style="background:#f7fafd; color:#2a677d; font-weight:500;" placeholder="—">`;
+        } else if(col === 7 || col === 10) {
+          td.innerHTML = `<input type="text" value="${escapeHtml(row[col] || '')}" readonly>`;
+        } else if(col === 2) {
+          td.innerHTML = `<span class="nit-link" data-nit="${escapeHtml(row[col] || '')}">${escapeHtml(row[col] || '')}</span>`;
+        } else {
+          td.textContent = row[col] || "";
+        }
+        tr.appendChild(td);
+      }
+      const actionTd = document.createElement("td");
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "UPDATE";
+      saveBtn.className = "action-btn";
+      saveBtn.setAttribute("data-rowkey", rowRef);
+      saveBtn.onclick = () => updateSingleRow(rowRef, saveBtn);
+      actionTd.appendChild(saveBtn);
+      tr.appendChild(actionTd);
+      tbody.appendChild(tr);
+    });
+    attachEditableEvents();
+    attachNitClickEvents();
+  }
+
+  function attachEditableEvents() {
+    document.querySelectorAll(".editable-field").forEach(input => {
+      input.removeEventListener("change", handleFieldChange);
+      input.addEventListener("change", handleFieldChange);
+    });
+  }
+  
+  function handleFieldChange(e) {
+    const rowIdx = parseInt(e.target.getAttribute("data-rowidx"));
+    const colIdx = parseInt(e.target.getAttribute("data-col"));
+    const newVal = e.target.value;
+    if(!isNaN(rowIdx) && masterDataset[rowIdx] && (colIdx === 8 || colIdx === 9)) {
+      masterDataset[rowIdx][colIdx] = newVal;
+      const btns = document.querySelectorAll(`button.action-btn[data-rowkey="${rowIdx}"]`);
+      btns.forEach(btn => { btn.textContent = "UPDATE"; btn.style.background = "linear-gradient(95deg, #398f6e, #2c7b5c)"; });
+    }
+  }
+
+  async function updateSingleRow(rowIndex, btnElement) {
+    if(!masterDataset[rowIndex]) return;
+    const row = masterDataset[rowIndex];
+    const uniqueNIT = row[1];
+    const vendor = row[5];
+    const woNo = row[8];
+    const woDate = row[9];
+    const bidAmount = row[11];
+    
+    btnElement.disabled = true;
+    btnElement.innerHTML = `<span class="spinner-mini"></span> Saving`;
+    try {
+      const formData = new FormData();
+      formData.append("action", "updateBillPayment");
+      formData.append("uniqueNIT", uniqueNIT);
+      formData.append("vendor", vendor);
+      formData.append("col8", woNo || "");
+      formData.append("col9", woDate || "");
+      formData.append("col11", bidAmount || "");
+      
+      const response = await fetch(SCRIPT_URL, { method: "POST", body: formData });
+      const result = await response.json();
+      if(result.success) {
+        btnElement.innerHTML = "✓ Saved";
+        btnElement.style.background = "#2c9b6e";
+        showToast(`WO updated | Bid Amount preserved`, "success");
+        setTimeout(() => { btnElement.innerHTML = "UPDATE"; btnElement.style.background = "linear-gradient(95deg, #398f6e, #2c7b5c)"; btnElement.disabled = false; }, 1500);
+      } else throw new Error(result.error || "failed");
+    } catch(err) {
+      btnElement.innerHTML = "Retry";
+      btnElement.style.background = "#b95c4a";
+      showToast(`Error: ${err.message}`, "error");
+      setTimeout(() => { btnElement.innerHTML = "UPDATE"; btnElement.style.background = "linear-gradient(95deg, #398f6e, #2c7b5c)"; btnElement.disabled = false; }, 1800);
+    }
+  }
+
+  function attachNitClickEvents() {
+    document.querySelectorAll(".nit-link").forEach(el => {
+      el.removeEventListener("click", nitClickHandler);
+      el.addEventListener("click", nitClickHandler);
+    });
+  }
+  function nitClickHandler(e) { openNitModalForNIT(e.target.getAttribute("data-nit")); }
+
+  function openNitModalForNIT(nit) {
+    const filteredByNIT = masterDataset.filter(r => r[2] === nit);
+    const blankRows = filteredByNIT.filter(r => !r[8] || r[8].trim() === "");
+    if(blankRows.length === 0) { showToast(`✅ All rows for NIT ${nit} have WO numbers`, "error"); return; }
+    const financialYear = getFinancialYear();
+    let baseSequence = 1;
+    const existingWOs = filteredByNIT.map(r => r[8]).filter(v => v && v.trim());
+    if(existingWOs.length) {
+      const nums = existingWOs.map(v => parseInt(v.split("/")[0])).filter(n => !isNaN(n));
+      if(nums.length) baseSequence = Math.max(...nums) + 1;
+    }
+    modalRowsData = [];
+    const modalTbody = document.getElementById("modalTableBody");
+    modalTbody.innerHTML = "";
+    blankRows.forEach((row, idx) => {
+      const defaultWO = `${baseSequence + idx}/BGP/${financialYear}`;
+      const defaultDate = getTodayDate();
+      const tr = document.createElement("tr");
+      tr.setAttribute("data-modal-idx", idx);
+      tr.innerHTML = `
+        <td style="word-break:break-word;">${escapeHtml(row[1])}</td>
+        <td style="word-break:break-word;">${escapeHtml(row[5])}</td>
+        <td><input type="text" class="modal-wo-input" data-idx="${idx}" value="${defaultWO}" style="font-family:monospace; width:100%;"></td>
+        <td><input type="date" class="modal-date-input" data-idx="${idx}" value="${defaultDate}" style="width:100%;"></td>
+        <td class="modal-status-cell">⏳</td>
+      `;
+      modalTbody.appendChild(tr);
+      const originalIdx = masterDataset.findIndex(m => m[1] === row[1] && m[5] === row[5]);
+      modalRowsData.push({ 
+        tableIndex: originalIdx, 
+        uniqueNIT: row[1], 
+        vendor: row[5], 
+        woNo: defaultWO, 
+        woDate: defaultDate, 
+        bidAmount: row[11],
+        idx: idx 
+      });
+    });
+    attachSmartModalListeners();
+    document.getElementById("modalNitLabel").innerHTML = `📎 NIT: ${nit}`;
+    document.getElementById("nitModal").classList.add("active");
+  }
+
+  function attachSmartModalListeners() {
+    function parseWONumber(woStr) {
+      const match = woStr.match(/^(\d+)\/(.+)$/);
+      if(match) return { prefixNum: parseInt(match[1], 10), suffix: match[2] };
+      return null;
+    }
+    document.querySelectorAll(".modal-wo-input").forEach(input => {
+      input.removeEventListener("change", woChangeHandler);
+      input.addEventListener("change", woChangeHandler);
+      function woChangeHandler(e) {
+        const idx = parseInt(e.target.getAttribute("data-idx"));
+        const newVal = e.target.value;
+        if(isNaN(idx)) return;
+        modalRowsData[idx].woNo = newVal;
+        const parsed = parseWONumber(newVal);
+        if(parsed) {
+          let currentNum = parsed.prefixNum;
+          const suffix = parsed.suffix;
+          for(let i = idx; i < modalRowsData.length; i++) {
+            const sequentialWo = `${currentNum + (i - idx)}/${suffix}`;
+            modalRowsData[i].woNo = sequentialWo;
+            const targetInput = document.querySelector(`.modal-wo-input[data-idx="${i}"]`);
+            if(targetInput && targetInput.value !== sequentialWo) targetInput.value = sequentialWo;
+          }
+        }
+        showToast(`Sequence updated`, "loading");
+      }
+    });
+    document.querySelectorAll(".modal-date-input").forEach(dateInput => {
+      dateInput.removeEventListener("change", dateChangeHandler);
+      dateInput.addEventListener("change", dateChangeHandler);
+      function dateChangeHandler(e) {
+        const idx = parseInt(e.target.getAttribute("data-idx"));
+        const newDate = e.target.value;
+        if(isNaN(idx)) return;
+        modalRowsData[idx].woDate = newDate;
+        for(let i = 0; i < modalRowsData.length; i++) {
+          if(i !== idx) {
+            modalRowsData[i].woDate = newDate;
+            const otherField = document.querySelector(`.modal-date-input[data-idx="${i}"]`);
+            if(otherField) otherField.value = newDate;
+          }
+        }
+        showToast(`All dates set to ${newDate}`, "success");
+      }
+    });
+    if(modalRowsData.length > 0) {
+      const firstDate = modalRowsData[0].woDate;
+      for(let i = 1; i < modalRowsData.length; i++) {
+        modalRowsData[i].woDate = firstDate;
+        const dateField = document.querySelector(`.modal-date-input[data-idx="${i}"]`);
+        if(dateField) dateField.value = firstDate;
+      }
+    }
+  }
+
+  async function saveAllModalUpdates() {
+    if(modalRowsData.length === 0) return;
+    const saveBtn = document.getElementById("confirmSaveAllBtn");
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `<span class="spinner-mini"></span> Saving...`;
+    let successCount = 0;
+    for(let i=0; i<modalRowsData.length; i++) {
+      const entry = modalRowsData[i];
+      try {
+        const fd = new FormData();
+        fd.append("action", "updateBillPayment");
+        fd.append("uniqueNIT", entry.uniqueNIT);
+        fd.append("vendor", entry.vendor);
+        fd.append("col8", entry.woNo);
+        fd.append("col9", entry.woDate);
+        fd.append("col11", entry.bidAmount || "");
+        
+        const resp = await fetch(SCRIPT_URL, { method: "POST", body: fd });
+        const result = await resp.json();
+        if(result.success) {
+          successCount++;
+          if(masterDataset[entry.tableIndex]) {
+            masterDataset[entry.tableIndex][8] = entry.woNo;
+            masterDataset[entry.tableIndex][9] = entry.woDate;
+            if(entry.bidAmount) masterDataset[entry.tableIndex][11] = entry.bidAmount;
+          }
+          const statusCell = document.querySelector(`#modalTableBody tr[data-modal-idx="${i}"] .modal-status-cell`);
+          if(statusCell) statusCell.innerHTML = "✅";
+        }
+      } catch(e) { console.warn(e); }
+    }
+    saveBtn.innerHTML = `✅ ${successCount}/${modalRowsData.length}`;
+    showToast(`Batch saved: ${successCount} work orders`, "success");
+    setTimeout(() => { closeModal(); applySearchAndRender(); saveBtn.disabled = false; saveBtn.innerHTML = "💾 Save All"; }, 1500);
+  }
+
+  function exportToExcel() {
+    if(!masterDataset.length) { showToast("No data to export", "error"); return; }
+    const dataToExport = currentFilteredData.length ? currentFilteredData : masterDataset;
+    const headers = ["Timestamp","Unique NIT","NIT","SL","NIT Date","Vendor","Name of Work","Source of Fund","Work Order No","WO Date","Estimate Value","Bid Amount"];
+    const exportRows = dataToExport.map(row => headers.map((_, colIdx) => row[colIdx] || ""));
+    const sheetData = [headers, ...exportRows];
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "WorkOrders");
+    XLSX.writeFile(wb, `WorkOrders_${new Date().toISOString().slice(0,19)}.xlsx`);
+    showToast(`Exported ${exportRows.length} records`, "success");
+  }
+
+  function closeModal() { document.getElementById("nitModal").classList.remove("active"); modalRowsData = []; }
+  function getFinancialYear() { const d=new Date(); const y=d.getFullYear(); return d.getMonth()>=3?`${y}-${y+1}`:`${y-1}-${y}`; }
+  function getTodayDate() { return new Date().toISOString().split("T")[0]; }
+  function escapeHtml(str) { if(!str) return ""; return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  function renderPaginationControls() {
+    const panel = document.getElementById("paginationPanel");
+    if(!panel) return;
+    const totalPages = Math.ceil(currentFilteredData.length / rowsPerPage);
+    if(totalPages <= 1 && currentFilteredData.length <= rowsPerPage) { panel.innerHTML = `<div>📄 ${masterDataset.length} records</div>`; return; }
+    let html = `<div>📋 ${((currentPage-1)*rowsPerPage)+1}–${Math.min(currentPage*rowsPerPage, currentFilteredData.length)} of ${currentFilteredData.length}</div><div class="pagination-controls">`;
+    html += `<button class="page-btn" data-page="prev" ${currentPage===1 ? 'disabled' : ''}>◀ Prev</button>`;
+    for(let i=1;i<=Math.min(totalPages,5);i++) html += `<button class="page-btn ${currentPage===i ? 'active-page' : ''}" data-page="${i}">${i}</button>`;
+    if(totalPages>5) html += `<span>...</span><button class="page-btn" data-page="${totalPages}">${totalPages}</button>`;
+    html += `<button class="page-btn" data-page="next" ${currentPage===totalPages ? 'disabled' : ''}>Next ▶</button>`;
+    html += `<select class="page-select" id="jumpPageSelect">${Array.from({length:totalPages},(_,i)=>`<option value="${i+1}" ${currentPage===i+1 ? 'selected' : ''}>Page ${i+1}</option>`).join('')}</select>`;
+    html += `</div>`;
+    panel.innerHTML = html;
+    document.querySelectorAll(".page-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const pg = btn.getAttribute("data-page");
+        if(pg === "prev" && currentPage>1) currentPage--;
+        else if(pg === "next" && currentPage<totalPages) currentPage++;
+        else if(!isNaN(parseInt(pg))) currentPage = parseInt(pg);
+        renderTablePage(); renderPaginationControls();
+      });
+    });
+    const jump = document.getElementById("jumpPageSelect");
+    if(jump) jump.onchange = (e) => { currentPage = parseInt(e.target.value); renderTablePage(); renderPaginationControls(); };
+  }
+
+  document.getElementById("globalSearch").addEventListener("input", () => applySearchAndRender());
+  document.getElementById("manualSyncBtn").addEventListener("click", manualSyncAndReload);
+  document.getElementById("refreshTableBtn").addEventListener("click", () => fetchAndSyncData(true));
+  document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
+  document.getElementById("closeModalBtn")?.addEventListener("click", closeModal);
+  document.getElementById("cancelModalBtn")?.addEventListener("click", closeModal);
+  document.getElementById("confirmSaveAllBtn")?.addEventListener("click", saveAllModalUpdates);
+
+  fetchAndSyncData(true);
+
+  const script = document.createElement('script');
+  script.src = "https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js";
+  script.onload = () => console.log("Excel library ready");
+  document.head.appendChild(script);
 </script>
 </body>
 </html>
