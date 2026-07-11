@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIR DATA · Dashboard + 3D Bar Chart</title>
+    <!-- Font Awesome 6 & Inter -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
+    </script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <!-- Chart.js 3D plugin - FIXED VERSION -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-3d@2.1.0/dist/chartjs-plugin-3d.min.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f0f6ff 0%, #e2eaf5 100%);
+            min-height: 100vh;
+            padding: 28px 24px;
+            color: #0b1a2f;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ----- NAVIGATION TABS ----- */
+        .nav-tabs {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 24px -8px rgba(0, 20, 40, 0.08);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #2f4a6b;
+            transition: 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn i {
+            font-size: 18px;
+            color: #4a6e96;
+        }
+        .tab-btn.active {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 30, 60, 0.10);
+            color: #0f2b47;
+        }
+        .tab-btn.active i {
+            color: #1d4b7a;
+        }
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ----- PAGES ----- */
+        .page {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0.3;
+                transform: translateY(6px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ----- DASHBOARD CARDS ----- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px 22px;
+            box-shadow: 0 12px 28px -12px rgba(0, 20, 40, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+        .card:nth-child(1)::after {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        }
+        .card:nth-child(2)::after {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+        }
+        .card:nth-child(3)::after {
+            background: linear-gradient(90deg, #ec4899, #f472b6);
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 32px -14px rgba(0, 30, 60, 0.15);
+        }
+        .card .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card .label i {
+            font-size: 18px;
+            color: #3f6a97;
+        }
+        .card .value {
+            font-size: 40px;
+            font-weight: 800;
+            color: #0b1d36;
+            margin-top: 6px;
+            line-height: 1;
+        }
+        .card .sub {
+            font-size: 13px;
+            color: #4d6a8a;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* ----- CHART CONTAINER ----- */
+        .chart-container {
+            background: white;
+            border-radius: 28px;
+            padding: 24px 24px 16px 24px;
+            box-shadow: 0 12px 28px -12px rgba(0, 20, 40, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            margin-bottom: 24px;
+        }
+        .chart-container h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a3550;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-container h3 i {
+            color: #3f6a97;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 340px;
+            width: 100%;
+        }
+
+        /* ----- TABLE PAGE TOOLBAR ----- */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px 20px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            padding: 12px 20px 12px 24px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 6px 16px -6px rgba(0, 20, 40, 0.04);
+            margin-bottom: 24px;
+        }
+        .search-wrapper {
+            flex: 2 1 240px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 40px;
+            padding: 0 18px;
+            border: 1px solid #dde6f2;
+            transition: 0.2s;
+        }
+        .search-wrapper:focus-within {
+            border-color: #7c9bc3;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+        .search-wrapper i {
+            color: #7c8fa8;
+            font-size: 15px;
+        }
+        .search-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 13px 12px;
+            font-size: 15px;
+            width: 100%;
+            outline: none;
+            font-weight: 500;
+            color: #0b1f36;
+        }
+        .search-wrapper input::placeholder {
+            color: #a4b6ce;
+            font-weight: 400;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #d4dfec;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f314a;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn i {
+            color: #4f6b8f;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3b5c, #2a4b70);
+            border: 1px solid #1e3b5c;
+            color: white;
+            box-shadow: 0 6px 12px -4px rgba(30, 59, 92, 0.2);
+        }
+        .btn-primary i {
+            color: #b6ceec;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #122c47, #1e3b5c);
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #cddaea;
+        }
+        .btn-outline:hover {
+            background: #eaf1fc;
+            border-color: #a5bddb;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+            border: 1px solid #0d9488;
+            color: white;
+        }
+        .btn-success i {
+            color: #b2dfda;
+        }
+        .btn-success:hover {
+            background: linear-gradient(135deg, #0b7a6f, #0d5f56);
+        }
+
+        /* ----- TABLE ----- */
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            overflow: auto;
+            box-shadow: 0 16px 40px -12px rgba(0, 20, 40, 0.06);
+            padding: 0 4px 4px 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 780px;
+        }
+        th {
+            text-align: left;
+            padding: 18px 18px;
+            background: #f0f7ff;
+            color: #103a5e;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #d7e2f0;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+        th i {
+            margin-right: 6px;
+            color: #3f6a97;
+        }
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #e4ebf5;
+            color: #1a2d47;
+            vertical-align: middle;
+            word-break: break-word;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #5e7594;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .badge-gender {
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+        .badge-gender.male {
+            background: #dbeafe;
+            color: #1e4b7a;
+        }
+        .badge-gender.female {
+            background: #fce7f3;
+            color: #a13d6b;
+        }
+        .badge-gender.other {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .footer-note {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #3a5a7a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 6px;
+            font-weight: 500;
+        }
+        .footer-note i {
+            color: #4f7aa3;
+            margin-right: 4px;
+        }
+        .status-msg {
+            margin-top: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1f8b4c;
+        }
+        .status-msg.error {
+            color: #b91c1c;
+            background: #fee2e2;
+            padding: 12px 20px;
+            border-radius: 16px;
+        }
+
+        /* 3D Shadow effect for bars */
+        .bar-3d-shadow {
+            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px;
+            }
+            .tab-btn {
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+            .toolbar {
+                border-radius: 32px;
+                padding: 12px 16px;
+            }
+            .search-wrapper {
+                flex: 1 1 100%;
+            }
+            .actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            .card {
+                padding: 18px;
+            }
+            .card .value {
+                font-size: 32px;
+            }
+            .chart-wrapper {
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ===== TABS ===== -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-page="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
+            <button class="tab-btn" data-page="table"><i class="fas fa-table"></i> Data Table</button>
+        </div>
+
+        <!-- ===== PAGE: DASHBOARD ===== -->
+        <div id="page-dashboard" class="page active">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="label"><i class="fas fa-users"></i> Total Records</div>
+                    <div class="value" id="totalRecords">—</div>
+                    <div class="sub"><i class="fas fa-database"></i> from SIR DATA</div>
+                </div>
+                <div class="card">
+                    <div class="label"><i class="fas fa-mars"></i> Male</div>
+                    <div class="value" id="maleCount">—</div>
+                    <div class="sub"><i class="fas fa-venus-mars"></i> ♂</div>
+                </div>
+                <div class="card">
+                    <div class="label"><i class="fas fa-venus"></i> Female</div>
+                    <div class="value" id="femaleCount">—</div>
+                    <div class="sub"><i class="fas fa-venus-mars"></i> ♀</div>
+                </div>
+            </div>
+
+            <!-- 3D Bar Chart -->
+            <div class="chart-container">
+                <h3><i class="fas fa-chart-bar" style="color: #3b82f6;"></i> GP-wise Distribution <span style="font-size:12px; font-weight:400; color:#64748b;">(3D effect)</span></h3>
+                <div class="chart-wrapper">
+                    <canvas id="gpChart"></canvas>
+                </div>
+            </div>
+
+            <div class="info-box" style="background:rgba(255,255,255,0.5); backdrop-filter:blur(4px); border-radius:24px; padding:16px 24px; border:1px solid rgba(255,255,255,0.4); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:14px; color:#3a5a7a;">
+                <span><i class="fas fa-check-circle" style="color: #1f8b4c;"></i> Live data from Google Sheets</span>
+                <span><i class="fas fa-sync-alt"></i> Auto‑refreshes on load</span>
+                <span><span class="badge" style="background:#dbeafe; padding:4px 16px; border-radius:40px; font-weight:600; font-size:13px; color:#1e4b7a;"><i class="fas fa-flag"></i> SIR DATA</span></span>
+            </div>
+            <div id="dashboardStatus" class="status-msg"><i class="fas fa-spinner fa-pulse"></i> Loading …</div>
+        </div>
+
+        <!-- ===== PAGE: DATA TABLE ===== -->
+        <div id="page-table" class="page">
+            <div class="toolbar">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search any column (partial match) ..." autocomplete="off">
+                </div>
+                <div class="actions">
+                    <button class="btn btn-outline" id="clearBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+                    <button class="btn btn-success" id="exportBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i>Part No.</th>
+                            <th><i class="fas fa-id-card"></i>Epic No.</th>
+                            <th><i class="fas fa-sort-numeric-up"></i>Sl</th>
+                            <th><i class="fas fa-user"></i>Voter Name</th>
+                            <th><i class="fas fa-venus-mars"></i>GENDER</th>
+                            <th><i class="fas fa-user-friends"></i>Father/Husband</th>
+                            <th><i class="fas fa-link"></i>Relation Type</th>
+                            <th><i class="fas fa-flag"></i>GP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="8" class="empty-state"><i class="fas fa-spinner fa-pulse" style="margin-right: 12px;"></i>Loading data …</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="footer-note">
+                <span><i class="fas fa-filter"></i> Showing <strong id="shownCount">0</strong> rows · partial match across all columns</span>
+                <span><i class="fas fa-cloud"></i> SIR DATA</span>
+            </div>
+            <div id="tableStatus" class="status-msg"><i class="fas fa-spinner fa-pulse"></i> Loading …</div>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            // ----- CONFIG -----
+            const GAS_URL =
+                'https://script.google.com/macros/s/AKfycbzCAIhBXKbpJJC73dPluqlIafC2Xj2ume60LM44EWSHE-PbMocC1MdP3MtvnT2zkU98cw/exec';
+            const HEADERS = ['Part No.', 'Epic No.', 'Sl', 'Voter Name', 'GENDER', 'Father/Husband', 'Relation Type', 'GP'];
+
+            // ----- STATE -----
+            let allRows = [];
+            let filteredRows = [];
+            let chartInstance = null;
+
+            // ----- DOM REFS -----
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const pages = {
+                dashboard: document.getElementById('page-dashboard'),
+                table: document.getElementById('page-table')
+            };
+            const totalRecordsEl = document.getElementById('totalRecords');
+            const maleCountEl = document.getElementById('maleCount');
+            const femaleCountEl = document.getElementById('femaleCount');
+            const dashboardStatus = document.getElementById('dashboardStatus');
+
+            const tableBody = document.getElementById('tableBody');
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const shownCountEl = document.getElementById('shownCount');
+            const tableStatus = document.getElementById('tableStatus');
+            const canvas = document.getElementById('gpChart');
+
+            // ----- TAB SWITCHING -----
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const pageId = btn.dataset.page;
+                    Object.keys(pages).forEach(key => {
+                        pages[key].classList.toggle('active', key === pageId);
+                    });
+                    // Refresh chart if switching to dashboard
+                    if (pageId === 'dashboard' && chartInstance) {
+                        setTimeout(() => chartInstance.resize(), 100);
+                    }
+                });
+            });
+
+            // ----- FETCH DATA -----
+            async function fetchData() {
+                try {
+                    const response = await fetch(GAS_URL, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    if (!Array.isArray(data)) throw new Error('Invalid data format');
+                    return data;
+                } catch (err) {
+                    throw new Error(`Failed to load: ${err.message}`);
+                }
+            }
+
+            // ----- BUILD 3D CHART (using custom 3D plugin) -----
+            function buildChart(gpData) {
+                const labels = Object.keys(gpData).sort();
+                const values = labels.map(label => gpData[label]);
+
+                // Color palette for 3D bars
+                const colors = [
+                    'rgba(59, 130, 246, 0.85)',
+                    'rgba(16, 185, 129, 0.85)',
+                    'rgba(236, 72, 153, 0.85)',
+                    'rgba(245, 158, 11, 0.85)',
+                    'rgba(139, 92, 246, 0.85)',
+                    'rgba(239, 68, 68, 0.85)',
+                    'rgba(6, 182, 212, 0.85)',
+                    'rgba(251, 146, 60, 0.85)',
+                    'rgba(99, 102, 241, 0.85)',
+                    'rgba(52, 211, 153, 0.85)',
+                ];
+
+                const backgroundColors = labels.map((_, i) => colors[i % colors.length]);
+                const borderColors = backgroundColors.map(c => c.replace('0.85', '1'));
+
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+
+                const ctx = canvas.getContext('2d');
+
+                // Register 3D plugin if available
+                let chartConfig = {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Voters per GP',
+                            data: values,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 2,
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: { size: 12, weight: '600' }
+                                },
+                                grid: {
+                                    color: 'rgba(0,0,0,0.06)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: { size: 11, weight: '600' },
+                                    maxRotation: 35,
+                                    minRotation: 25
+                                }
+                            }
+                        },
+                        layout: {
+                            padding: {
+                                top: 10,
+                                bottom: 10,
+                                left: 5,
+                                right: 5
+                            }
+                        }
+                    }
+                };
+
+                // Try to add 3D plugin if available
+                if (typeof Chart3D !== 'undefined') {
+                    chartConfig.options.plugins.chart3d = {
+                        enabled: true,
+                        alpha: 20,
+                        beta: 15,
+                        depth: 25,
+                        viewer: {
+                            autoRotate: false,
+                            rotateSpeed: 0.5
+                        }
+                    };
+                    chartConfig.plugins = [Chart3D];
+                } else {
+                    // Fallback: add 3D shadow effect using custom drawing
+                    console.warn('Chart3D plugin not available, using fallback styling');
+                }
+
+                chartInstance = new Chart(ctx, chartConfig);
+            }
+
+            // ----- UPDATE DASHBOARD & CHART -----
+            function updateDashboard(rows) {
+                const total = rows.length;
+                totalRecordsEl.textContent = total;
+
+                let male = 0,
+                    female = 0;
+                const gpCounts = {};
+
+                rows.forEach(row => {
+                    const val = row[4]?.toString().trim() || '';
+                    const upper = val.toUpperCase();
+                    if (upper === 'MALE' || upper === 'M') male++;
+                    else if (upper === 'FEMALE' || upper === 'F') female++;
+
+                    // GP-wise count (index 7)
+                    const gp = row[7]?.toString().trim() || 'Unknown';
+                    gpCounts[gp] = (gpCounts[gp] || 0) + 1;
+                });
+
+                maleCountEl.textContent = male;
+                femaleCountEl.textContent = female;
+                dashboardStatus.innerHTML =
+                    `<i class="fas fa-check-circle" style="color:#1f8b4c;"></i> Loaded ${total} records · ${Object.keys(gpCounts).length} GPs`;
+
+                // Build/update chart
+                if (Object.keys(gpCounts).length > 0) {
+                    buildChart(gpCounts);
+                } else {
+                    if (chartInstance) {
+                        chartInstance.destroy();
+                        chartInstance = null;
+                    }
+                }
+            }
+
+            // ----- RENDER TABLE -----
+            function renderTable(rows) {
+                if (!rows || rows.length === 0) {
+                    tableBody.innerHTML =
+                        `<tr><td colspan="8" class="empty-state"><i class="fas fa-search" style="margin-right: 10px;"></i>No records match</td></tr>`;
+                    shownCountEl.textContent = 0;
+                    return;
+                }
+                let html = '';
+                rows.forEach(row => {
+                    const cells = row.map(c => (c !== undefined && c !== null) ? c : '');
+                    let genderClass = 'badge-gender';
+                    const g = (cells[4] || '').toString().toUpperCase();
+                    if (g === 'MALE' || g === 'M') genderClass += ' male';
+                    else if (g === 'FEMALE' || g === 'F') genderClass += ' female';
+                    else genderClass += ' other';
+
+                    html += `<tr>
+                        <td><strong>${cells[0]}</strong></td>
+                        <td>${cells[1]}</td>
+                        <td>${cells[2]}</td>
+                        <td><span style="font-weight:600; color:#0b2b4a;">${cells[3]}</span></td>
+                        <td><span class="${genderClass}">${cells[4] || '—'}</span></td>
+                        <td>${cells[5]}</td>
+                        <td><span style="background:#eef4fa; padding:2px 14px; border-radius:30px; font-size:12px; font-weight:500;">${cells[6]}</span></td>
+                        <td><span style="background:#d9e6f5; padding:2px 14px; border-radius:30px; font-size:12px; font-weight:600; color:#1f4a7a;">${cells[7]}</span></td>
+                    </tr>`;
+                });
+                tableBody.innerHTML = html;
+                shownCountEl.textContent = rows.length;
+                tableStatus.innerHTML = `<i class="fas fa-check-circle" style="color:#1f8b4c;"></i> Showing ${rows.length} records`;
+            }
+
+            // ----- FILTER -----
+            function applyFilter(term) {
+                const searchTerm = term.trim().toLowerCase();
+                if (!searchTerm) {
+                    filteredRows = [...allRows];
+                } else {
+                    filteredRows = allRows.filter(row =>
+                        row.some(cell => cell !== undefined && cell !== null && cell.toString().toLowerCase().includes(
+                            searchTerm))
+                    );
+                }
+                renderTable(filteredRows);
+                // Update dashboard with filtered data (chart updates too)
+                updateDashboard(filteredRows);
+            }
+
+            // ----- EXPORT EXCEL -----
+            function exportExcel() {
+                if (!filteredRows || filteredRows.length === 0) {
+                    alert('No data to export.');
+                    return;
+                }
+                const exportData = [HEADERS, ...filteredRows];
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(exportData);
+                ws['!cols'] = HEADERS.map(h => ({ wch: Math.max(h.length, 14) }));
+                XLSX.utils.book_append_sheet(wb, ws, 'SIR_DATA');
+                XLSX.writeFile(wb, `SIR_DATA_${new Date().toISOString().slice(0,10)}.xlsx`);
+            }
+
+            // ----- INIT -----
+            async function init() {
+                try {
+                    const data = await fetchData();
+                    allRows = data.map(row => {
+                        const r = Array.isArray(row) ? row : [];
+                        while (r.length < 8) r.push('');
+                        return r;
+                    });
+                    filteredRows = [...allRows];
+
+                    // Update both views
+                    updateDashboard(allRows);
+                    renderTable(allRows);
+
+                    // Event listeners
+                    searchInput.addEventListener('input', (e) => applyFilter(e.target.value));
+                    clearBtn.addEventListener('click', () => {
+                        searchInput.value = '';
+                        applyFilter('');
+                    });
+                    exportBtn.addEventListener('click', exportExcel);
+
+                } catch (err) {
+                    const errorMsg = err.message;
+                    dashboardStatus.className = 'status-msg error';
+                    dashboardStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${errorMsg}`;
+                    tableStatus.className = 'status-msg error';
+                    tableStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${errorMsg}`;
+                    tableBody.innerHTML =
+                        `<tr><td colspan="8" class="empty-state"><i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i>${errorMsg}</td></tr>`;
+                }
+            }
+
+            init();
+        })();
+    </script>
+
+</body>
+</html>
